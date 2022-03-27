@@ -1,0 +1,27 @@
+apiVersion: ceph.rook.io/v1
+kind: CephFilesystem
+metadata:
+  name: rook-ceph-filesystem
+  namespace: rook
+spec:
+  metadataPool:
+    replicated:
+      size: 1 # TODO set to 3
+      requireSafeReplicaSize: false
+  dataPools:
+    - name: rook-blockpool
+      failureDomain: host
+      replicated:
+        size: 1 # TODO set to 3
+        # Disallow setting pool with replica 1, this could lead to data loss without recovery.
+        # Make sure you're *ABSOLUTELY CERTAIN* that is what you want
+        requireSafeReplicaSize: false
+  # Whether to preserve filesystem after CephFilesystem CRD deletion
+  preserveFilesystemOnDelete: false
+  # The metadata service (mds) configuration
+  metadataServer:
+    # The number of active MDS instances
+    activeCount: 1
+    # Whether each active MDS instance will have an active standby with a warm metadata cache for faster failover.
+    # If false, standbys will be available, but will not have a warm cache.
+    activeStandby: true

@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: link-shortener
+  namespace: link-shortener
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - link.thetillhoff.de
+    secretName: ingress-tls
+  rules:
+  - host: link.thetillhoff.de
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: link-shortener
+            port:
+              number: 80

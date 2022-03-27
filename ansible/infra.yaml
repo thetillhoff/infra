@@ -1,0 +1,215 @@
+- name: Kubenodes configuration
+  hosts: kubenodes
+  remote_user: root
+
+  tasks:
+
+# Secure the system
+    - apt:
+        pkg:
+          - ufw
+    - ufw:
+        rule: limit
+        port: ssh
+        proto: tcp
+    - ufw:
+        rule: allow
+        src: '{{ item }}'
+      loop:
+        - 10.0.0.0/8
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+    - ufw:
+        state: enabled
+        policy: deny
+
+# System basics
+    - apt:
+        pkg:
+          - git
+
+# tailscale vpn
+    - apt:
+        pkg:
+          - gnupg
+    - ansible.builtin.apt_key:
+        url: https://pkgs.tailscale.com/stable/debian/bullseye.noarmor.gpg
+        state: present
+    - ansible.builtin.apt_repository:
+        repo: deb https://pkgs.tailscale.com/stable/debian {{ ansible_distribution_release }} main
+        update_cache: yes
+    - apt:
+        pkg:
+          - tailscale
+    - block:
+      - command: tailscale status
+        # This commands either fails with "Logged out." or succeeds with "Logged in. <...>"
+        changed_when: false
+      rescue:
+      - command: tailscale up --hostname={{ lookup('env', 'CLUSTER_NAME') }} --authkey {{ lookup('env', 'TAILSCALE_AUTH_TOKEN') }} --advertise-exit-node
+
+# Kubernetes prerequisites
+    - community.general.modprobe:
+        name: br_netfilter
+        state: present
+    - ansible.posix.sysctl:
+        name: net.bridge.bridge-nf-call-ip6tables
+        value: '1'
+        reload: yes
+    - ansible.posix.sysctl:
+        name: net.bridge.bridge-nf-call-iptables
+        value: '1'
+        reload: yes
+
+# Docker package preparation
+    - apt:
+        pkg:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+    - ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+    - ansible.builtin.apt_repository:
+        repo: deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+        update_cache: yes
+
+# Docker installation
+    - apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+
+    - ansible.builtin.file:
+        path: /etc/docker
+        state: directory
+
+    - ansible.builtin.copy:
+        dest: /etc/docker/daemon.json
+        content: |
+          {
+            "exec-opts": ["native.cgroupdriver=systemd"],
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "100m"
+            },
+            "storage-driver": "overlay2"
+          }
+      register: docker_daemon_config
+
+    - ansible.builtin.systemd:
+        name: docker
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+      when: docker_daemon_config.changed
+
+# kube* package preparations
+    - apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+    - ansible.builtin.apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+    - ansible.builtin.apt_repository:
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        update_cache: yes
+
+# kube* installation
+    - apt:
+        pkg:
+          - kubelet
+          - kubeadm
+          - kubectl
+    - dpkg_selections:
+        name: kubelet
+        selection: hold
+    - dpkg_selections:
+        name: kubeadm
+        selection: hold
+    - dpkg_selections:
+        name: kubectl
+        selection: hold
+
+# kubeadm init and kubeconfig creation
+    - stat:
+        path: ~/.kube/config
+      register: kube_config
+    - when: "not kube_config.stat.exists"
+      block:
+      - copy:
+          dest: "/tmp/kubeadm-clusterconfiguration.yaml"
+          content: |
+            apiVersion: kubeadm.k8s.io/v1beta3
+            kind: ClusterConfiguration
+            controlPlaneEndpoint: "k8s.thetillhoff.de"
+            #apiServer:
+            #  extraArgs:
+            #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
+      - command: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
+      - shell: mkdir ~/.kube && cp /etc/kubernetes/admin.conf ~/.kube/config
+      - command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
+
+# applying kubernetes manifests
+    - name: Install helm3
+      shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      args:
+        creates: /usr/local/bin/helm
+
+    - name: Clone infra-repo
+      ansible.builtin.git:
+        repo: https://github.com/thetillhoff/infra
+        dest: ./infra
+        depth: 1
+
+    - name: Install cilium CNI
+      shell: |
+        helm repo add cilium https://helm.cilium.io/
+        helm upgrade --install cilium cilium/cilium --version 1.10.5 --namespace kube-system --set operator.replicas=1
+
+    - name: Create custom metallb configmap
+      copy:
+        content: '{{ lookup("template", "./metallb.configmap.yaml.j2") }}'
+        dest: infra/kubernetes/metallb.configmap.yaml
+
+    - name: Install metallb
+      shell: |
+        helm repo add bitnami https://charts.bitnami.com/bitnami
+        helm upgrade --install metallb bitnami/metallb -f metallb.values.yaml --namespace metallb --create-namespace
+        kubectl apply -f metallb.configmap.yaml --namespace metallb
+      args:
+        chdir: infra/kubernetes
+
+    - name: Install ingress-nginx
+      shell: |
+        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+        helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx -f ingress-nginx.values.yaml --namespace ingress-nginx --create-namespace
+      args:
+        chdir: infra/kubernetes
+
+    - name: Install cert-manager
+      shell: |
+        helm repo add jetstack https://charts.jetstack.io
+        helm upgrade --install cert-manager jetstack/cert-manager -f cert-manager.values.yaml --namespace cert-manager --create-namespace
+        kubectl apply -k ./cert-manager --namespace cert-manager
+      args:
+        chdir: infra/kubernetes
+
+    - name: Install rook
+      shell: |
+        helm repo add rook https://charts.rook.io/release
+        helm upgrade --install rook-operator rook/rook-ceph -f rook-operator.values.yaml --namespace rook --create-namespace
+        kubectl apply -f rook-toolbox.deployment.yaml --namespace rook
+        kubectl apply -k ./rook --namespace rook
+      args:
+        chdir: infra/kubernetes
+
+    - name: Install apps
+      shell: |
+        kubectl apply -k ./apps
+      args:
+        chdir: infra/kubernetes

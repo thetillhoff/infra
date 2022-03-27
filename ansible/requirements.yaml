@@ -1,0 +1,5 @@
+collections:
+# modprobe
+- community.general
+# sysctl
+- ansible.posix

@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: thetillhoff
+  namespace: thetillhoff
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - thetillhoff.de
+    secretName: ingress-tls
+  rules:
+  - host: thetillhoff.de
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: thetillhoff
+            port:
+              number: 80
