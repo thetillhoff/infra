@@ -1,0 +1,31 @@
+name: Destroy deployment
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  delete:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+      - uses: actions/checkout@v2
+
+      - run: |
+          terraform init \
+          -input=false
+        working-directory: ./terraform
+
+      - run: |
+          terraform destroy \
+          -auto-approve
+        working-directory: ./terraform
+        env:
+          TF_VAR_SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+          TF_VAR_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
+          TF_VAR_CLOUDFLARE_APIKEY: ${{ secrets.TF_VAR_CLOUDFLARE_APIKEY }}
+          TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+          TF_VAR_DNS_SUFFIX: ${{ secrets.TF_VAR_DNS_SUFFIX }}

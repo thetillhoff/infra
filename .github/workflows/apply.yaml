@@ -1,0 +1,131 @@
+name: Run deployment
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+
+  validate:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+      - uses: actions/checkout@v2
+
+      - run: |
+          terraform init \
+          -input=false
+        working-directory: ./terraform
+
+      - run: |
+          terraform validate
+        working-directory: ./terraform
+        env:
+          TF_VAR_SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+          TF_VAR_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
+          TF_VAR_CLOUDFLARE_APIKEY: ${{ secrets.TF_VAR_CLOUDFLARE_APIKEY }}
+          TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+          TF_VAR_ROOT_DOMAIN: ${{ secrets.TF_VAR_ROOT_DOMAIN }}
+
+      - uses: dawidd6/action-ansible-playbook@v2
+        with:
+          # Required, playbook filepath
+          playbook: infra.yaml
+          # Optional, directory where playbooks live
+          directory: ./ansible
+          # Optional, SSH private key
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # # Optional, SSH known hosts file content
+          # known_hosts: .known_hosts
+          # # Optional, encrypted vault password
+          # vault_password: ${{secrets.VAULT_PASSWORD}}
+          # Optional, galaxy requirements filepath
+          requirements: requirements.yaml
+          # Optional, additional flags to pass to ansible-playbook
+          options: |
+            --inventory ../inventory.ini
+            --verbose
+            --check
+        env:
+          CLUSTER_NAME: pegasus
+          TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
+
+  plan:
+    needs: validate
+    runs-on: ubuntu-20.04
+    concurrency: ${{ github.workflow }}-terraform
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+      - uses: actions/checkout@v2
+
+      - run: |
+          terraform init \
+          -input=false
+        working-directory: ./terraform
+
+      - run: |
+          terraform plan \
+          -input=false
+        working-directory: ./terraform
+        env:
+          TF_VAR_SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+          TF_VAR_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
+          TF_VAR_CLOUDFLARE_APIKEY: ${{ secrets.TF_VAR_CLOUDFLARE_APIKEY }}
+          TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+          TF_VAR_ROOT_DOMAIN: ${{ secrets.TF_VAR_ROOT_DOMAIN }}
+
+  apply:
+    needs: plan
+    runs-on: ubuntu-20.04
+    concurrency: ${{ github.workflow }}-terraform
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+      - uses: actions/checkout@v2
+
+      - run: |
+          terraform init \
+          -input=false
+        working-directory: ./terraform
+
+      - run: |
+          terraform apply \
+          -input=false \
+          -auto-approve
+        working-directory: ./terraform
+        env:
+          TF_VAR_SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+          TF_VAR_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
+          TF_VAR_CLOUDFLARE_APIKEY: ${{ secrets.TF_VAR_CLOUDFLARE_APIKEY }}
+          TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+          TF_VAR_ROOT_DOMAIN: ${{ secrets.TF_VAR_ROOT_DOMAIN }}
+
+      - uses: dawidd6/action-ansible-playbook@v2
+        with:
+          # Required, playbook filepath
+          playbook: infra.yaml
+          # Optional, directory where playbooks live
+          directory: ./ansible
+          # Optional, SSH private key
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # # Optional, SSH known hosts file content
+          # known_hosts: .known_hosts
+          # # Optional, encrypted vault password
+          # vault_password: ${{secrets.VAULT_PASSWORD}}
+          # Optional, galaxy requirements filepath
+          requirements: requirements.yaml
+          # Optional, additional flags to pass to ansible-playbook
+          options: |
+            --inventory ../inventory.ini
+            --verbose
+        env:
+          CLUSTER_NAME: pegasus
+          TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
