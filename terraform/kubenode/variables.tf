@@ -9,13 +9,6 @@ variable "HCLOUD_TOKEN" {
   sensitive = true
 }
 
-variable "CLOUDFLARE_EMAIL" {
-  sensitive = true
-}
-variable "CLOUDFLARE_APIKEY" {
-  sensitive = true
-}
-
 #####
 
 variable "name" {}

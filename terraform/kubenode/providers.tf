@@ -3,9 +3,5 @@ terraform {
     hcloud = {
       source = "hetznercloud/hcloud"
     }
-
-    cloudflare = {
-      source = "cloudflare/cloudflare"
-    }
   }
 }
