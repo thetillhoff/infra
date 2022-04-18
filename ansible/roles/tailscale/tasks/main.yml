@@ -1,0 +1,19 @@
+# tailscale vpn
+- apt:
+    pkg:
+      - gnupg
+- ansible.builtin.apt_key:
+    url: https://pkgs.tailscale.com/stable/debian/{{ ansible_distribution_release }}.noarmor.gpg
+    state: present
+- ansible.builtin.apt_repository:
+    repo: deb https://pkgs.tailscale.com/stable/debian {{ ansible_distribution_release }} main
+    update_cache: yes
+- apt:
+    pkg:
+      - tailscale
+- block:
+  - command: tailscale status
+    # This commands either fails with "Logged out." or succeeds with "Logged in. <...>"
+    changed_when: false
+  rescue:
+  - command: tailscale up --hostname={{ lookup('env', 'CLUSTER_NAME') }} --authkey {{ lookup('env', 'TAILSCALE_AUTH_TOKEN') }} --advertise-exit-node

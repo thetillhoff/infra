@@ -1,0 +1,17 @@
+- name: Kubenodes configuration
+  hosts: kubenodes
+
+  # Requirements:
+  # - python installed -> `sudo apt-get install -y python3`
+  # - passwordless sudo
+
+  roles:
+    - basic
+    - tailscale
+    - kubernetes-requirements
+    - kubernetes
+    - metallb
+    - ingress-nginx
+    - cert-manager
+    - rook
+    - apps

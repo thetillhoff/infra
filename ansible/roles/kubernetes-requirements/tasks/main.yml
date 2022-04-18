@@ -1,0 +1,86 @@
+# Kubernetes prerequisites
+- community.general.modprobe:
+    name: br_netfilter
+    state: present
+- ansible.posix.sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: '1'
+    reload: yes
+- ansible.posix.sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: '1'
+    reload: yes
+
+# Docker package preparation
+- apt:
+    pkg:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+- ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+- ansible.builtin.apt_repository:
+    repo: deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+    update_cache: yes
+
+# Docker installation
+- apt:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+- ansible.builtin.file:
+    path: /etc/docker
+    state: directory
+
+- ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "100m"
+        },
+        "storage-driver": "overlay2"
+      }
+  register: docker_daemon_config
+
+- ansible.builtin.systemd:
+    name: docker
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+  when: docker_daemon_config.changed
+
+# kube* package preparations
+- apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+- ansible.builtin.apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+- ansible.builtin.apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    update_cache: yes
+
+# kube* package installations
+- apt:
+    pkg:
+      - kubelet
+      - kubeadm
+      - kubectl
+- dpkg_selections:
+    name: kubelet
+    selection: hold
+- dpkg_selections:
+    name: kubeadm
+    selection: hold
+- dpkg_selections:
+    name: kubectl
+    selection: hold

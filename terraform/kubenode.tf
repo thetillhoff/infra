@@ -2,7 +2,7 @@ module "kubenode" {
   source = "./kubenode"
   count = var.kubenode_master_instances
 
-  name = "kubenode-master-${count.index}"
+  name = "${var.CLUSTER_NAME}-kubenode-${count.index}"
   location = "nbg1"
 
   master = true

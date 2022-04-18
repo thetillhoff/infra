@@ -29,6 +29,7 @@ jobs:
           TF_VAR_CLOUDFLARE_APIKEY: ${{ secrets.TF_VAR_CLOUDFLARE_APIKEY }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
           TF_VAR_ROOT_DOMAIN: ${{ secrets.TF_VAR_ROOT_DOMAIN }}
+          TF_VAR_CLUSTER_NAME: pegasus
 
       - uses: dawidd6/action-ansible-playbook@v2
         with:
@@ -50,8 +51,9 @@ jobs:
             --verbose
             --check
         env:
-          CLUSTER_NAME: pegasus
+          CONTROL_PLANE_ENDPOINT: k8s.${{ secrets.TF_VAR_ROOT_DOMAIN }}
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
+          CLUSTER_NAME: pegasus
 
   plan:
     needs: validate
@@ -79,6 +81,7 @@ jobs:
           TF_VAR_CLOUDFLARE_APIKEY: ${{ secrets.TF_VAR_CLOUDFLARE_APIKEY }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
           TF_VAR_ROOT_DOMAIN: ${{ secrets.TF_VAR_ROOT_DOMAIN }}
+          TF_VAR_CLUSTER_NAME: pegasus
 
   apply:
     needs: plan
@@ -107,6 +110,7 @@ jobs:
           TF_VAR_CLOUDFLARE_APIKEY: ${{ secrets.TF_VAR_CLOUDFLARE_APIKEY }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
           TF_VAR_ROOT_DOMAIN: ${{ secrets.TF_VAR_ROOT_DOMAIN }}
+          TF_VAR_CLUSTER_NAME: pegasus
 
       - uses: dawidd6/action-ansible-playbook@v2
         with:
@@ -127,5 +131,6 @@ jobs:
             --inventory ../inventory.ini
             --verbose
         env:
-          CLUSTER_NAME: pegasus
+          CONTROL_PLANE_ENDPOINT: k8s.${{ secrets.TF_VAR_ROOT_DOMAIN }}
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
+          CLUSTER_NAME: pegasus

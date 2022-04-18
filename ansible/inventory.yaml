@@ -1,0 +1,11 @@
+all:
+  children:
+    blackhole:
+      hosts:
+        blackhole:
+          ansible_user: thetillhoff
+          ansible_become: true
+    kubenodes:
+      hosts:
+        pegasus:
+          ansible_user: root

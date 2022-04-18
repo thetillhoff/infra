@@ -1,0 +1,12 @@
+- name: Create custom metallb configmap
+  copy:
+    content: '{{ lookup("template", "./templates/metallb.configmap.yaml.j2") }}'
+    dest: infra/kubernetes/metallb.configmap.yaml
+
+- name: Install metallb
+  shell: |
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm upgrade --install metallb bitnami/metallb -f metallb.values.yaml --namespace metallb --create-namespace
+    kubectl apply -f metallb.configmap.yaml --namespace metallb
+  args:
+    chdir: infra/kubernetes

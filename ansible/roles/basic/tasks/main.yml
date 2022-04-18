@@ -1,0 +1,29 @@
+# Secure the system
+- apt:
+    pkg:
+      - ufw
+- ufw: # refuse connections from IP addresses that attempt to log in or connect more than 6 times in 30 seconds
+    rule: limit
+    port: ssh
+    proto: tcp
+- ufw: # allow connections from private ips
+    rule: allow
+    src: '{{ item }}'
+  loop:
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+- ufw: # enable firewall, deny by default
+    state: enabled
+    policy: deny
+
+# System basics
+- apt:
+    pkg:
+      - git
+
+- name: Clone infra-repo
+  ansible.builtin.git:
+    repo: https://github.com/thetillhoff/infra
+    dest: ./infra
+    depth: 1
