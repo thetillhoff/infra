@@ -10,8 +10,8 @@
     - tailscale
     - kubernetes-requirements
     - kubernetes
-    - metallb
-    - ingress-nginx
-    - cert-manager
-    - rook
-    - apps
+    #- metallb
+    #- ingress-nginx
+    #- cert-manager
+    #- rook
+    #- apps

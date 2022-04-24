@@ -16,4 +16,4 @@
     # This commands either fails with "Logged out." or succeeds with "Logged in. <...>"
     changed_when: false
   rescue:
-  - command: tailscale up --hostname={{ lookup('env', 'CLUSTER_NAME') }} --authkey {{ lookup('env', 'TAILSCALE_AUTH_TOKEN') }} --advertise-exit-node
+  - command: tailscale up --hostname={{ inventory_hostname }} --authkey {{ lookup('env', 'TAILSCALE_AUTH_TOKEN') }} --advertise-exit-node

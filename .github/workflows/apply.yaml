@@ -112,25 +112,25 @@ jobs:
           TF_VAR_ROOT_DOMAIN: ${{ secrets.TF_VAR_ROOT_DOMAIN }}
           TF_VAR_CLUSTER_NAME: pegasus
 
-      # - uses: dawidd6/action-ansible-playbook@v2
-      #   with:
-      #     # Required, playbook filepath
-      #     playbook: kubenodes.yaml
-      #     # Optional, directory where playbooks live
-      #     directory: ./ansible
-      #     # Optional, SSH private key
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     # # Optional, SSH known hosts file content
-      #     # known_hosts: .known_hosts
-      #     # # Optional, encrypted vault password
-      #     # vault_password: ${{secrets.VAULT_PASSWORD}}
-      #     # Optional, galaxy requirements filepath
-      #     requirements: requirements.yaml
-      #     # Optional, additional flags to pass to ansible-playbook
-      #     options: |
-      #       --inventory ../inventory.ini
-      #       --verbose
-      #   env:
-      #     CONTROL_PLANE_ENDPOINT: k8s.${{ secrets.TF_VAR_ROOT_DOMAIN }}
-      #     TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
-      #     CLUSTER_NAME: pegasus
+      - uses: dawidd6/action-ansible-playbook@v2
+        with:
+          # Required, playbook filepath
+          playbook: kubenodes.yaml
+          # Optional, directory where playbooks live
+          directory: ./ansible
+          # Optional, SSH private key
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # # Optional, SSH known hosts file content
+          # known_hosts: .known_hosts
+          # # Optional, encrypted vault password
+          # vault_password: ${{secrets.VAULT_PASSWORD}}
+          # Optional, galaxy requirements filepath
+          requirements: requirements.yaml
+          # Optional, additional flags to pass to ansible-playbook
+          options: |
+            --inventory ../inventory.ini
+            --verbose
+        env:
+          CONTROL_PLANE_ENDPOINT: k8s.${{ secrets.TF_VAR_ROOT_DOMAIN }}
+          TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
+          CLUSTER_NAME: pegasus

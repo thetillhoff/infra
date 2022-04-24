@@ -1,28 +1,37 @@
 # kubeadm init and kubeconfig creation
-- stat:
-    path: ~/.kube/config
-  register: kube_config
-- when: "not kube_config.stat.exists"
+
+- when: inventory_hostname == kubenodes[0]
   block:
-  - copy:
-      dest: "/tmp/kubeadm-clusterconfiguration.yaml"
-      content: |
-        apiVersion: kubeadm.k8s.io/v1beta3
-        kind: ClusterConfiguration
-        controlPlaneEndpoint: "{{ lookup('env', 'CONTROL_PLANE_ENDPOINT') }}"
-        #apiServer:
-        #  extraArgs:
-        #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
-  - command: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
-  - shell: mkdir ~/.kube && cp /etc/kubernetes/admin.conf ~/.kube/config
-  - command: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable single-node workloads
+  - stat:
+      path: ~/.kube/config
+    register: kube_config
+  - when: "not kube_config.stat.exists"
+    block:
+    - copy:
+        dest: "/tmp/kubeadm-clusterconfiguration.yaml"
+        content: |
+          apiVersion: kubeadm.k8s.io/v1beta3
+          kind: ClusterConfiguration
+          controlPlaneEndpoint: "{{ lookup('env', 'CONTROL_PLANE_ENDPOINT') }}"
+          #apiServer:
+          #  extraArgs:
+          #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
+    - command: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
 
-- name: Install helm3
-  shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-  args:
-    creates: /usr/local/bin/helm
+    
 
-- name: Install cilium CNI
-  shell: |
-    helm repo add cilium https://helm.cilium.io/
-    helm upgrade --install cilium cilium/cilium --version 1.10.5 --namespace kube-system --set operator.replicas=1
+  - fetch:
+      src: /etc/kubernetes/admin.conf
+      dest: ./kube.config
+
+  - command: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable workloads on master nodes
+
+  - name: Install helm3
+    shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    args:
+      creates: /usr/local/bin/helm
+
+  - name: Install cilium CNI
+    shell: |
+      helm repo add cilium https://helm.cilium.io/
+      helm upgrade --install cilium cilium/cilium --version 1.10.5 --namespace kube-system --set operator.replicas=1
