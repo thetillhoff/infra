@@ -5,7 +5,7 @@ module "kubenodes" {
   depends_on = [hcloud_load_balancer.kubernetes]
 
   cluster-name = "${var.CLUSTER_NAME}"
-  index = "${count.index}"
+  index = "${count.index + 1}"
   location = var.location
   nodetype = "cx21"
   network_id = hcloud_network.kubernetes.id
