@@ -11,11 +11,14 @@ variable "HCLOUD_TOKEN" {
 
 #####
 
-variable "name" {}
+variable "cluster-name" {}
+variable "index" {}
 variable "location" {}
-# masters don't have attached storage (only their root disk)
-variable "master" {type = bool}
+variable "nodetype" {}
 variable "storagesize" {
   type = number
   default = 0
 }
+variable "network_id" {}
+variable "ssh_key_id" {}
+variable "load_balancer_id" {}

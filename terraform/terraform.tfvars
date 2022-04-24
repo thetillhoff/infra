@@ -1,2 +1,2 @@
-kubenode_master_instances=1
+kubenode_master_instances=3
 storagesize=10
