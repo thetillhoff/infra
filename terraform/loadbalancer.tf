@@ -10,7 +10,7 @@ resource "hcloud_load_balancer" "kubernetes" {
 
 resource "hcloud_load_balancer_service" "https" {
   load_balancer_id = hcloud_load_balancer.kubernetes.id
-  protocol = tcp
+  protocol = "tcp"
   listen_port = 443
   destination_port = 443
 
