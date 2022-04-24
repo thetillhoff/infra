@@ -29,3 +29,4 @@ jobs:
           TF_VAR_CLOUDFLARE_APIKEY: ${{ secrets.TF_VAR_CLOUDFLARE_APIKEY }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
           TF_VAR_DNS_SUFFIX: ${{ secrets.TF_VAR_DNS_SUFFIX }}
+          TF_VAR_CLUSTER_NAME: pegasus
