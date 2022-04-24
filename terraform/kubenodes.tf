@@ -4,7 +4,7 @@ module "kubenodes" {
 
   cluster-name = "${var.CLUSTER_NAME}"
   index = "${count.index}"
-  location = "${var.location}"
+  location = var.location
   nodetype = "cx21"
   network_id = hcloud_network.kubernetes.id
   ssh_key_id = hcloud_ssh_key.infra.id
