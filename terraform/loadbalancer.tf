@@ -1,4 +1,5 @@
 resource "hcloud_load_balancer" "kubernetes" {
+  depends_on = hcloud_network.kubernetes
   name = "kubernetes"
   load_balancer_type = "lb11"
   location = "${var.location}"
@@ -6,6 +7,12 @@ resource "hcloud_load_balancer" "kubernetes" {
   algorithm {
     type = "least_connections"
   }
+}
+
+resource "hcloud_load_balancer_network" "kubernetes" {
+  load_balancer_id = hcloud_load_balancer.kubernetes.id
+  network_id = hcloud_network.kubernetes.id
+  ip = "10.8.0.1"
 }
 
 resource "hcloud_load_balancer_service" "https" {
