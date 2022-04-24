@@ -3,7 +3,9 @@ resource "hcloud_load_balancer" "kubernetes" {
   load_balancer_type = "lb11"
   location = "${var.location}"
 
-  algorithm = "least_connections"
+  algorithm {
+    type = "least_connections"
+  }
 }
 
 resource "hcloud_load_balancer_service" "https" {
