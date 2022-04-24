@@ -1,5 +1,5 @@
 resource "hcloud_load_balancer" "kubernetes" {
-  depends_on = hcloud_network.kubernetes
+  depends_on = [hcloud_network.kubernetes]
   name = "kubernetes"
   load_balancer_type = "lb11"
   location = "${var.location}"
