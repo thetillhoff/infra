@@ -2,6 +2,8 @@ module "kubenodes" {
   source = "./kubenode"
   count = var.kubenode_master_instances
 
+  depends_on = [hcloud_load_balancer.kubernetes]
+
   cluster-name = "${var.CLUSTER_NAME}"
   index = "${count.index}"
   location = var.location
