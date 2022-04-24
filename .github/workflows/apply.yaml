@@ -34,7 +34,7 @@ jobs:
       - uses: dawidd6/action-ansible-playbook@v2
         with:
           # Required, playbook filepath
-          playbook: infra.yaml
+          playbook: kubenodes.yaml
           # Optional, directory where playbooks live
           directory: ./ansible
           # Optional, SSH private key
@@ -115,7 +115,7 @@ jobs:
       # - uses: dawidd6/action-ansible-playbook@v2
       #   with:
       #     # Required, playbook filepath
-      #     playbook: infra.yaml
+      #     playbook: kubenodes.yaml
       #     # Optional, directory where playbooks live
       #     directory: ./ansible
       #     # Optional, SSH private key
