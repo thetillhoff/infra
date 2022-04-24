@@ -11,7 +11,7 @@ resource "hcloud_load_balancer" "kubernetes" {
 resource "hcloud_load_balancer_network" "kubernetes" {
   load_balancer_id = hcloud_load_balancer.kubernetes.id
   network_id = hcloud_network.kubernetes.id
-  ip = "10.8.0.1"
+  ip = "10.8.255.254"
 }
 
 resource "hcloud_load_balancer_service" "https" {
