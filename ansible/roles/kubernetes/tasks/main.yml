@@ -1,6 +1,6 @@
 # kubeadm init and kubeconfig creation
 
-- when: inventory_hostname == kubenodes[0]
+- run_once: true
   block:
   - stat:
       path: ~/.kube/config
@@ -18,7 +18,7 @@
           #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
     - command: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
 
-    
+
 
   - fetch:
       src: /etc/kubernetes/admin.conf
