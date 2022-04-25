@@ -19,6 +19,7 @@
     - command: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
 
   - command: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable workloads on master nodes
+    ignore_errors: yes
     environment:
       KUBECONFIG: /etc/kubernetes/admin.conf
 
