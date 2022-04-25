@@ -3,7 +3,7 @@
 - run_once: true
   block:
   - stat:
-      path: ~/.kube/config
+      path: /etc/kubernetes/admin.conf
     register: kube_config
   - when: "not kube_config.stat.exists"
     block:
@@ -17,8 +17,6 @@
           #  extraArgs:
           #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
     - command: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
-
-
 
   - fetch:
       src: /etc/kubernetes/admin.conf
