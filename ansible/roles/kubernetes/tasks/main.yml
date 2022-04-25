@@ -23,6 +23,8 @@
       dest: ./kube.config
 
   - command: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable workloads on master nodes
+    environment:
+      KUBECONFIG: ./kube.config
 
   - name: Install helm3
     shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
