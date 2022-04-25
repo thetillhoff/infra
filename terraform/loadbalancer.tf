@@ -29,7 +29,7 @@ resource "hcloud_load_balancer_service" "https" {
   }
 }
 
-resource "hcloud_load_balancer_service" "https" {
+resource "hcloud_load_balancer_service" "controlplane" {
   load_balancer_id = hcloud_load_balancer.kubernetes.id
   protocol = "tcp"
   listen_port = 6443
