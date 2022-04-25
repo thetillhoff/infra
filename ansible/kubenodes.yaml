@@ -11,8 +11,7 @@
     - tailscale
     - kubernetes-requirements
     - kubernetes
-    #- metallb
-    #- ingress-nginx
-    #- cert-manager
+    - ingress-nginx
+    - cert-manager
     #- rook
     #- apps
