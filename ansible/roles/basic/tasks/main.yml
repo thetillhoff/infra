@@ -18,12 +18,14 @@
     policy: deny
 
 # System basics
-- apt:
-    pkg:
-      - git
+- run_once: true
+  block:
+  - apt:
+      pkg:
+        - git
 
-- name: Clone infra-repo
-  ansible.builtin.git:
-    repo: https://github.com/thetillhoff/infra
-    dest: ./infra
-    depth: 1
+  - name: Clone infra-repo
+    ansible.builtin.git:
+      repo: https://github.com/thetillhoff/infra
+      dest: ./infra
+      depth: 1

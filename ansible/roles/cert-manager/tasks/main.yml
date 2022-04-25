@@ -1,9 +1,11 @@
-- name: Install cert-manager
-  shell: |
-    helm repo add jetstack https://charts.jetstack.io
-    helm upgrade --install cert-manager jetstack/cert-manager -f cert-manager.values.yaml --namespace cert-manager --create-namespace
-    kubectl apply -k ./cert-manager --namespace cert-manager
-  environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
-  args:
-    chdir: infra/kubernetes
+- run_once: true
+  block:
+  - name: Install cert-manager
+    shell: |
+      helm repo add jetstack https://charts.jetstack.io
+      helm upgrade --install cert-manager jetstack/cert-manager -f cert-manager.values.yaml --namespace cert-manager --create-namespace
+      kubectl apply -k ./cert-manager --namespace cert-manager
+    environment:
+      KUBECONFIG: /etc/kubernetes/admin.conf
+    args:
+      chdir: infra/kubernetes

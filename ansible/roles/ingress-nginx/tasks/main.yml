@@ -1,8 +1,10 @@
-- name: Install ingress-nginx
-  shell: |
-    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-    helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx -f ingress-nginx.values.yaml --namespace ingress-nginx --create-namespace
-  environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
-  args:
-    chdir: infra/kubernetes
+- run_once: true
+  block:
+  - name: Install ingress-nginx
+    shell: |
+      helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+      helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx -f ingress-nginx.values.yaml --namespace ingress-nginx --create-namespace
+    environment:
+      KUBECONFIG: /etc/kubernetes/admin.conf
+    args:
+      chdir: infra/kubernetes
