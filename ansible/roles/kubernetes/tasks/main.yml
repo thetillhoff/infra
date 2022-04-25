@@ -18,13 +18,9 @@
           #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
     - command: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
 
-  - fetch:
-      src: /etc/kubernetes/admin.conf
-      dest: ./kube.config
-
   - command: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable workloads on master nodes
     environment:
-      KUBECONFIG: ./kube.config
+      KUBECONFIG: /etc/kubernetes/admin.conf
 
   - name: Install helm3
     shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -35,3 +31,5 @@
     shell: |
       helm repo add cilium https://helm.cilium.io/
       helm upgrade --install cilium cilium/cilium --version 1.10.5 --namespace kube-system --set operator.replicas=1
+    environment:
+      KUBECONFIG: /etc/kubernetes/admin.conf
