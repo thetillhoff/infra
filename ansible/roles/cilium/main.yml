@@ -1,0 +1,10 @@
+- run_once: true
+  block:
+  - name: Install cilium CNI
+    shell: |
+      helm repo add cilium https://helm.cilium.io/
+      helm upgrade --install cilium cilium/cilium --version 1.10.5 --namespace kube-system # --set operator.replicas=1
+    environment:
+      KUBECONFIG: /etc/kubernetes/admin.conf
+    args:
+      chdir: infra/kubernetes
