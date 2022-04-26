@@ -11,8 +11,8 @@
     - tailscale
     - kubernetes-requirements
     - kubernetes
-    - cilium
-    - ingress-nginx
-    - cert-manager
+    #- cilium
+    #- ingress-nginx
+    #- cert-manager
     #- rook
     #- apps
