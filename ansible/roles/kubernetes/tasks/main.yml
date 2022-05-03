@@ -1,26 +1,32 @@
 # kubeadm init and kubeconfig creation
 
 - when: inventory_hostname == groups['kubenodes'][0]
-  block:
-  - stat:
-      path: /etc/kubernetes/admin.conf
-    register: kube_config
-  - when: "not kube_config.stat.exists"
-    block:
-    - copy:
-        dest: "/tmp/kubeadm-clusterconfiguration.yaml"
-        content: |
-          apiVersion: kubeadm.k8s.io/v1beta3
-          kind: ClusterConfiguration
-          controlPlaneEndpoint: "{{ lookup('env', 'CONTROL_PLANE_ENDPOINT') }}"
-          #apiServer:
-          #  extraArgs:
-          #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
-    - shell: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
-    - shell: "kubeadm token create --print-join-command"
-      register: kubeadm_token_create_command
+  stat:
+    path: /etc/kubernetes/admin.conf
+  register: kube_config
 
 
+- when: not kube_config.stat.exists and inventory_hostname == groups['kubenodes'][0]
+  copy:
+    dest: "/tmp/kubeadm-clusterconfiguration.yaml"
+    content: |
+      apiVersion: kubeadm.k8s.io/v1beta3
+      kind: ClusterConfiguration
+      controlPlaneEndpoint: "{{ lookup('env', 'CONTROL_PLANE_ENDPOINT') }}"
+      #apiServer:
+      #  extraArgs:
+      #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
+- when: not kube_config.stat.exists and inventory_hostname == groups['kubenodes'][0]
+  shell: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
+- when: "inventory_hostname == groups['kubenodes'][0]"
+  community.crypto.x509_certificate_info:
+    path: /etc/kubernetes/pki/ca.crt
+  register: kubeadm_discovery_cert
+
+
+- when: inventory_hostname == groups['kubenodes'][0]
+  shell: "kubeadm token create"
+  register: kubeadm_token_create_command
 
 - when: inventory_hostname != groups['kubenodes'][0]
   block:
@@ -28,9 +34,11 @@
       var: kubeadm_token_create_command
   - debug:
       var: kubeadm_token_create_command.stdout_lines
-  - shell: "{{ kubeadm_token_create_command.stdout_lines }}" # kubeadm join ...
-  
+  - shell: "kubeadm join {{ lookup('env', 'CONTROL_PLANE_ENDPOINT') }}:6443 --token {{ kubeadm_token_create_command.stdout_lines }} --discovery-token-ca-cert-hash sha256:{{ kubeadm_discovery_cert.public_key_fingerprints.sha256 | replace(':', '') }}"
+    ignore_errors: yes
 
+- when: inventory_hostname == groups['kubenodes'][0]
+  shell: kubeadm token delete {{ kubeadm_token_create_command.stdout_lines }}
 
 
 - when: inventory_hostname == groups['kubenodes'][0]
