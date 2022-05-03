@@ -4,7 +4,7 @@ resource "hcloud_server" "kubenode" {
   server_type = "cx21"
   image = "debian-11"
   location = var.location
-  user_data = file("kubenode/cloud-init.yaml")
+  user_data = file("cloud-init.yaml")
   ssh_keys = [hcloud_ssh_key.infra.id]
 
   connection {
