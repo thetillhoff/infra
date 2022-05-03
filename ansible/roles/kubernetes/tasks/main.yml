@@ -16,8 +16,8 @@
           #apiServer:
           #  extraArgs:
           #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
-    - command: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
-    - command: "kubeadm token create --print-join-command"
+    - shell: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
+    - shell: "kubeadm token create --print-join-command"
       register: kubeadm_token_create_command
 
 
@@ -28,13 +28,13 @@
       var: kubeadm_token_create_command
   - debug:
       var: kubeadm_token_create_command.stdout_lines
-  - command: "{{ kubeadm_token_create_command.stdout_lines }}" # kubeadm join ...
+  - shell: "{{ kubeadm_token_create_command.stdout_lines }}" # kubeadm join ...
   
 
 
 
 - when: inventory_hostname == groups['kubenodes'][0]
-  command: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable workloads on master nodes
+  shell: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable workloads on master nodes
   ignore_errors: yes
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
