@@ -3,3 +3,5 @@ collections:
 - community.general
 # sysctl
 - ansible.posix
+# helm/kubernetes
+- kubernetes.core
