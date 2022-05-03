@@ -20,9 +20,15 @@
     - command: "kubeadm token create --print-join-command"
       register: kubeadm_token_create_command
 
+
+
 - when: inventory_hostname != groups['kubenodes'][0]
   block:
-  - command: "{{ kubeadm_token_create_command.stdout }}" # kubeadm join ...
+  - debug:
+      var: kubeadm_token_create_command
+  - debug:
+      var: kubeadm_token_create_command.stdout_lines
+  - command: "{{ kubeadm_token_create_command.stdout_lines }}" # kubeadm join ...
   
 
 
