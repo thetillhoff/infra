@@ -1,6 +1,6 @@
 # Create server
 resource "hcloud_server" "kubenode" {
-  name = "${var.cluster-name}-${var.index}"
+  name = "${var.cluster-name}"
   server_type = var.nodetype
   image = "debian-11"
   location = var.location
