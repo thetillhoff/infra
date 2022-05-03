@@ -5,19 +5,8 @@
   register: kube_config
 
 - when: not kube_config.stat.exists
-  copy:
-    dest: "/tmp/kubeadm-clusterconfiguration.yaml"
-    content: |
-      apiVersion: kubeadm.k8s.io/v1beta3
-      kind: ClusterConfiguration
-      controlPlaneEndpoint: "{{ lookup('env', 'CONTROL_PLANE_ENDPOINT') }}"
-      #apiServer:
-      #  extraArgs:
-      #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
-- when: not kube_config.stat.exists
-  shell: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
+  shell: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --control-plane-endpoint {{ lookup('env', 'CONTROL_PLANE_ENDPOINT') }} --ignore-preflight-errors=NumCPU"
 - when: not kube_config.stat.exists
   shell: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable workloads on master nodes
-  ignore_errors: yes
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
