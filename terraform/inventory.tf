@@ -1,6 +1,6 @@
 resource "local_file" "ansible_inventory" {
   content = templatefile("inventory.ini.tpl", {
-    kubenodes = [module.kubenode.public_ipv4_address]
+    kubenodes = [hcloud_server.kubenode.public_ipv4_address]
   })
   filename = "../inventory.ini"
 }

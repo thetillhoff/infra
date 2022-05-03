@@ -1,7 +1,7 @@
 # Create server
 resource "hcloud_server" "kubenode" {
-  name = "${var.cluster-name}"
-  server_type = var.nodetype
+  name = "${var.CLUSTER_NAME}"
+  server_type = "cx21"
   image = "debian-11"
   location = var.location
   user_data = file("kubenode/cloud-init.yaml")
