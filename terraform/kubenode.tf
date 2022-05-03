@@ -5,7 +5,7 @@ resource "hcloud_server" "kubenode" {
   image = "debian-11"
   location = var.location
   user_data = file("kubenode/cloud-init.yaml")
-  ssh_keys = ["${var.ssh_key_id}"]
+  ssh_keys = [hcloud_ssh_key.infra.id]
 
   connection {
     private_key = var.SSH_PRIVATE_KEY
