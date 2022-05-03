@@ -1,6 +1,6 @@
 # kubeadm init and kubeconfig creation
 
-- when: inventory_hostname == kubenodes[0]
+- when: inventory_hostname == groups['kubenodes'][0]
   block:
   - stat:
       path: /etc/kubernetes/admin.conf
@@ -20,14 +20,14 @@
     - command: "kubeadm token create --print-join-command"
       register: kubeadm_token_create_command
 
-- when: inventory_hostname != kubenodes[0]
+- when: inventory_hostname != groups['kubenodes'][0]
   block:
   - command: "{{ kubeadm_token_create_command.stdout }}" # kubeadm join ...
   
 
 
 
-- when: inventory_hostname == kubenodes[0]
+- when: inventory_hostname == groups['kubenodes'][0]
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable workloads on master nodes
   ignore_errors: yes
   environment:
