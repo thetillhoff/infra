@@ -56,6 +56,20 @@
     enabled: yes
   when: docker_daemon_config.changed
 
+# Containerd configuration
+- ansible.builtin.file:
+    path: /etc/containerd/config.toml
+    state: absent
+  when: docker_daemon_config.changed
+
+- ansible.builtin.systemd:
+    name: containerd
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+  when: docker_daemon_config.changed
+  
+
 # kube* package preparations
 - apt:
     pkg:
