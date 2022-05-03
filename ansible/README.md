@@ -1,5 +1,7 @@
 # ansible
 
+The roles in this folder are meant for *single-node* kubernetes clusters.
+
 ## Install requirements
 `ansible-galaxy install -r requirements.yaml`
 

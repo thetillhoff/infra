@@ -1,12 +1,10 @@
 # kubeadm init and kubeconfig creation
 
-- when: inventory_hostname == groups['kubenodes'][0]
-  stat:
+- stat:
     path: /etc/kubernetes/admin.conf
   register: kube_config
 
-
-- when: not kube_config.stat.exists and inventory_hostname == groups['kubenodes'][0]
+- when: not kube_config.stat.exists
   copy:
     dest: "/tmp/kubeadm-clusterconfiguration.yaml"
     content: |
@@ -16,32 +14,9 @@
       #apiServer:
       #  extraArgs:
       #    enable-admission-plugins: DefaultIngressClass,DefaultStorageClass
-- when: not kube_config.stat.exists and inventory_hostname == groups['kubenodes'][0]
+- when: not kube_config.stat.exists
   shell: "kubeadm init --config /tmp/kubeadm-clusterconfiguration.yaml --ignore-preflight-errors=NumCPU"
-- when: "inventory_hostname == groups['kubenodes'][0]"
-  community.crypto.x509_certificate_info:
-    path: /etc/kubernetes/pki/ca.crt
-  register: kubeadm_discovery_cert
-
-
-- when: inventory_hostname == groups['kubenodes'][0]
-  shell: "kubeadm token create"
-  register: kubeadm_token_create_command
-
-- when: inventory_hostname != groups['kubenodes'][0]
-  block:
-  - debug:
-      var: kubeadm_token_create_command
-  - debug:
-      var: kubeadm_token_create_command.stdout_lines
-  - shell: "kubeadm join {{ lookup('env', 'CONTROL_PLANE_ENDPOINT') }}:6443 --token {{ kubeadm_token_create_command.stdout_lines }} --discovery-token-ca-cert-hash sha256:{{ kubeadm_discovery_cert.public_key_fingerprints.sha256 | replace(':', '') }}"
-    ignore_errors: yes
-
-- when: inventory_hostname == groups['kubenodes'][0]
-  shell: kubeadm token delete {{ kubeadm_token_create_command.stdout_lines }}
-
-
-- when: inventory_hostname == groups['kubenodes'][0]
+- when: not kube_config.stat.exists
   shell: "kubectl taint nodes --all node-role.kubernetes.io/master-" # enable workloads on master nodes
   ignore_errors: yes
   environment:

@@ -12,13 +12,6 @@ variable "HCLOUD_TOKEN" {
 #####
 
 variable "cluster-name" {}
-variable "index" {}
 variable "location" {}
 variable "nodetype" {}
-variable "storagesize" {
-  type = number
-  default = 0
-}
-variable "network_id" {}
 variable "ssh_key_id" {}
-variable "load_balancer_id" {}

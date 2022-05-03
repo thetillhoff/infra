@@ -20,6 +20,4 @@ variable "CLOUDFLARE_APIKEY" {
 
 variable "ROOT_DOMAIN" {}
 variable "CLUSTER_NAME" {}
-variable "kubenode_master_instances" {type = number}
-variable "storagesize" {type = number}
 variable "location" {}
