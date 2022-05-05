@@ -1,10 +1,11 @@
-- ansible.builtin.file:
-    path: /etc/rancher/k3s/
-    state: directory
-
 - stat:
     path: /etc/rancher/k3s/config.yaml
   register: k3s_config
+
+- when: not k3s_config.stat.exists
+  ansible.builtin.file:
+    path: /etc/rancher/k3s/
+    state: directory
 
 - when: not k3s_config.stat.exists
   ansible.builtin.copy:
@@ -15,8 +16,7 @@
       #default-local-storage-path: ...
     dest: /etc/rancher/k3s/config.yaml
 
-- when: not k3s_config.stat.exists
-  command: curl -sfL https://get.k3s.io | sh -
+- command: curl -sfL https://get.k3s.io | sh -
 
 - stat:
     path: /root/.kube/config
