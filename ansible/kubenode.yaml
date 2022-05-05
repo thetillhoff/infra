@@ -9,10 +9,6 @@
   roles:
     - basic
     - tailscale
-    - kubernetes-requirements
-    - kubernetes
-    #- cilium
-    #- ingress-nginx
+    - k3s
     #- cert-manager
-    #- rook
     #- apps
