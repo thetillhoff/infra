@@ -72,6 +72,9 @@
     name: containerd
   register: containerd_service
 
+- ansible.builtin.debug:
+    var: containerd_service
+
 - command: containerd config default
   register: containerd_config_default
   when: containerd_service['ActiveState'] != 'active'
