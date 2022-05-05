@@ -1,9 +1,0 @@
-- kubernetes.core.helm:
-    release_name: cilium
-    release_namespace: kube-system
-    chart_repo_url: https://helm.cilium.io/
-    chart_ref: cilium/cilium
-    chart_version: 1.10.5
-    create_namespace: true
-    kubeconfig: /etc/kubernetes/admin.conf
-    wait: true
