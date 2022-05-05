@@ -23,6 +23,7 @@
   - apt:
       pkg:
         - git
+        - curl
 
   - name: Clone infra-repo
     ansible.builtin.git:
