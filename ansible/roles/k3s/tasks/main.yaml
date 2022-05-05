@@ -2,7 +2,7 @@
     path: /etc/rancher/k3s/config.yaml
   register: k3s_config
 
-- when: not kube_config.stat.exists
+- when: not k3s_config.stat.exists
   ansible.builtin.copy:
     content: |
       bind-address: {{ tailscale_ip.stdout }}
@@ -11,5 +11,5 @@
       #default-local-storage-path: ...
     dest: /etc/rancher/k3s/config.yaml
 
-- when: not kube_config.stat.exists
+- when: not k3s_config.stat.exists
   command: curl -sfL https://get.k3s.io | sh -
