@@ -27,6 +27,7 @@
 - ansible.builtin.unarchive:
     src: /tmp/containerd.tar.gz
     dest: /usr/local/
+    remote_src: yes
 
 - ansible.builtin.file:
     path: /tmp/containerd.tar.gz
@@ -56,6 +57,7 @@
 - ansible.builtin.unarchive:
     src: /tmp/cni-plugins.tar.gz
     dest: /opt/cni/bin/
+    remote_src: yes
 
 - ansible.builtin.file:
     path: /tmp/cni-plugins.tar.gz
