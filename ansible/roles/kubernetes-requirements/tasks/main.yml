@@ -2,73 +2,113 @@
 - community.general.modprobe:
     name: br_netfilter
     state: present
+- community.general.modprobe:
+    name: overlay
+    state: present
 - ansible.posix.sysctl:
-    name: net.bridge.bridge-nf-call-ip6tables
+    name: net.ipv4.ip_forward
     value: '1'
     reload: yes
 - ansible.posix.sysctl:
     name: net.bridge.bridge-nf-call-iptables
     value: '1'
     reload: yes
+- ansible.posix.sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: '1'
+    reload: yes
 
-# Docker package preparation
-- apt:
-    pkg:
-      - ca-certificates
-      - curl
-      - gnupg
-      - lsb-release
-- ansible.builtin.apt_key:
-    url: https://download.docker.com/linux/debian/gpg
-    state: present
-- ansible.builtin.apt_repository:
-    repo: deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
-    update_cache: yes
+# Install Containerd
+- get_url:
+    url: https://github.com/containerd/containerd/releases/download/v1.6.4/containerd-1.6.4-linux-amd64.tar.gz
+    dest: /tmp/containerd.tar.gz
+    checksum: sha256:https://github.com/containerd/containerd/releases/download/v1.6.4/containerd-1.6.4-linux-amd64.tar.gz.sha256sum
 
-# Docker installation
-- apt:
-    pkg:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
+- ansible.builtin.unarchive:
+    src: /tmp/containerd.tar.gz
+    dest: /usr/local/
 
 - ansible.builtin.file:
-    path: /etc/docker
+    path: /tmp/containerd.tar.gz
+    state: absent
+
+# Enable and start Containerd systemd service
+- get_url:
+    url: https://github.com/containerd/containerd/blob/main/containerd.service
+    dest: /usr/local/lib/systemd/system/containerd.service
+
+# Install Runc
+- get_url:
+    url: https://github.com/opencontainers/runc/releases/download/v1.1.1/runc.amd64
+    dest: /usr/local/sbin/runc
+    mode: '0755'
+
+# Install CNI plugins
+- ansible.builtin.file:
+    path: /opt/cni/bin/
     state: directory
 
-- ansible.builtin.copy:
-    dest: /etc/docker/daemon.json
-    content: |
-      {
-        "exec-opts": ["native.cgroupdriver=systemd"],
-        "log-driver": "json-file",
-        "log-opts": {
-          "max-size": "100m"
-        },
-        "storage-driver": "overlay2"
-      }
-  register: docker_daemon_config
+- get_url:
+    url: https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz
+    dest: /tmp/cni-plugins.tar.gz
+    checksum: sha256:https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz.sha256
 
-- ansible.builtin.systemd:
-    name: docker
-    daemon_reload: yes
-    state: restarted
-    enabled: yes
-  when: docker_daemon_config.changed
+- ansible.builtin.unarchive:
+    src: /tmp/cni-plugins.tar.gz
+    dest: /opt/cni/bin/
+
+- ansible.builtin.file:
+    path: /tmp/cni-plugins.tar.gz
+    state: absent
 
 # Containerd configuration
 - ansible.builtin.file:
-    path: /etc/containerd/config.toml
+    path: /etc/containerd/
+    state: directory
+
+- ansible.builtin.systemd:
+    name: containerd
+  register: containerd_service
+
+- command: containerd config default
+  register: containerd_config_default
+  when: containerd_service['ActiveState'] != 'active'
+
+# Enable Containerd systemd configuration
+- copy:
+    dest: /tmp/containerd_config.toml
+    content: "{{ containerd_config_default.stdout }}"
+  when: containerd_service['ActiveState'] != 'active'
+
+- lineinfile:
+    insertafter: '.*\[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options\]$'
+    line: '          SystemdCgroup = true'
+    state: present
+    path: /tmp/containerd_config.toml
+  when: containerd_service['ActiveState'] != 'active'
+
+- ansible.builtin.lineinfile:
+    path: /tmp/containerd_config.toml
     state: absent
-  when: docker_daemon_config.changed
+    line: '            SystemdCgroup = false'
+  when: containerd_service['ActiveState'] != 'active'
+
+- copy:
+    remote_src: true
+    src: /tmp/containerd_config.toml
+    dest: /etc/containerd/config.toml
+  when: containerd_service['ActiveState'] != 'active'
+
+- file:
+    path: /tmp/containerd_config.toml
+    state: absent
+  when: containerd_service['ActiveState'] != 'active'
 
 - ansible.builtin.systemd:
     name: containerd
     daemon_reload: yes
-    state: restarted
+    state: started
     enabled: yes
-  when: docker_daemon_config.changed
-  
 
 # kube* package preparations
 - apt:
