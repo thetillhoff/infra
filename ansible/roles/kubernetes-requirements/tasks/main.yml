@@ -35,7 +35,7 @@
 
 # Enable and start Containerd systemd service
 - get_url:
-    url: https://github.com/containerd/containerd/blob/main/containerd.service
+    url: https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
     dest: /etc/systemd/system/containerd.service
 
 # Install Runc
