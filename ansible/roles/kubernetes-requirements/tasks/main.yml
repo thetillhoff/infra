@@ -73,11 +73,11 @@
   register: containerd_service
 
 - ansible.builtin.debug:
-    var: containerd_service
+    var: containerd_service['status']
 
 - command: containerd config default
   register: containerd_config_default
-  when: containerd_service['ActiveState'] != 'active'
+  when: containerd_service['status']['ActiveState'] != 'active'
 
 # Enable Containerd systemd configuration
 - copy:
