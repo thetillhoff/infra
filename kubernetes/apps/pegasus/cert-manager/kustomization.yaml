@@ -3,7 +3,8 @@ kind: Kustomization
 
 resources:
 - cert-manager-1.8.0.yaml
-
-crds:
 - clusterIssuer-prod.yaml
 - clusterIssuer-staging.yaml
+
+crds:
+- cert-manager-crds.yaml
