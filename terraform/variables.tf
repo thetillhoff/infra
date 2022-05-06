@@ -18,6 +18,5 @@ variable "CLOUDFLARE_APIKEY" {
 
 #####
 
-variable "ROOT_DOMAIN" {}
 variable "CLUSTER_NAME" {}
 variable "location" {}
