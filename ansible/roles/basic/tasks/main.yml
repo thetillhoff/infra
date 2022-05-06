@@ -18,10 +18,11 @@
     policy: deny
 
 # System basics
-- apt:
-    pkg:
+- ansible.builtin.package:
+    name:
       - git
       - curl
+    state: present
 
 - ansible.builtin.git:
     repo: https://github.com/thetillhoff/infra
