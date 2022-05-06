@@ -10,8 +10,8 @@
 - when: not k3s_config.stat.exists
   ansible.builtin.copy:
     content: |
-      bind-address: {{ tailscale_ip.stdout }}
-      flannel-backend: wireguard
+      # bind-address: {{ tailscale_ip.stdout }}
+      # flannel-backend: wireguard
       # default storage path: /opt/local-path-provisioner
       #default-local-storage-path: ...
     dest: /etc/rancher/k3s/config.yaml

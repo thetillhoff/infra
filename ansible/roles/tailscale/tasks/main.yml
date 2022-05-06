@@ -21,3 +21,7 @@
 - command: tailscale ip -4
   register: tailscale_ip
   changed_when: false
+
+- ufw: # allow connections from private ips
+    rule: allow
+    dest: "{{ tailscale_ip.stdout }}"
