@@ -16,7 +16,9 @@
       #default-local-storage-path: ...
     dest: /etc/rancher/k3s/config.yaml
 
-- command: curl -sfL https://get.k3s.io | sh -
+- ansible.builtin.shell: curl -sfL https://get.k3s.io | sh -
+  args:
+    creates: /usr/local/bin/k3s
 
 - stat:
     path: /root/.kube/config
