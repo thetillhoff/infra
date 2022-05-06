@@ -29,6 +29,8 @@ spec:
           value: pw.thetillhoff.de
         - name: SIGNUPS_ALLOWED
           value: "false"
+        - name: SHOW_PASSWORD_HINT
+          value: "false"
 
         volumeMounts:
         - name: data
