@@ -1,3 +1,0 @@
-controller:
-  annotations:
-    ingressclass.kubernetes.io/is-default-class: "true"
