@@ -1,3 +1,8 @@
+- ufw: # allow connections from private ips
+    rule: allow
+    port: '443'
+    proto: tcp
+
 - shell: |
     kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
   args:
