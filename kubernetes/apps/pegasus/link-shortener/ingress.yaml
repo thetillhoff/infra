@@ -4,9 +4,8 @@ metadata:
   name: link-shortener
   namespace: link-shortener
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
-  ingressClassName: nginx
   tls:
   - hosts:
     - link.thetillhoff.de
