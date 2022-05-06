@@ -28,7 +28,7 @@ spec:
         - name: DOMAIN
           value: pw.thetillhoff.de
         - name: SIGNUPS_ALLOWED
-          value: false
+          value: "false"
 
         volumeMounts:
         - name: data
