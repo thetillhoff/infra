@@ -4,9 +4,8 @@ metadata:
   name: thetillhoff
   namespace: thetillhoff
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
-  ingressClassName: nginx
   tls:
   - hosts:
     - thetillhoff.de
