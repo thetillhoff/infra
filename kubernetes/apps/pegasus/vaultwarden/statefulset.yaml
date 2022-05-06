@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vaultwarden
+  namespace: vaultwarden
+spec:
+  serviceName: vaultwarden
+  selector:
+    matchLabels:
+      app: vaultwarden
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vaultwarden
+    spec:
+      containers:
+      - name: vaultwarden
+        image: vaultwarden/server
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            port: 80
+          initialDelaySeconds: 5
+
+        env:
+        - name: DOMAIN
+          value: pw.thetillhoff.de
+        - name: SIGNUPS_ALLOWED
+          value: false
+
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: vaultwarden
