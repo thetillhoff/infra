@@ -10,5 +10,4 @@
     - basic
     - tailscale
     - k3s
-    #- cert-manager
-    #- apps
+    - apps

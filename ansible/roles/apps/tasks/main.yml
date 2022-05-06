@@ -1,7 +1,4 @@
-- run_once: true
-  block:
-  - name: Install apps
-    shell: |
-      kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
-    args:
-      chdir: infra/kubernetes
+- shell: |
+    kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
+  args:
+    chdir: infra/kubernetes
