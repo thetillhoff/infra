@@ -21,7 +21,7 @@
 
 - when: not cert_manager_k8s_manifest.stat.exists
   ansible.builtin.file:
-    path: /etc/rancher/k3s/
+    path: /var/lib/rancher/k3s/server/manifests/
     state: directory
 
 - when: not cert_manager_k8s_manifest.stat.exists
