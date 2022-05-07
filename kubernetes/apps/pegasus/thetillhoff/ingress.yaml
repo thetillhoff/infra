@@ -5,7 +5,9 @@ metadata:
   namespace: thetillhoff
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/limit-rpm: 600
 spec:
+  ingressClassName: nginx
   tls:
   - hosts:
     - thetillhoff.de

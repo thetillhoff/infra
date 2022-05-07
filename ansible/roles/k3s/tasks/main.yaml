@@ -10,9 +10,25 @@
 - when: not k3s_config.stat.exists
   ansible.builtin.copy:
     content: |
+      disable: traefik
       # default storage path: /opt/local-path-provisioner
       #default-local-storage-path: ...
     dest: /etc/rancher/k3s/config.yaml
+
+
+- stat:
+    path: /var/lib/rancher/k3s/server/manifests/ingress-nginx.yaml
+  register: ingress-nginx_k8s_manifest
+
+- when: not ingress-nginx_k8s_manifest.stat.exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+
+- when: not ingress-nginx_k8s_manifest.stat.exists
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/cloud/deploy.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx.yaml
 
 
 - stat:
