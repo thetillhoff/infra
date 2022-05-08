@@ -5,7 +5,7 @@ metadata:
   namespace: vaultwarden
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    # nginx.ingress.kubernetes.io/limit-rpm: 600
+    nginx.ingress.kubernetes.io/limit-rpm: 20
 spec:
   ingressClassName: nginx
   tls:

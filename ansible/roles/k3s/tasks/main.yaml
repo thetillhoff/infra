@@ -1,3 +1,4 @@
+# k3s config
 - stat:
     path: /etc/rancher/k3s/config.yaml
   register: k3s_config
@@ -15,7 +16,7 @@
       #default-local-storage-path: ...
     dest: /etc/rancher/k3s/config.yaml
 
-
+# ingress-nginx
 - stat:
     path: /var/lib/rancher/k3s/server/manifests/ingress-nginx.yaml
   register: ingress_nginx_k8s_manifest
@@ -30,7 +31,72 @@
     url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/cloud/deploy.yaml
     dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx.yaml
 
+# ingress-nginx config
+- stat:
+    path: /var/lib/rancher/k3s/server/manifests/ingress-nginx-headers-configmap.yaml
+  register: ingress_nginx_configmap_k8s_manifest
 
+- when: not ingress_nginx_configmap_k8s_manifest.stat.exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+
+- when: not ingress_nginx_configmap_k8s_manifest.stat.exists
+  ansible.builtin.copy:
+    content: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: ingress-nginx-controller
+        namespace: ingress-nginx
+        labels:
+          app.kubernetes.io/name: ingress-nginx
+          app.kubernetes.io/part-of: ingress-nginx
+      data:
+        proxy-set-headers: "ingress-nginx/custom-headers"
+    dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx-headers-configmap.yaml
+
+# ingress-nginx headers config
+- stat:
+    path: /var/lib/rancher/k3s/server/manifests/ingress-nginx-headers-configmap.yaml
+  register: ingress_nginx_headers_k8s_manifest
+
+- when: not ingress_nginx_headers_k8s_manifest.stat.exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+
+- when: not ingress_nginx_headers_k8s_manifest.stat.exists
+  ansible.builtin.copy:
+    content: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: custom-headers
+        namespace: ingress-nginx
+      data:
+        X-Frame-Options: "sameorigin";
+        X-Content-Type-Options nosniff;
+        X-XSS-Protection: “1; mode=block”;
+        Referrer-Policy: 'same-origin';
+        Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+        ssl_prefer_server_ciphers on;
+        server-tokens: "false";
+    dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx-headers-configmap.yaml
+
+apiVersion: v1
+data:
+  X-Different-Name: "true"
+  X-Request-Start: t=${msec}
+  X-Using-Nginx-Controller: "true"
+kind: ConfigMap
+metadata:
+  name: custom-headers
+  namespace: ingress-nginx
+
+# cert-manager
 - stat:
     path: /var/lib/rancher/k3s/server/manifests/cert-manager.yaml
   register: cert_manager_k8s_manifest
@@ -45,12 +111,12 @@
     url: https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
     dest: /var/lib/rancher/k3s/server/manifests/cert-manager.yaml
 
-
+# k3s
 - ansible.builtin.shell: curl -sfL https://get.k3s.io | sh -
   args:
     creates: /usr/local/bin/k3s
 
-
+# kube config
 - stat:
     path: /root/.kube/config
   register: kube_config
