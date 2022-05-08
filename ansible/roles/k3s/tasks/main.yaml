@@ -33,7 +33,7 @@
 
 # ingress-nginx config
 - stat:
-    path: /var/lib/rancher/k3s/server/manifests/ingress-nginx-headers-configmap.yaml
+    path: /var/lib/rancher/k3s/server/manifests/ingress-nginx-configmap.yaml
   register: ingress_nginx_configmap_k8s_manifest
 
 - when: not ingress_nginx_configmap_k8s_manifest.stat.exists
@@ -54,7 +54,7 @@
           app.kubernetes.io/part-of: ingress-nginx
       data:
         proxy-set-headers: "ingress-nginx/custom-headers"
-    dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx-headers-configmap.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx-configmap.yaml
 
 # ingress-nginx headers config
 - stat:
