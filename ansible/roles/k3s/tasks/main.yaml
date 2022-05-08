@@ -86,16 +86,6 @@
         server-tokens: "false";
     dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx-headers-configmap.yaml
 
-apiVersion: v1
-data:
-  X-Different-Name: "true"
-  X-Request-Start: t=${msec}
-  X-Using-Nginx-Controller: "true"
-kind: ConfigMap
-metadata:
-  name: custom-headers
-  namespace: ingress-nginx
-
 # cert-manager
 - stat:
     path: /var/lib/rancher/k3s/server/manifests/cert-manager.yaml
