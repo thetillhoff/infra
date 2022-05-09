@@ -12,7 +12,7 @@ variable "HCLOUD_TOKEN" {
 variable "CLOUDFLARE_EMAIL" {
   sensitive = true
 }
-variable "CLOUDFLARE_APIKEY" {
+variable "CLOUDFLARE_APITOKEN" {
   sensitive = true
 }
 

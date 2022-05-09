@@ -26,5 +26,5 @@ provider "hcloud" {
 # Configure the Cloudflare Provider
 provider "cloudflare" {
   email   = var.CLOUDFLARE_EMAIL
-  api_key = var.CLOUDFLARE_APIKEY
+  api_token = var.CLOUDFLARE_APITOKEN
 }

@@ -13,7 +13,7 @@ SSH_PRIVATE_KEY # use \n as line seperator
 TERRAFORM_TOKEN
 TF_VAR_HCLOUD_TOKEN
 TF_VAR_CLOUDFLARE_EMAIL
-TF_VAR_CLOUDFLARE_APIKEY
+TF_VAR_CLOUDFLARE_APITOKEN
 
 TF_VAR_DNS_SUFFIX # basically the base domain; can vary between environments
 ```
