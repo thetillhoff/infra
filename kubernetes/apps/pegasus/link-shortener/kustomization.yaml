@@ -10,5 +10,6 @@ resources:
 
 configMapGenerator:
 - name: caddyfile
+  namespace: link-shortener
   files:
     - Caddyfile
