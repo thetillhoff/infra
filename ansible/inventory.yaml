@@ -1,7 +1,5 @@
 all:
-  children:
+  hosts:
     blackhole:
-      hosts:
-        blackhole:
-          ansible_user: thetillhoff
-          ansible_become: true
+      ansible_user: enforge
+      ansible_become: true

@@ -8,9 +8,6 @@
   roles:
     - basic
     - tailscale
-    - kubernetes-requirements
-    - kubernetes
-    - metallb
-    - ingress-nginx
-    - cert-manager
-    - apps
+    - zfs
+    - k3s
+    # - apps
