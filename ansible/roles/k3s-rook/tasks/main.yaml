@@ -1,0 +1,64 @@
+# rook prerequisites
+- apt:
+    pkg:
+      - lvm2
+
+# rook crds
+- stat:
+    path: /var/lib/rancher/k3s/server/manifests/rook-crds.yaml
+  register: rook_crds_k8s_manifest
+
+- when: not rook_crds_k8s_manifest.stat.exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+
+- when: not rook_crds_k8s_manifest.stat.exists
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/rook/rook/release-1.9/deploy/examples/crds.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/rook-crds.yaml
+
+# rook common
+- stat:
+    path: /var/lib/rancher/k3s/server/manifests/rook-common.yaml
+  register: rook_common_k8s_manifest
+
+- when: not rook_common_k8s_manifest.stat.exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+
+- when: not rook_common_k8s_manifest.stat.exists
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/rook/rook/release-1.9/deploy/examples/common.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/rook-common.yaml
+
+# rook operator
+- stat:
+    path: /var/lib/rancher/k3s/server/manifests/rook-operator.yaml
+  register: rook_operator_k8s_manifest
+
+- when: not rook_operator_k8s_manifest.stat.exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+
+- when: not rook_operator_k8s_manifest.stat.exists
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/rook/rook/release-1.9/deploy/examples/operator.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/rook-operator.yaml
+
+# rook single-node cluster
+- stat:
+    path: /var/lib/rancher/k3s/server/manifests/rook-cluster.yaml
+  register: rook_cluster_k8s_manifest
+
+- when: not rook_cluster_k8s_manifest.stat.exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+
+- when: not rook_cluster_k8s_manifest.stat.exists
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/rook/rook/release-1.9/deploy/examples/cluster-test.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/rook-cluster.yaml

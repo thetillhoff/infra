@@ -1,0 +1,14 @@
+# ingress-nginx
+- stat:
+    path: /var/lib/rancher/k3s/server/manifests/ingress-nginx.yaml
+  register: ingress_nginx_k8s_manifest
+
+- when: not ingress_nginx_k8s_manifest.stat.exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+
+- when: not ingress_nginx_k8s_manifest.stat.exists
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/cloud/deploy.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx.yaml

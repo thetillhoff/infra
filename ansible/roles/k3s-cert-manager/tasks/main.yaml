@@ -1,0 +1,14 @@
+# cert-manager
+- stat:
+    path: /var/lib/rancher/k3s/server/manifests/cert-manager.yaml
+  register: cert_manager_k8s_manifest
+
+- when: not cert_manager_k8s_manifest.stat.exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: directory
+
+- when: not cert_manager_k8s_manifest.stat.exists
+  ansible.builtin.get_url:
+    url: https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/cert-manager.yaml
