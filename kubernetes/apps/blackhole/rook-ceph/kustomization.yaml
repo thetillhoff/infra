@@ -9,4 +9,3 @@ resources:
 - StorageClass-cold.yaml
 - CephBlockPool-hot.yaml
 - StorageClass-hot.yaml
-
