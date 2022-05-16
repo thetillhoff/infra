@@ -1,0 +1,92 @@
+#################################################################################################################
+# Define the settings for the rook-ceph cluster with common settings for a small test cluster.
+# All nodes with available raw devices will be used for the Ceph cluster. One node is sufficient
+# in this example.
+
+# For example, to create the cluster:
+#   kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+#   kubectl create -f cluster-test.yaml
+#################################################################################################################
+# kind: ConfigMap
+# apiVersion: v1
+# metadata:
+#   name: rook-config-override
+#   namespace: rook-ceph
+# data:
+#   config: |
+#     [global]
+#     osd_pool_default_size = 1
+#     mon_warn_on_pool_no_redundancy = false
+#     bdev_flock_retry = 20
+#     bluefs_buffered_io = false
+# ---
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: rookCluster
+  namespace: rook-ceph
+spec:
+  cephVersion:
+    # The container image used to launch the Ceph daemon pods (mon, mgr, osd, mds, rgw).
+    # v15 is octopus, and v16 is pacific.
+    # RECOMMENDATION: In production, use a specific version tag instead of the general v14 flag, which pulls the latest release and could result in different
+    # versions running within the cluster. See tags available at https://hub.docker.com/r/ceph/ceph/tags/.
+    # If you want to be more precise, you can always use a timestamp tag such quay.io/ceph/ceph:v16.2.7-20220216
+    # This tag might not contain a new Ceph version, just security fixes from the underlying operating system, which will reduce vulnerabilities
+    image: quay.io/ceph/ceph:v17
+    allowUnsupported: false
+  # The path on the host where configuration files will be persisted. Must be specified.
+  # Important: if you reinstall the cluster, make sure you delete this directory from each host or else the mons will fail to start on the new cluster.
+  dataDirHostPath: /var/lib/rook
+  mon:
+    count: 1
+    allowMultiplePerNode: true
+  mgr:
+    count: 1
+    allowMultiplePerNode: true
+      modules:
+        # Several modules should not need to be included in this list. The "dashboard" and "monitoring" modules
+        # are already enabled by other settings in the cluster CR.
+      - name: pg_autoscaler
+        enabled: true
+  # enable the ceph dashboard for viewing cluster status
+  dashboard:
+    enabled: true
+  monitoring:
+    # requires Prometheus to be pre-installed
+    enabled: false
+  network:
+    connections:
+      # Whether to encrypt the data in transit across the wire to prevent eavesdropping the data on the network.
+      # The default is false. When encryption is enabled, all communication between clients and Ceph daemons, or between Ceph daemons will be encrypted.
+      # When encryption is not enabled, clients still establish a strong initial authentication and data integrity is still validated with a crc check.
+      # IMPORTANT: Encryption requires the 5.11 kernel for the latest nbd and cephfs drivers. Alternatively for testing only,
+      # you can set the "mounter: rbd-nbd" in the rbd storage class, or "mounter: fuse" in the cephfs storage class.
+      # The nbd and fuse drivers are *not* recommended in production since restarting the csi driver pod will disconnect the volumes.
+      encryption:
+        enabled: false
+      # Whether to compress the data in transit across the wire. The default is false.
+      # Requires Ceph Quincy (v17) or newer. Also see the kernel requirements above for encryption.
+      compression:
+        enabled: false
+      # enable host networking
+      provider: host
+      # Provide internet protocol version. IPv6, IPv4 or empty string are valid options. Empty string would mean IPv4
+      #ipFamily: "IPv6"
+      # Ceph daemons to listen on both IPv4 and Ipv6 networks
+      #dualStack: false
+  crashCollector:
+    disable: true
+  storage:
+    useAllNodes: true
+    useAllDevices: true
+  healthCheck:
+    daemonHealth:
+      mon:
+        interval: 45s
+        timeout: 600s
+  priorityClassNames:
+    all: system-node-critical
+    mgr: system-cluster-critical
+  disruptionManagement:
+    managePodBudgets: true

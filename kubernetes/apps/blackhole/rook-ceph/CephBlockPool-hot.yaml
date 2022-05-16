@@ -1,0 +1,14 @@
+# pool with ErasureCoding enabled
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: hot
+  namespace: rook-ceph
+spec:
+  failureDomain: osd
+  deviceClass: ssd
+  replicated:
+    size: 1
+  mirroring:
+    enabled: true
+    mode: pool

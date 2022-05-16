@@ -3,7 +3,6 @@
     port: '443'
     proto: tcp
 
-- shell: |
-    kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
+- shell: kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
   args:
     chdir: infra/kubernetes

@@ -1,0 +1,12 @@
+# pool with ErasureCoding enabled
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: cold
+  namespace: rook-ceph
+spec:
+  failureDomain: osd
+  deviceClass: hdd
+  erasureCoded:
+    dataChunks: 2
+    codingChunks: 1

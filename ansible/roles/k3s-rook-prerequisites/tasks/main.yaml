@@ -1,0 +1,4 @@
+# rook prerequisites
+- apt:
+    pkg:
+      - lvm2
