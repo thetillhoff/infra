@@ -10,10 +10,12 @@ terraform {
   required_providers {
     hcloud = {
       source = "hetznercloud/hcloud"
+      version = "1.35.1"
     }
 
     cloudflare = {
       source = "cloudflare/cloudflare"
+      version = "3.20.0"
     }
   }
 }
@@ -25,6 +27,5 @@ provider "hcloud" {
 
 # Configure the Cloudflare Provider
 provider "cloudflare" {
-  email     = var.CLOUDFLARE_EMAIL
   api_token = var.CLOUDFLARE_APITOKEN
 }
