@@ -28,7 +28,7 @@ spec:
         - name: DOMAIN
           value: https://pw.thetillhoff.de
         - name: SIGNUPS_ALLOWED
-          value: "false"
+          value: "true"
         - name: SHOW_PASSWORD_HINT
           value: "false"
         - name: INVITATIONS_ALLOWED
