@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: umami
+  namespace: umami
+spec:
+  serviceName: umami
+  selector:
+    matchLabels:
+      app: umami
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: umami
+    spec:
+      containers:
+      - name: umami
+        image: docker.umami.is/umami-software/umami:mysql-latest
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            port: 80
+          initialDelaySeconds: 5
+
+        env:
+        - name: HOSTNAME
+          value: analytics.thetillhoff.de
+        - name: FORCE_SSL
+          value: 1
+        - name: DATABASE_URL
+          value: mysql://username:mypassword@localhost:3306/mydb

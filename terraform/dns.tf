@@ -33,3 +33,12 @@ resource "cloudflare_record" "vaultwarden" {
   type    = "A"
   ttl     = 3600
 }
+
+# umami
+resource "cloudflare_record" "umami" {
+  zone_id = "94d9f474ce48a61513a68744b663f5e5"
+  name    = "analytics.thetillhoff.de"
+  value   = hcloud_server.kubenode.ipv4_address
+  type    = "A"
+  ttl     = 3600
+}
