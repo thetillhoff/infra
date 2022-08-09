@@ -28,7 +28,7 @@ spec:
         - name: HOSTNAME
           value: analytics.thetillhoff.de
         - name: FORCE_SSL
-          value: 1
+          value: "1"
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
