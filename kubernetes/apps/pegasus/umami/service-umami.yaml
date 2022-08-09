@@ -4,8 +4,8 @@ metadata:
   name: umami
   namespace: umami
 spec:
-  ports:
-  - port: 80
-    targetPort: 80
   selector:
     app: umami
+  ports:
+  - port: 3306
+    targetPort: 3306

@@ -2,7 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - namespace.yaml
-- mariadb.yaml
-- service.yaml
-- statefulset.yaml
-- ingress.yaml
+- pvc.yaml
+- secret-mariadb.yaml
+- statefulset-mariadb.yaml
+# - service-mariadb.yaml
+# - secret-umami.yaml
+# - statefulset-umami.yaml
+# - service-umami.yaml
+# - ingress.yaml
