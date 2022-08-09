@@ -46,7 +46,16 @@ spec:
               name: mariadb
               key: MARIADB_PASSWORD
 
-        volumes:
+        volumeMounts:
         - name: mariadb-data
-          persistentVolumeClaim:
-            claimName: mariadb-data
+          mountPath: "/var/lib/mysql"
+
+  volumeClaimTemplates:
+  - metadata:
+      name: mariadb-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "local-path"
+      resources:
+        requests:
+          storage: 10Gi
