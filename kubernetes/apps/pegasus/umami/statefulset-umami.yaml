@@ -18,7 +18,7 @@ spec:
       - name: umami
         image: docker.umami.is/umami-software/umami:mysql-latest
         ports:
-        - containerPort: 80
+        - containerPort: 3000
         # livenessProbe:
         #   httpGet:
         #     port: 80
