@@ -16,10 +16,10 @@
   with_items: "{{ secret.files }}"
 
 - shell: echo "{{ item }}"
-  with_items: secret_files
+  with_items: "{{ secret.files }}"
 
 - shell: gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '{{ item }}' '{{ item }}'
-  with_items: secret_files
+  with_items: "{{ secret.files }}"
 
 - shell: kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
   args:
