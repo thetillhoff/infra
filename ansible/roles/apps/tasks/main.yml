@@ -3,7 +3,7 @@
     port: '443'
     proto: tcp
 
-- shell: find . -name '*.gpg' -exec gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '\{\}' '\{\}' \\;
+- shell: find . -name '*.gpg' -exec gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '\{\}' '\{\}' \\\;
   args:
     chdir: infra/kubernetes/apps/{{ lookup('env', 'CLUSTER_NAME') }}
 
