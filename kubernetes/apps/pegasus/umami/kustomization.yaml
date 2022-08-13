@@ -9,3 +9,11 @@ resources:
 - statefulset-umami.yaml
 - service-umami.yaml
 - ingress.yaml
+
+secretGenerator:
+- name: mariadb
+  files:
+  - mariadb.env.gpg
+- name: umami
+  files:
+  - umami.env.gpg

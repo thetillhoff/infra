@@ -28,3 +28,4 @@
     repo: https://github.com/thetillhoff/infra
     dest: ./infra
     depth: 1
+    force: yes # discard local changes

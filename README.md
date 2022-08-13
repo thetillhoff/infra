@@ -40,13 +40,12 @@ There are two options on how to deploy changes:
 
 > There is currently a bug with the metallb helm charts (https://github.com/metallb/metallb/issues/1102). Current workaround it so use the manifests directly.
 
-<!-- ## Install traefik
-```
-helm repo add traefik https://helm.traefik.io/traefik
-helm install traefik traefik/traefik \
-  --namespace=traefik \
-  --create-namespace
-``` -->
+## Secrets
+There are several `*.gpg` files in this repository. They were encrypted symmetrically with gpg.
+The command used for encryption is `find . -name '*.gpg' -exec gpg --batch --yes --cipher-algo AES256 --passphrase '<password>' -o '{}.gpg' --symmetric '{}' \;`.
+The command for decrypting them is `find . -name '*.gpg' -exec gpg --batch --yes --decrypt --passphrase '<password>' -o '{}' '{}' \;`.
+> Encrypting will add the `.gpg` file extension to each file.
+> Decryption will overwrite the existing file.
 
 ## TODO
 - mariadb with persistence
