@@ -10,14 +10,16 @@
   register: secret
 
 - set_fact:
-    secrets_files: "{{ secrets_files + [item.path] }}"
+    secret_files: []
+- set_fact:
+    secret_files: "{{ secret_files + [item.path] }}"
   with_items: "{{ secret.files }}"
 
 - shell: echo "{{ item }}"
-  with_items: secrets_files
+  with_items: secret_files
 
 - shell: gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '{{ item }}' '{{ item }}'
-  with_items: secrets_files
+  with_items: secret_files
 
 - shell: kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
   args:
