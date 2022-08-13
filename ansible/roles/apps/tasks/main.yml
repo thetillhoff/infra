@@ -12,7 +12,6 @@
 - set_fact:
     secrets_files: "{{ secrets_files + [item.path] }}"
   with_items: "{{ secret.files }}"
-  no_log: true
 
 - shell: echo "{{ item }}"
   with_items: secrets_files
