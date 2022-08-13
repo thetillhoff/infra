@@ -9,10 +9,10 @@
     patterns: '*.gpg'
   register: secrets
 
-- shell: echo {{ item }}
+- shell: echo {{ item.path }}
   with_items: "{{ secrets }}"
 
-- shell: gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '{{ item }}' '{{ item }}'
+- shell: gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '{{ item.path }}' '{{ item.path }}'
   with_items: "{{ secrets }}"
 
 - shell: kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
