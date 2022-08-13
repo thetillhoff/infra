@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: thetillhoff
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: thetillhoff
-        image: ghcr.io/thetillhoff/thetillhoff.de:v0.1.1
+        image: ghcr.io/thetillhoff/thetillhoff.de:v0.1.2
         ports:
         - containerPort: 80
         livenessProbe:
