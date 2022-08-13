@@ -3,9 +3,17 @@
     port: '443'
     proto: tcp
 
-- shell: find . -name '*.gpg' -exec gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '\{\}' '\{\}' \\\;
-  args:
-    chdir: infra/kubernetes/apps/{{ lookup('env', 'CLUSTER_NAME') }}
+- ansible.builtin.find:
+    paths: infra/kubernetes/apps/{{ lookup('env', 'CLUSTER_NAME') }}
+    recurse: yes
+    patterns: '*.gpg'
+  register: secrets
+
+- shell: echo {{ item }}
+  with_items: "{{ secrets }}"
+
+- shell: gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '{{ item }}' '{{ item }}'
+  with_items: "{{ secrets }}"
 
 - shell: kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
   args:
