@@ -10,6 +10,8 @@ if [ -z "$GPG_PASSWORD" ]; then
   echo "GPG_PASSWORD is required."
   exit 0
 fi
+git reset --hard
+find . -name '*.gpg' -exec gpg --batch --yes --decrypt --passphrase "$GPG_PASSWORD" -o '{}' '{}' \;
 
 CONTROL_PLANE_ENDPOINT="$(hostname)" \
   CLUSTER_NAME="$(hostname)" \
