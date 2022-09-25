@@ -44,4 +44,4 @@ spec:
 
       - name: user-backup
         secret:
-          name: user-backup
+          secretName: user-backup
