@@ -1,5 +1,6 @@
 - name: Blackhole configuration
   hosts: blackhole
+  connection: local
 
   # Requirements:
   # - python installed -> `sudo apt-get install -y python3`
