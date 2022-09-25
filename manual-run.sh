@@ -6,6 +6,11 @@ python3 -m pip install ansible
 
 ansible-galaxy install -r "ansible/requirements.yaml"
 
+if [-z "$GPG_PASSWORD" ]; then
+  echo "GPG_PASSWORD is not required."
+  exit 0
+done
+
 CONTROL_PLANE_ENDPOINT="$(hostname)" \
   CLUSTER_NAME="$(hostname)" \
   ansible-playbook "ansible/$(hostname).yaml" -i "ansible/inventory.yaml" -bK

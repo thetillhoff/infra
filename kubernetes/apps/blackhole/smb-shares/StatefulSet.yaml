@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: smb-share-backup
+  namespace: smb-shares
+spec:
+  serviceName: smb-share-backup
+  selector:
+    matchLabels:
+      app: smb-share-backup
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: smb-share-backup
+    spec:
+      containers:
+      - name: smb-share-backup
+        image: crazymax/samba:4.15.7
+        ports:
+        - containerPort: 445
+
+        volumeMounts:
+        - name: smb-config
+          subPath: smb-config.yaml
+          mountPath: /data/config.yml
+
+        - name: share-data
+          mountPath: /storage
+
+        - name: user-backup
+          subPath: user-backup.gpg
+          mountPath: /secrets/user-backup
+
+      volumes:
+      - name: smb-config
+        configMap:
+          name: smb-config
+
+      - name: share-data
+        hostPath:
+          path: /mnt/hot/backup
+          type: DirectoryOrCreate
+
+      - name: user-backup
+        secret:
+          name: user-backup

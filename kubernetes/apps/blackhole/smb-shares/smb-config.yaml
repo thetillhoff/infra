@@ -1,0 +1,17 @@
+auth:
+  - user: backup
+    group: smb
+    uid: 1101
+    gid: 1201
+    password_file: /secrets/user_backup
+
+share:
+  - name: backup
+    path: /storage/backup
+    browsable: yes
+    readonly: no
+    guestok: no
+    validusers: backup # comma separated list of users/groups
+    writelist: backup # comma separated list of users/groups
+    veto: no
+    recycle: no
