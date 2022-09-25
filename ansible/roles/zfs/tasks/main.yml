@@ -37,18 +37,22 @@
     name: zfs
     state: present
 
-- block:
+- stat:
+    path: /mnt/hot
+  register: storage_dir
+- when: not storage_dir.stat.exists
+  block:
     - command: "sgdisk --zap-all {{ item }}"
       with_fileglob: '/dev/disk/by-id/ata-Samsung*'
     - command: zpool create -m /mnt/hot -f hot mirror -o feature@lz4_compress=enabled {{ lookup('ansible.builtin.fileglob', '/dev/disk/by-id/ata-Samsung*') }}
       # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
-  args:
-    creates: /mnt/hot
 
-- block:
+- stat:
+    path: /mnt/cold
+  register: storage_dir
+- when: not storage_dir.stat.exists
+  block:
     - command: "sgdisk --zap-all {{ item }}"
       with_fileglob: '/dev/disk/by-id/ata-WDC*'
     - command: zpool create -m /mnt/cold -f cold raidz -o feature@lz4_compress=enabled {{ lookup('ansible.builtin.fileglob', '/dev/disk/by-id/ata-WDC*') }}
       # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
-  args:
-    creates: /mnt/cold
