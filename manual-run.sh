@@ -6,8 +6,8 @@ python3 -m pip install ansible
 
 ansible-galaxy install -r "ansible/requirements.yaml"
 
-if [-z "$GPG_PASSWORD" ]; then
-  echo "GPG_PASSWORD is not required."
+if [ -z "$GPG_PASSWORD" ]; then
+  echo "GPG_PASSWORD is required."
   exit 0
 fi
 
