@@ -32,64 +32,23 @@
       - linux-image-amd64
       - zfs-dkms
       - zfsutils-linux
-      - samba # for sharing zfs things via smb
-      - nfs-kernel-server # for sharing zfs things via nfs
 
 - community.general.modprobe:
     name: zfs
     state: present
 
-- stat:
-    path: /storage/
-  register: storage_dir
-- when: not storage_dir.stat.exists
-  ansible.builtin.file:
-    path: /storage/
-    state: directory
-
-- command: zpool create hot mirror -m /storage/hot /dev/sde /dev/sdf -o feature@lz4_compress=enabled
-  # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
+- block:
+    - command: "sgdisk --zap-all {{ item }}"
+      with_fileglob: '/dev/disk/by-id/ata-Samsung*'
+    - command: zpool create -m /mnt/hot -f hot mirror -o feature@lz4_compress=enabled {{ lookup('ansible.builtin.fileglob', '/dev/disk/by-id/ata-Samsung*') }}
+      # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
   args:
-    creates: /storage/hot
+    creates: /mnt/hot
 
-
-- command: zpool create cold raidz -m /storage/cold /dev/sdb /dev/sdc /dev/sbd -o feature@lz4_compress=enabled
-  # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
+- block:
+    - command: "sgdisk --zap-all {{ item }}"
+      with_fileglob: '/dev/disk/by-id/ata-WDC*'
+    - command: zpool create -m /mnt/cold -f cold raidz -o feature@lz4_compress=enabled {{ lookup('ansible.builtin.fileglob', '/dev/disk/by-id/ata-WDC*') }}
+      # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
   args:
-    creates: /storage/cold
-
-# zpool export storage
-# zpool import storage -d /dev/disk/by-id
-
-- ufw: # allow nfs connections from private ips
-    rule: allow
-    port: "{{ item }}"
-  with_item:
-  - 2049 # nfs
-  - 139 # smb
-  - 445 # smb
-
-- ansible.builtin.user:
-    name: backup
-    password: ! # disabled account (login disabled) - else $6$wirlutpourraitor$VGipLNlGStQAR3yjlEfy/POCzBkwMlMOktFEmkKLm2Boif2psPKfGtJPhJTFohzuCtmq3fVnBYERvacFJ98jE.
-
-- community.general.zfs:
-    name: cold/backup
-    state: present
-    extra_zfs_properties:
-      # share: name=backup
-      # path: /storage/cold/backup
-      # prot: nfs
-#      sharenfs: on # -> This gives access to all sources
-#      sharenfs: rw=@192.168.1.0/24,rw=@100.64.0.0/10 # This gives access to all sources in the home subnet and the tailscale subnet
-      sharenfs: sec=sys,rw=@192.168.1.123/32,crossmnt,no_subtree_check # This gives access to some sources in the home subnet
-      sharesmb: on
-      casesensitivity: mixed
-      nbmand: on # Controls whether the file system should be mounted with nbmand (Non Blocking mandatory locks). This is used for CIFS clients.
-
-- ansible.builtin.file:
-    path: /storage/cold/backup
-    mode: '0777'
-
-#exportfs -ar # reloads the exports
-#exportfs -v # view current exports
+    creates: /mnt/cold

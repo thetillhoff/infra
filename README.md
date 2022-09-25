@@ -47,6 +47,14 @@ The command for decrypting them is `find . -name '*.gpg' -exec gpg --batch --yes
 > Encrypting will add the `.gpg` file extension to each file.
 > Decryption will overwrite the existing file.
 
+## Storage
+Several storage providers were tested and were not fitting;
+- Rook/Ceph had an internal certificate expiration that was undocumented at the time of writing
+- Longhorn relies on UI-interaction for multi-disk configurations
+
+Therefore, bare-metal ZFS is deployed where needed (since so far everythings operates on single-node base).
+ZFS is deployed and configured via ansible. Integration with Kubernetes happens via the default kubernetes `hostPath` provider.
+
 ## TODO
 - mariadb with persistence
 - vaultwarden that uses external mariadb

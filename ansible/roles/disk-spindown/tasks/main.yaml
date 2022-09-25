@@ -1,0 +1,4 @@
+- command: "hdparm -S 120 {{ item }}"
+  # A value of 120 sets the timeout to 10min.
+  # More details at https://wiki.archlinux.org/title/hdparm#Power_management_configuration
+  with_fileglob: '/dev/sd?'
