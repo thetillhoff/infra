@@ -1,3 +1,8 @@
+# How to check the status of the ZFS pools
+```
+zpool status
+```
+
 # Example pod configuration with ZFS and Kubernetes `hostPath`
 ```
 apiVersion: v1
