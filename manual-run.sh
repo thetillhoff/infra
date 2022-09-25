@@ -9,7 +9,7 @@ ansible-galaxy install -r "ansible/requirements.yaml"
 if [-z "$GPG_PASSWORD" ]; then
   echo "GPG_PASSWORD is not required."
   exit 0
-done
+fi
 
 CONTROL_PLANE_ENDPOINT="$(hostname)" \
   CLUSTER_NAME="$(hostname)" \
