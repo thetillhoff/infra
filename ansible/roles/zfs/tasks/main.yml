@@ -42,9 +42,16 @@
   register: storage_dir
 - when: not storage_dir.stat.exists
   block:
-    - command: "sgdisk --zap-all {{ item }}"
-      with_fileglob: '/dev/disk/by-id/ata-Samsung*'
-    - command: zpool create -m /mnt/hot -f hot mirror -o feature@lz4_compress=enabled {{ lookup('ansible.builtin.fileglob', '/dev/disk/by-id/ata-Samsung*') }}
+    - command: "sgdisk --zap-all /dev/disk/by-id/ata-{{ item }}"
+      loop:
+      - Samsung_SSD_850_EVO_250GB_S2R6NX0JB23647W
+      - Samsung_SSD_860_EVO_250GB_S3YJNX0KB49233X
+    - command: partprobe
+      # inform kernel about partition changes
+    - command: |
+        zpool create -m /mnt/hot -f hot mirror -o feature@lz4_compress=enabled
+        /dev/disk/by-id/ata-Samsung_SSD_850_EVO_250GB_S2R6NX0JB23647W
+        /dev/disk/by-id/ata-Samsung_SSD_860_EVO_250GB_S3YJNX0KB49233X
       # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
 
 - stat:
@@ -52,7 +59,14 @@
   register: storage_dir
 - when: not storage_dir.stat.exists
   block:
-    - command: "sgdisk --zap-all {{ item }}"
-      with_fileglob: '/dev/disk/by-id/ata-WDC*'
-    - command: zpool create -m /mnt/cold -f cold raidz -o feature@lz4_compress=enabled {{ lookup('ansible.builtin.fileglob', '/dev/disk/by-id/ata-WDC*') }}
+    - command: "sgdisk --zap-all /dev/disk/by-id/ata-{{ item }}"
+      loop:
+      - WDC_WD30EZRX-00D8PB0_WD-WCC4N0CNYEZD
+      - WDC_WD30EZRX-00D8PB0_WD-WCC4N1XYTYZY
+      - WDC_WD30EZRX-00D8PB0_WD-WCC4N2TXL9J4
+    - command: |
+        zpool create -m /mnt/cold -f cold raidz -o feature@lz4_compress=enabled
+        /dev/disk/by-id/ata-WDC_WD30EZRX-00D8PB0_WD-WCC4N0CNYEZD
+        /dev/disk/by-id/ata-WDC_WD30EZRX-00D8PB0_WD-WCC4N1XYTYZY
+        /dev/disk/by-id/ata-WDC_WD30EZRX-00D8PB0_WD-WCC4N2TXL9J4
       # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
