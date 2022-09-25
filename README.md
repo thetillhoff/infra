@@ -28,7 +28,9 @@ There are two options on how to deploy changes:
 1. Run kubectl/helm commands from localhost or github action.
   This is harder to setup initially, but easier to debug. Automatic deletion is unsupported this way.
 2. Install flux (or different gitops tool) on cluster and let it reconcile automatically. Automatic deletion is supported - but only for k8s-internal resources.
+3. k3s supports automatic installation of manifests out of the box.
 
+Option 3 is what this project leverages.
 
 ## Retrieve the kubeconfig
 `scp -i ./id_ed25519 root@k8s.thetillhoff.de:/etc/kubernetes/admin.conf ./kube-config`
