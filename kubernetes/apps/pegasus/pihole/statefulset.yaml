@@ -19,8 +19,7 @@ spec:
         image: pihole/pihole:2022.09.4
         ports:
         - containerPort: 80
-        - containerPort: 53/tcp
-        - containerPort: 53/udp
+        - containerPort: 53
         #- containerPort: 67/udp # Only required for DHCP
         livenessProbe:
           httpGet:
