@@ -6,3 +6,5 @@ resources:
 - link-shortener
 - vaultwarden
 - umami
+- pihole
+- global-tcp-udp-services.yaml
