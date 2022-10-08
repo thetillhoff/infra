@@ -10,9 +10,9 @@ spec:
     protocol: http
   - port: 53
     targetPort: 53
-    protocol: tcp
+    protocol: TCP
   - port: 53
     targetPort: 53
-    protocol: udp
+    protocol: UDP
   selector:
     app: pihole
