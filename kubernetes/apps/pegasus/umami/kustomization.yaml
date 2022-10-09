@@ -10,8 +10,10 @@ resources:
 
 secretGenerator:
 - name: mariadb
+  namespace: umami
   files:
   - mariadb.env.gpg
 - name: umami
+  namespace: umami
   files:
   - umami.env.gpg

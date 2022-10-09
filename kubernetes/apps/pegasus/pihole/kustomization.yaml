@@ -9,5 +9,6 @@ resources:
 
 secretGenerator:
 - name: pihole
+  namespace: pihole
   files:
   - pihole.env.gpg
