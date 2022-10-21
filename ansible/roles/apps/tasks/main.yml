@@ -18,6 +18,6 @@
 - shell: gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '{{ item.path }}' '{{ item.path }}'
   with_items: "{{ secret.files }}"
 
-- shell: kubectl apply --prune -all -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
+- shell: kubectl apply --prune --all -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
   args:
     chdir: infra/kubernetes
