@@ -9,10 +9,10 @@ jobs:
   validate:
     runs-on: ubuntu-20.04
     steps:
-      - uses: hashicorp/setup-terraform@v1
+      - uses: hashicorp/setup-terraform@v2
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - run: |
           terraform init \
@@ -59,10 +59,10 @@ jobs:
     runs-on: ubuntu-20.04
     concurrency: ${{ github.workflow }}-terraform
     steps:
-      - uses: hashicorp/setup-terraform@v1
+      - uses: hashicorp/setup-terraform@v2
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - run: |
           terraform init \
@@ -86,10 +86,10 @@ jobs:
     runs-on: ubuntu-20.04
     concurrency: ${{ github.workflow }}-terraform
     steps:
-      - uses: hashicorp/setup-terraform@v1
+      - uses: hashicorp/setup-terraform@v2
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - run: |
           terraform init \
