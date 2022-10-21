@@ -9,7 +9,6 @@
   roles:
     - basic
     - zfs
-    - k3s-ingress-nginx
     - k3s
     - apps
     - disk-spindown

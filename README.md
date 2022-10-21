@@ -33,14 +33,8 @@ There are two options on how to deploy changes:
 Option 3 is what this project leverages.
 
 ## Retrieve the kubeconfig
-`scp -i ./id_ed25519 root@k8s.thetillhoff.de:/etc/kubernetes/admin.conf ./kube-config`
+`scp -i ~/.ssh/automation.key root@k8s.thetillhoff.de:/etc/kubernetes/admin.conf ./kube-config`
 > Use `kubectl --kubeconfig ./kube-config *` from now on.
-
-
-## Install Metallb (required for external access on lower ports)
-> Note, that metallb requies the IP in CIDR (a.b.c.d/32) format instead of range with equal start-end ip (worked with v0.9.3).
-
-> There is currently a bug with the metallb helm charts (https://github.com/metallb/metallb/issues/1102). Current workaround it so use the manifests directly.
 
 ## Secrets
 There are several `*.gpg` files in this repository. They were encrypted symmetrically with gpg.
