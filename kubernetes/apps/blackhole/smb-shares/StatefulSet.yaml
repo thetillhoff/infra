@@ -29,7 +29,7 @@ spec:
           mountPath: /storage
 
         - name: user-backup
-          subPath: user-backup.gpg
+          subPath: user-backup.secret
           mountPath: /secrets/user-backup
 
       volumes:

@@ -12,8 +12,8 @@ secretGenerator:
 - name: mariadb
   namespace: umami
   envs:
-  - mariadb.env.gpg
+  - mariadb.env.secret
 - name: umami
   namespace: umami
   envs:
-  - umami.env.gpg
+  - umami.env.secret

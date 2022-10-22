@@ -14,4 +14,4 @@ secretGenerator:
 - name: user-backup
   namespace: smb-shares
   files:
-    - user-backup.gpg
+    - user-backup.secret

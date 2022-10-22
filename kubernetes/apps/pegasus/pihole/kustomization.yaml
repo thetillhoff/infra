@@ -11,4 +11,4 @@ secretGenerator:
 - name: pihole
   namespace: pihole
   envs:
-  - pihole.env.gpg
+  - pihole.env.secret
