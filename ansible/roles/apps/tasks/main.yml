@@ -4,6 +4,7 @@
     proto: tcp
 
 - shell: ./transcrypt -y -c aes-256-cbc -p "{{ lookup('env', 'TRANSCRYPT_PASSWORD') }}"
+  ignore_errors: true # will fail if already configured
   args:
     chdir: infra
 
