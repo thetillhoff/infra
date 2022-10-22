@@ -3,20 +3,9 @@
     port: '443'
     proto: tcp
 
-- ansible.builtin.find:
-    paths: infra/kubernetes/apps/{{ lookup('env', 'CLUSTER_NAME') }}
-    recurse: yes
-    patterns: '*.gpg'
-  register: secret
-
-- set_fact:
-    secret_files: []
-- set_fact:
-    secret_files: "{{ secret_files + [item] }}"
-  with_items: "{{ secret.files }}"
-
-- shell: gpg --batch --yes --decrypt --passphrase '{{ lookup('env', 'GPG_PASSWORD') }}' -o '{{ item.path }}' '{{ item.path }}'
-  with_items: "{{ secret.files }}"
+- shell: ./transcrypt -c aes-256-cbc -p "{{ lookup('env', 'TRANSCRYPT_PASSWORD') }}"
+  args:
+    chdir: infra
 
 - shell: kubectl apply --prune --all -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
   args:
