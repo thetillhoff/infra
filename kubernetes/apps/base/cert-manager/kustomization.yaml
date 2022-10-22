@@ -7,8 +7,15 @@ kind: Kustomization
 #- crd-clusterissuers.yaml
 #- crd-issuers.yaml
 #- crd-orders.yaml
+helmCharts:
+- releaseName: cert-manager
+  namespace: cert-manager
+  repo: https://charts.jetstack.io
+  name: cert-manger
+  version: v1.10.0
+  includeCRDs: true
+  #valuesInline:
 resources:
-- helmChart.yaml
 #- cert-manager.yaml
 - clusterIssuer-staging.yaml
 - clusterIssuer-prod.yaml
