@@ -51,7 +51,7 @@ jobs:
             --check
         env:
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
-          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+          TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
           CLUSTER_NAME: pegasus
 
   plan:
@@ -129,5 +129,5 @@ jobs:
             --verbose
         env:
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
-          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+          TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
           CLUSTER_NAME: pegasus
