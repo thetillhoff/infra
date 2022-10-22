@@ -10,4 +10,5 @@
     - basic
     - tailscale
     - k3s
+    - helm
     - apps
