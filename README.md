@@ -37,11 +37,9 @@ Option 3 is what this project leverages.
 > Use `kubectl --kubeconfig ./kube-config *` from now on.
 
 ## Secrets
-There are several `*.gpg` files in this repository. They were encrypted symmetrically with gpg.
-The command used for encryption is `find . -name '*.gpg' -exec gpg --batch --yes --cipher-algo AES256 --passphrase '<password>' -o '{}.gpg' --symmetric '{}' \;`.
-The command for decrypting them is `find . -name '*.gpg' -exec gpg --batch --yes --decrypt --passphrase '<password>' -o '{}' '{}' \;`.
-> Encrypting will add the `.gpg` file extension to each file.
-> Decryption will overwrite the existing file.
+Secrets are encrypted with `transcrypt` using aes-256-cbc as cipher.
+New repositories can be initialized with `./transcrypt`.
+Cloned repositories can be initialized with `./transcrypt -c aes-256-cbc -p 'password'`.
 
 ## Storage
 Several storage providers were tested and were not fitting;
