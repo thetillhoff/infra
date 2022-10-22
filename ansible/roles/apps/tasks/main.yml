@@ -8,6 +8,6 @@
   args:
     chdir: infra
 
-- shell: kubectl kustomize --enable-helm ./ | kubectl apply -f -
+- shell: kubectl kustomize --enable-helm ./apps/{{ lookup('env', 'CLUSTER_NAME') }} | kubectl apply --prune --all -f -
   args:
     chdir: infra/kubernetes
