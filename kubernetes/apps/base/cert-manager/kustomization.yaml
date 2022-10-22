@@ -5,6 +5,7 @@ crds:
 - crd-certificates.yaml
 - crd-challenges.yaml
 - crd-clusterissuers.yaml
+- crd-issuers.yaml
 - crd-orders.yaml
 resources:
 - cert-manager.yaml
