@@ -1,1 +1,1 @@
-#pattern  filter=crypt diff=crypt merge=crypt
+*.secret  filter=crypt diff=crypt merge=crypt
