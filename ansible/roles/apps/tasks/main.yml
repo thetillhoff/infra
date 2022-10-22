@@ -3,7 +3,7 @@
     port: '443'
     proto: tcp
 
-- shell: ./transcrypt -c aes-256-cbc -p "{{ lookup('env', 'TRANSCRYPT_PASSWORD') }}"
+- shell: ./transcrypt -y -c aes-256-cbc -p "{{ lookup('env', 'TRANSCRYPT_PASSWORD') }}"
   args:
     chdir: infra
 
