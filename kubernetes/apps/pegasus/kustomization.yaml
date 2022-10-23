@@ -3,10 +3,10 @@ kind: Kustomization
 resources:
 - ../base/ingress-nginx
 - ../base/cert-manager
-- ../base/grafana
+#- ../base/grafana
 - thetillhoff
-- link-shortener
-- vaultwarden
-- umami
-- pihole
-- global-tcp-udp-services.yaml
+#- link-shortener
+#- vaultwarden
+#- umami
+#- pihole
+#- global-tcp-udp-services.yaml
