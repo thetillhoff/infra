@@ -13,6 +13,14 @@
     - 10.0.0.0/8
     - 172.16.0.0/12
     - 192.168.0.0/16
+- ufw: # allow connections to port 80
+    rule: allow
+    port: 80
+    proto: tcp
+- ufw: # allow connections to port 443
+    rule: allow
+    port: 443
+    proto: tcp
 - ufw: # enable firewall, deny by default
     state: enabled
     policy: deny
