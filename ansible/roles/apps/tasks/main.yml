@@ -8,10 +8,10 @@
   args:
     chdir: infra
 
-- shell: kubectl kustomize --enable-helm ./apps/{{ lookup('env', 'CLUSTER_NAME') }}-crds | kubectl apply -f -
+- shell: kubectl apply -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}-crds
   args:
     chdir: infra/kubernetes
 
-- shell: kubectl kustomize --enable-helm ./apps/{{ lookup('env', 'CLUSTER_NAME') }} | kubectl apply --prune --all --prune-whitelist=apiextensions.k8s.io/v1/customresourcedefinition -f -
+- shell: kubectl apply --prune --all --prune-whitelist=apiextensions.k8s.io/v1/customresourcedefinition -k ./apps/{{ lookup('env', 'CLUSTER_NAME') }}
   args:
     chdir: infra/kubernetes
