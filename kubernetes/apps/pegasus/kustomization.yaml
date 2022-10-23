@@ -5,8 +5,8 @@ resources:
 - ../base/cert-manager
 #- ../base/grafana
 - thetillhoff
-#- link-shortener
-#- vaultwarden
-#- umami
+- vaultwarden
+- link-shortener
+- umami
 #- pihole
 #- global-tcp-udp-services.yaml

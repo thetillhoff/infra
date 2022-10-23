@@ -1,5 +1,7 @@
 # from https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.4.0/deploy/static/provider/cloud/deploy.yaml
 
+# THIS IS IMPORTANT: Ensure you use the provider/cloud/deploy.yaml
+
 apiVersion: v1
 kind: Namespace
 metadata:
