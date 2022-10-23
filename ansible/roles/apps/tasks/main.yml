@@ -12,6 +12,6 @@
   args:
     chdir: infra/kubernetes
 
-- shell: kubectl kustomize --enable-helm ./apps/{{ lookup('env', 'CLUSTER_NAME') }} | kubectl apply --prune --all --prune-whitelist=apiextensions.k8s.io/v1/customresourcedefinitions -f -
+- shell: kubectl kustomize --enable-helm ./apps/{{ lookup('env', 'CLUSTER_NAME') }} | kubectl apply --prune --all --prune-whitelist=apiextensions.k8s.io/v1/customresourcedefinition -f -
   args:
     chdir: infra/kubernetes
