@@ -1,3 +1,8 @@
+# k3s prerequisites
+- apt:
+    pkg:
+      - apparmor-utils # Used to prevent the k3s logs to be spammed with apparmor errors
+
 # k3s config
 - stat:
     path: /etc/rancher/k3s/config.yaml
