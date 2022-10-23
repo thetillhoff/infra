@@ -16,7 +16,7 @@ metadata:
     #  more_set_headers "Referrer-Policy: same-origin";
     #  more_set_headers "Permissions-Policy: accelerometer=(), battery=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
 spec:
-  # ingressClassName: nginx
+  ingressClassName: nginx
   # tls:
   # - hosts:
   #   - thetillhoff.de
