@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: thetillhoff
-        image: ghcr.io/thetillhoff/thetillhoff.de:v0.1.2
+        image: ghcr.io/thetillhoff/thetillhoff.de:v0.1.3
         ports:
         - containerPort: 80
         livenessProbe:
