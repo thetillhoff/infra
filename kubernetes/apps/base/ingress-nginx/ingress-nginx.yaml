@@ -1,4 +1,4 @@
-# from https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.4.0/deploy/static/provider/baremetal/deploy.yaml
+# from https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.4.0/deploy/static/provider/cloud/deploy.yaml
 
 apiVersion: v1
 kind: Namespace
@@ -361,6 +361,7 @@ metadata:
   name: ingress-nginx-controller
   namespace: ingress-nginx
 spec:
+  externalTrafficPolicy: Local
   ipFamilies:
   - IPv4
   ipFamilyPolicy: SingleStack
@@ -379,7 +380,7 @@ spec:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: ingress-nginx
     app.kubernetes.io/name: ingress-nginx
-  type: NodePort
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: Service
@@ -433,6 +434,7 @@ spec:
       containers:
       - args:
         - /nginx-ingress-controller
+        - --publish-service=$(POD_NAMESPACE)/ingress-nginx-controller
         - --election-id=ingress-controller-leader
         - --controller-class=k8s.io/ingress-nginx
         - --ingress-class=nginx
