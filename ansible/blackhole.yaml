@@ -8,7 +8,7 @@
 
   roles:
     - basic
-    - zfs
+    - fileserver-blackhole
     - k3s
     - apps
     - disk-spindown

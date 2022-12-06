@@ -1,0 +1,120 @@
+
+- block: # Do the following only on debian systems
+  - ansible.builtin.apt_repository:
+      repo: deb http://deb.debian.org/debian bullseye-backports main contrib
+      state: present
+    register: apt_zfs_repo
+
+  - when: apt_zfs_repo.changed
+    apt:
+      update_cache: yes
+
+  # apt zfs onfig
+  - stat:
+      path: /etc/apt/preferences.d/90_zfs
+    register: apt_zfs_preferences
+
+  - when: not apt_zfs_preferences.stat.exists
+    ansible.builtin.file:
+      path: /etc/apt/preferences.d/
+      state: directory
+
+  - when: not apt_zfs_preferences.stat.exists
+    ansible.builtin.copy:
+      content: |
+        Package: libnvpair1linux libnvpair3linux libuutil1linux libuutil3linux libzfs2linux libzfs4linux libzpool2linux libzpool4linux spl-dkms zfs-dkms zfs-test zfsutils-linux zfsutils-linux-dev zfs-zed
+        Pin: release n=bullseye-backports
+        Pin-Priority: 990
+      dest: /etc/apt/preferences.d/90_zfs
+  when: ansible_distribution == 'Debian'
+
+- apt:
+    pkg:
+      - dpkg-dev
+      - linux-headers-generic
+      - linux-image-amd64
+      - zfs-dkms
+      - zfsutils-linux
+
+- community.general.modprobe:
+    name: zfs
+    state: present
+
+- stat:
+    path: /mnt/hot
+  register: storage_dir
+- when: not storage_dir.stat.exists
+  block:
+    - command: "sgdisk --zap-all /dev/disk/by-id/ata-{{ item }}"
+      loop:
+      - Samsung_SSD_850_EVO_250GB_S2R6NX0JB23647W
+      - Samsung_SSD_860_EVO_250GB_S3YJNX0KB49233X
+    - command: partprobe
+      # inform kernel about partition changes
+    - command: |
+        zpool create -m /mnt/hot -f hot mirror -o feature@lz4_compress=enabled
+        /dev/disk/by-id/ata-Samsung_SSD_850_EVO_250GB_S2R6NX0JB23647W
+        /dev/disk/by-id/ata-Samsung_SSD_860_EVO_250GB_S3YJNX0KB49233X
+      # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
+
+- stat:
+    path: /mnt/cold
+  register: storage_dir
+- when: not storage_dir.stat.exists
+  block:
+    - command: "sgdisk --zap-all /dev/disk/by-id/ata-{{ item }}"
+      loop:
+      - WDC_WD30EZRX-00D8PB0_WD-WCC4N0CNYEZD
+      - WDC_WD30EZRX-00D8PB0_WD-WCC4N1XYTYZY
+      - WDC_WD30EZRX-00D8PB0_WD-WCC4N2TXL9J4
+    - command: |
+        zpool create -m /mnt/cold -f cold raidz -o feature@lz4_compress=enabled -o casesensitivity=mixed -o nbmand=on
+        /dev/disk/by-id/ata-WDC_WD30EZRX-00D8PB0_WD-WCC4N0CNYEZD
+        /dev/disk/by-id/ata-WDC_WD30EZRX-00D8PB0_WD-WCC4N1XYTYZY
+        /dev/disk/by-id/ata-WDC_WD30EZRX-00D8PB0_WD-WCC4N2TXL9J4
+      # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
+
+
+# install samba
+- apt:
+    pkg:
+      - samba
+
+# allow SMB port/s
+- ufw: # allow connections to port
+    rule: allow
+    port: 137
+    proto: udp
+- ufw: # allow connections to port
+    rule: allow
+    port: 138
+    proto: udp
+- ufw: # allow connections to port
+    rule: allow
+    port: 139
+    proto: tcp
+- ufw: # allow connections to port
+    rule: allow
+    port: 445
+    proto: tcp
+
+
+- block:
+  # create smb user (normal user)
+  - ansible.builtin.user:
+      name: '{{ item.name }}'
+
+  # set smb password for user
+  - shell: "printf '{{ item.value }}\n{{ item.value }}\n' | smbpasswd -a {{ item.name }}" # password can be generated with `mkpasswd --method=sha-512`
+
+  # create shared folder and set permissions on it
+  - ansible.builtin.file:
+      path: "/mnt/cold/{{ item.name }}"
+      state: directory
+      mode: '0755'
+      recurse: yes
+      owner: "{{ item.name }}"
+      group: "{{ item.name }}"
+  loop:
+    - name: 'backup'
+      value: '$6$4RcOWr5xAMv$4P5NTQTpbGz4.gd1/ZD/dt2yIH0.8rY2SGZ8txTqSP2XXvVnMieq82ju5tFVSJk6BI7QGtesT38bKLQ7Vflx10'
