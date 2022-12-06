@@ -99,22 +99,21 @@
     proto: tcp
 
 
-- block:
-  # create smb user (normal user)
-  - ansible.builtin.user:
-      name: '{{ item.name }}'
+# create smb user (normal user)
+- ansible.builtin.user:
+    name: '{{ item.name }}'
+  loop: "{{ smbusers }}"
 
-  # set smb password for user
-  - shell: "printf '{{ item.value }}\n{{ item.value }}\n' | smbpasswd -a {{ item.name }}" # password can be generated with `mkpasswd --method=sha-512`
+# set smb password for user
+- shell: "printf '{{ item.passhash }}\n{{ item.passhash }}\n' | smbpasswd -a {{ item.name }}" # password can be generated with `mkpasswd --method=sha-512`
+  loop: "{{ smbusers }}"
 
-  # create shared folder and set permissions on it
-  - ansible.builtin.file:
-      path: "/mnt/cold/{{ item.name }}"
-      state: directory
-      mode: '0755'
-      recurse: yes
-      owner: "{{ item.name }}"
-      group: "{{ item.name }}"
-  loop:
-    - name: 'backup'
-      value: '$6$4RcOWr5xAMv$4P5NTQTpbGz4.gd1/ZD/dt2yIH0.8rY2SGZ8txTqSP2XXvVnMieq82ju5tFVSJk6BI7QGtesT38bKLQ7Vflx10'
+# create shared folder and set permissions on it
+- ansible.builtin.file:
+    path: "/mnt/cold/{{ item.name }}"
+    state: directory
+    mode: '0755'
+    recurse: yes
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+  loop: "{{ smbusers }}"
