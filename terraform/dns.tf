@@ -51,3 +51,12 @@ resource "cloudflare_record" "pihole" {
   type    = "A"
   ttl     = 3600
 }
+
+# github presentations
+resource "cloudflare_record" "presentations" {
+  zone_id = "94d9f474ce48a61513a68744b663f5e5"
+  name    = "p.thetillhoff.de"
+  value   = "thetillhoff.github.io"
+  type    = "CNAME"
+  ttl     = 3600
+}
