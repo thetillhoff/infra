@@ -60,7 +60,6 @@ resource "cloudflare_record" "presentations-verification" {
   type    = "TXT"
   ttl     = 3600
 }
-_github-pages-challenge-thetillhoff.p
 # github presentations
 resource "cloudflare_record" "presentations" {
   zone_id = "94d9f474ce48a61513a68744b663f5e5"
