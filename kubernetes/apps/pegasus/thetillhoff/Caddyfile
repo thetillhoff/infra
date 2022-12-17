@@ -1,0 +1,11 @@
+# website
+:80 {
+  root * /usr/share/caddy
+  file_server
+  encode zstd gzip
+}
+
+# healtchcheck
+:8080 {
+  respond "I'm healthy!"
+}
