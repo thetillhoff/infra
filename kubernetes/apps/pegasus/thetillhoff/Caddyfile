@@ -3,6 +3,8 @@
   root * /usr/share/caddy
   file_server
   encode zstd gzip
+
+  respond /hello-world "hello world" 200
 }
 
 # healtchcheck
