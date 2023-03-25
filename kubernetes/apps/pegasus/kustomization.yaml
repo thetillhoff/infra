@@ -8,5 +8,4 @@ resources:
 - vaultwarden
 - link-shortener
 - umami
-#- pihole
 #- global-tcp-udp-services.yaml
