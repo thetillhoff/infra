@@ -1,38 +1,7 @@
-
-- block: # Do the following only on debian systems
-  - ansible.builtin.apt_repository:
-      repo: deb http://deb.debian.org/debian bullseye-backports main contrib
-      state: present
-    register: apt_zfs_repo
-
-  - when: apt_zfs_repo.changed
-    apt:
-      update_cache: yes
-
-  # apt zfs onfig
-  - stat:
-      path: /etc/apt/preferences.d/90_zfs
-    register: apt_zfs_preferences
-
-  - when: not apt_zfs_preferences.stat.exists
-    ansible.builtin.file:
-      path: /etc/apt/preferences.d/
-      state: directory
-
-  - when: not apt_zfs_preferences.stat.exists
-    ansible.builtin.copy:
-      content: |
-        Package: libnvpair1linux libnvpair3linux libuutil1linux libuutil3linux libzfs2linux libzfs4linux libzpool2linux libzpool4linux spl-dkms zfs-dkms zfs-test zfsutils-linux zfsutils-linux-dev zfs-zed
-        Pin: release n=bullseye-backports
-        Pin-Priority: 990
-      dest: /etc/apt/preferences.d/90_zfs
-  when: ansible_distribution == 'Debian'
-
 - apt:
     pkg:
       - dpkg-dev
       - linux-headers-generic
-      - linux-image-amd64
       - zfs-dkms
       - zfsutils-linux
 
@@ -68,11 +37,12 @@
       - WDC_WD30EZRX-00D8PB0_WD-WCC4N1XYTYZY
       - WDC_WD30EZRX-00D8PB0_WD-WCC4N2TXL9J4
     - command: |
-        zpool create -m /mnt/cold -f cold raidz -o feature@lz4_compress=enabled -o casesensitivity=mixed -o nbmand=on
+        zpool create -m /mnt/cold -f cold raidz -o feature@lz4_compress=enabled
         /dev/disk/by-id/ata-WDC_WD30EZRX-00D8PB0_WD-WCC4N0CNYEZD
         /dev/disk/by-id/ata-WDC_WD30EZRX-00D8PB0_WD-WCC4N1XYTYZY
         /dev/disk/by-id/ata-WDC_WD30EZRX-00D8PB0_WD-WCC4N2TXL9J4
       # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
+      #-o casesensitivity=mixed -o nbmand=on
 
 
 # install samba
@@ -99,21 +69,47 @@
     proto: tcp
 
 
-# create smb user (normal user)
+# create public shared folder and set permissions on it
+- ansible.builtin.file:
+    path: "/mnt/cold/public"
+    state: directory
+    mode: '0777'
+    recurse: yes
+
+# create users for shares
 - ansible.builtin.user:
     name: '{{ item.name }}'
-  loop: "{{ smbusers }}"
+    password: '{{ item.passhash }}' # password can be generated with `mkpasswd --method=sha-512`
+    home: '/mnt/cold/{{ item.name }}'
+  loop:
+  - name: 'backup'
+    passhash: '$6$BTghggjHZA$SyMHrFe7dLamQPsilwJE4PLlcAzk09Bq6D9cBB6SMAruDA.usJ.ka3LJOk8VGukR4XGSkyXr2ZhlBgr59fuxu0'
+  - name: 'backupp'
+    passhash: '$6$somesalt$ZlH6KQUe0X5MfWe92Sb/SiHZVGUg25YKe/EeH9RpavT8GHPryq188CnOmddX1YBirKLfyoUVrlgIJS.RmPUF0/'
+  register: smbusers
 
-# set smb password for user
-- shell: "printf '{{ item.passhash }}\n{{ item.passhash }}\n' | smbpasswd -a {{ item.name }}" # password can be generated with `mkpasswd --method=sha-512`
-  loop: "{{ smbusers }}"
+# # create shared folder and set permissions on it
+# - ansible.builtin.file:
+#     path: "/mnt/cold/{{ item.name }}"
+#     state: directory
+#     mode: '0755'
+#     recurse: yes
+#     owner: "{{ item.name }}"
+#     group: "{{ item.name }}"
+#   loop: "{{ smbusers }}"
 
-# create shared folder and set permissions on it
-- ansible.builtin.file:
-    path: "/mnt/cold/{{ item.name }}"
-    state: directory
-    mode: '0755'
-    recurse: yes
-    owner: "{{ item.name }}"
-    group: "{{ item.name }}"
-  loop: "{{ smbusers }}"
+- ansible.builtin.template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+  vars:
+    publicshares:
+    - public
+    usershares:
+    - backup
+    - backupp
+  register: smbconf
+
+- ansible.builtin.service:
+    name: smbd
+    state: restarted
+  when: smbconf.changed or smbusers.changed

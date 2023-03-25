@@ -1,3 +1,0 @@
-smbusers:
-- name: 'backup'
-  passhash: '$6$4RcOWr5xAMv$4P5NTQTpbGz4.gd1/ZD/dt2yIH0.8rY2SGZ8txTqSP2XXvVnMieq82ju5tFVSJk6BI7QGtesT38bKLQ7Vflx10'

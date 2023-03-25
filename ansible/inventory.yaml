@@ -1,5 +1,5 @@
 all:
   hosts:
     blackhole:
-      ansible_user: enforge
+      ansible_user: user
       ansible_become: true

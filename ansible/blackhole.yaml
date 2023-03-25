@@ -1,6 +1,12 @@
 - name: Blackhole configuration
   hosts: blackhole
-  connection: local
+  # connection: local
+
+  #####
+
+  # This server should run Ubuntu server 20
+
+  #####
 
   # Requirements:
   # - python installed -> `sudo apt-get install -y python3`
@@ -9,6 +15,6 @@
   roles:
     - basic
     - fileserver-blackhole
-    - k3s
-    - apps
+    #- k3s
+    #- apps
     - disk-spindown
