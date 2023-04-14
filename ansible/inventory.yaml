@@ -1,8 +1,10 @@
 all:
   children:
     blackhole:
-      ansible_user: user
-      ansible_become: true
+      hosts:
+        blackhole:
+          ansible_user: user
+          ansible_become: true
     kubenodes:
       hosts:
         k8s.thetillhoff.de: # must be dict, but value can be empty

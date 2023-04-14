@@ -45,20 +45,31 @@
       #-o casesensitivity=mixed -o nbmand=on
 
 
-# install samba
-- apt:
-    pkg:
-      - samba
+# Install docker
+- package_facts:
+    manager: apt
+- when: '"docker-ce" not in ansible_facts.packages'
+  block:
+    - apt:
+        pkg:
+          - ca-certificates
+          - curl
+          - gnupg
+    - ansible.builtin.apt_key:
+        url:  https://download.docker.com/linux/ubuntu/gpg
+    - ansible.builtin.apt_repository:
+        repo: deb [arch="amd64"] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
+    - apt:
+        update_cache: yes
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
 
-# allow SMB port/s
-- ufw: # allow connections to port
-    rule: allow
-    port: 137
-    proto: udp
-- ufw: # allow connections to port
-    rule: allow
-    port: 138
-    proto: udp
+# Allow SMB port/s
 - ufw: # allow connections to port
     rule: allow
     port: 139
@@ -68,7 +79,6 @@
     port: 445
     proto: tcp
 
-
 # create public shared folder and set permissions on it
 - ansible.builtin.file:
     path: "/mnt/cold/public"
@@ -76,40 +86,32 @@
     mode: '0777'
     recurse: yes
 
-# create users for shares
-- ansible.builtin.user:
-    name: '{{ item.name }}'
-    password: '{{ item.passhash }}' # password can be generated with `mkpasswd --method=sha-512`
-    home: '/mnt/cold/{{ item.name }}'
-  loop:
-  - name: 'backup'
-    passhash: '$6$BTghggjHZA$SyMHrFe7dLamQPsilwJE4PLlcAzk09Bq6D9cBB6SMAruDA.usJ.ka3LJOk8VGukR4XGSkyXr2ZhlBgr59fuxu0'
-  - name: 'backupp'
-    passhash: '$6$somesalt$ZlH6KQUe0X5MfWe92Sb/SiHZVGUg25YKe/EeH9RpavT8GHPryq188CnOmddX1YBirKLfyoUVrlgIJS.RmPUF0/'
-  register: smbusers
+# Start samba container
+- community.docker.docker_container:
+    name: samba
+    image: dperson/samba
+    state: started
+    recreate: true
+    volumes:
+      - /mnt/cold/public:/share/public:rw
+      # - /mnt/cold/backup:/share/backup:rw
+    ports:
+      - "139:139"
+      - "445:445"
+    command: -p -s "public;/share/public;yes;no"
 
-# # create shared folder and set permissions on it
-# - ansible.builtin.file:
-#     path: "/mnt/cold/{{ item.name }}"
-#     state: directory
-#     mode: '0755'
-#     recurse: yes
-#     owner: "{{ item.name }}"
-#     group: "{{ item.name }}"
-#   loop: "{{ smbusers }}"
+# ---
 
-- ansible.builtin.template:
-    src: smb.conf.j2
-    dest: /etc/samba/smb.conf
-  vars:
-    publicshares:
-    - public
-    usershares:
-    - backup
-    - backupp
-  register: smbconf
+# # create users for shares
+# - ansible.builtin.user:
+#     name: '{{ item.name }}'
+#     password: '{{ item.passhash }}' # password can be generated with `mkpasswd --method=sha-512`
+#     home: '/mnt/cold/{{ item.name }}'
+#   loop:
+#   - name: 'backup'
+#     passhash: '$6$BTghggjHZA$SyMHrFe7dLamQPsilwJE4PLlcAzk09Bq6D9cBB6SMAruDA.usJ.ka3LJOk8VGukR4XGSkyXr2ZhlBgr59fuxu0'
+#   - name: 'backupp'
+#     passhash: '$6$somesalt$ZlH6KQUe0X5MfWe92Sb/SiHZVGUg25YKe/EeH9RpavT8GHPryq188CnOmddX1YBirKLfyoUVrlgIJS.RmPUF0/'
+#   register: smbusers
 
-- ansible.builtin.service:
-    name: smbd
-    state: restarted
-  when: smbconf.changed or smbusers.changed
+
