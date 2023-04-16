@@ -5,3 +5,4 @@ collections:
 - ansible.posix
 # helm/kubernetes
 - kubernetes.core
+- community.docker
