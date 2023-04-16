@@ -15,18 +15,10 @@ spec:
     spec:
       containers:
       - name: thetillhoff
-        image: ghcr.io/thetillhoff/thetillhoff.de:v1.0.1
+        image: ghcr.io/thetillhoff/thetillhoff.de:v1.0.2
         ports:
         - containerPort: 80
         livenessProbe:
           httpGet:
             port: 8080
           initialDelaySeconds: 5
-        volumeMounts:
-        - name: caddyfile
-          subPath: Caddyfile
-          mountPath: /etc/caddy/Caddyfile
-      volumes:
-      - name: caddyfile
-        configMap:
-          name: caddyfile
