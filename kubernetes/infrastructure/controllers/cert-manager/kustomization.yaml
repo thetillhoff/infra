@@ -3,5 +3,3 @@ kind: Kustomization
 resources:
 - crds.yaml
 - cert-manager.yaml
-- clusterIssuer-staging.yaml
-- clusterIssuer-prod.yaml
