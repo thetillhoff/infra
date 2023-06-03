@@ -8,6 +8,20 @@
   args:
     chdir: infra
 
+# install fluxcd
+- shell: curl -s https://fluxcd.io/install.sh | sudo bash
+  args:
+    creates: /usr/local/bin/flux
+
+- shell: |
+    flux bootstrap github \
+    --owner=thetillhoff \
+    --repository=infra \
+    --path=kubernetes/clusters/{{ ansible_hostname }} \
+    --personal
+  environment:
+    GITHUB_TOKEN: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+
 - shell: kubectl apply -k ./apps/{{ ansible_hostname }}-crds
   args:
     chdir: infra/kubernetes
