@@ -15,5 +15,5 @@ variable "CLOUDFLARE_APITOKEN" {
 
 #####
 
-variable "CLUSTER_NAME" {}
+variable "kubenode_name" {}
 variable "location" {}
