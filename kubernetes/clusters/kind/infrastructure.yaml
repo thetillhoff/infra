@@ -19,7 +19,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: infra-controllers
+    - name: infrastructure-controllers
   interval: 1h
   path: ./kubernetes/infrastructure/configs
   prune: true
