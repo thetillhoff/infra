@@ -25,6 +25,12 @@
     state: enabled
     policy: deny
 
+- ansible.builtin.lineinfile: # limit journald log size to 1G
+    path: /etc/systemd/journald.conf
+    regexp: '^SystemMaxUse'
+    insertafter: '^#SystemMaxUse'
+    line: 'SystemMaxUse=1G'
+
 # System basics
 - ansible.builtin.package:
     name:
