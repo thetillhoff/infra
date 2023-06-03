@@ -50,23 +50,15 @@ Therefore, bare-metal ZFS is deployed where needed (since so far everythings ope
 ZFS is deployed and configured via ansible. Integration with Kubernetes happens via the default kubernetes `hostPath` provider.
 
 ## TODO
-- mariadb with persistence
-- vaultwarden that uses external mariadb
 - secrets,sops,...
 - monitoring, logging (grafana, prometheus, openmetrics, fluentd, jaeger-tracing/grafana-tempo)
 - take a proper look at rook config (erasure coding, ...)
-- ? tekton
 - https://kubernetes.io/docs/tasks/administer-cluster/dns-horizontal-autoscaling/#enablng-dns-horizontal-autoscaling
 - RBAC / access mgmt / proper kubeconfigs
 - tailscale vpn between blackhole and pegasus (non-k8s)
-- storage:
-  - reimport zfs on blackhole
-    rook-nfs -> expose hostpath as nfs
 - k8s on blackhole
   - cilium
-  - metallb
   - ingress-nginx / traefik
-  - ? rook-cephfs -> expose backup location etc.
 - https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/cpu-default-namespace/
 - https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/
 
