@@ -91,7 +91,8 @@
     name: samba
     image: dperson/samba
     state: started
-    recreate: true
+    restart: true
+    restart_policy: "always"
     volumes:
       - /mnt/cold/public:/share/public:rw
       # - /mnt/cold/backup:/share/backup:rw
