@@ -64,7 +64,8 @@ jobs:
         working-directory: ./terraform
 
       - run: |
-          terraform plan
+          terraform plan \
+          -input=false
         working-directory: ./terraform
         env:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
