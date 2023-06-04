@@ -23,7 +23,7 @@ jobs:
           terraform validate
         working-directory: ./terraform
         env:
-          TF_VAR_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
           TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
@@ -35,7 +35,7 @@ jobs:
           # Optional, directory where playbooks live
           directory: ./ansible
           # Optional, SSH private key
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
           # # Optional, SSH known hosts file content
           # known_hosts: .known_hosts
           # # Optional, encrypted vault password
@@ -72,7 +72,7 @@ jobs:
           -input=false
         working-directory: ./terraform
         env:
-          TF_VAR_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
           TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
@@ -98,7 +98,7 @@ jobs:
           -auto-approve
         working-directory: ./terraform
         env:
-          TF_VAR_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
           TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
@@ -110,7 +110,7 @@ jobs:
           # Optional, directory where playbooks live
           directory: ./ansible
           # Optional, SSH private key
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
           # # Optional, SSH known hosts file content
           # known_hosts: .known_hosts
           # # Optional, encrypted vault password
