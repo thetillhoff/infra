@@ -8,7 +8,7 @@ resource "hcloud_server" "kubenode" {
   ssh_keys    = [hcloud_ssh_key.infra.id]
 
   connection {
-    private_key = var.SSH_PRIVATE_KEY
+    private_key = var.KUBENODE_SSH_PRIVATE_KEY
     host        = self.ipv4_address
   }
 
