@@ -1,9 +1,9 @@
 # Create storage
 resource "hcloud_volume" "kubenode_storage" {
-  name      = "kubenode"
-  size      = 10
-  location    = var.location
-  format    = "ext4"
+  name     = "kubenode"
+  size     = 10
+  location = var.location
+  format   = "ext4"
 }
 
 resource "hcloud_volume_attachment" "kubenode_storagemount" {

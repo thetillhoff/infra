@@ -15,7 +15,7 @@
 
 # Create deploy key file on kubenode
 - ansible.builtin.copy:
-    src: ./deploy.key
+    src: ../deploy.key
     dest: ./deploy.key
 
 - shell: | # Bootstrap flux
@@ -23,7 +23,7 @@
     --url=ssh://git@github.com/thetillhoff/infra
     --branch=main \
     --path=kubernetes/clusters/{{ ansible_hostname }} \
-    --private-key-file=deploy.key
+    --private-key-file=./deploy.key
 
 # Remove deploy key file from kubenode
 - ansible.builtin.file:

@@ -15,21 +15,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - run: |
-          echo "$KUBENODE_SSH_PRIVATE_KEY" > ./kubenode_ssh_private.key
-        working-directory: ./terraform
-        env:
-          KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
-
-      - run: |
-          terraform init \
-          -input=false
+          terraform init
         working-directory: ./terraform
 
       - run: |
           terraform validate
         working-directory: ./terraform
         env:
-          TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
@@ -68,22 +60,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - run: |
-          echo "$KUBENODE_SSH_PRIVATE_KEY" > ./kubenode_ssh_private.key
-        working-directory: ./terraform
-        env:
-          KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
-
-      - run: |
-          terraform init \
-          -input=false
+          terraform init
         working-directory: ./terraform
 
       - run: |
-          terraform plan \
-          -input=false
+          terraform plan
         working-directory: ./terraform
         env:
-          TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
@@ -98,14 +81,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - run: |
-          echo "$KUBENODE_SSH_PRIVATE_KEY" > ./kubenode_ssh_private.key
-        working-directory: ./terraform
-        env:
-          KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
-
-      - run: |
-          terraform init \
-          -input=false
+          terraform init
         working-directory: ./terraform
 
       - run: |
@@ -114,7 +90,6 @@ jobs:
           -auto-approve
         working-directory: ./terraform
         env:
-          TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 

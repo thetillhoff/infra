@@ -1,6 +1,6 @@
 # Create deploy key
 resource "tls_private_key" "deploy_key" {
-  algorithm   = "ED25519"
+  algorithm = "ED25519"
 }
 
 # Add a deploy key to github repo
@@ -13,5 +13,5 @@ resource "github_repository_deploy_key" "infra_deploy_key" {
 
 resource "local_sensitive_file" "deploy_key_for_flux" {
   content  = tls_private_key.deploy_key.private_key_openssh
-  filename = "deploy.key"
+  filename = "../deploy.key"
 }

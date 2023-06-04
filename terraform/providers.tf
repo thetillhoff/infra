@@ -34,3 +34,7 @@ provider "hcloud" {
 provider "cloudflare" {
   api_token = var.CLOUDFLARE_APITOKEN
 }
+
+provider "github" {
+  token = var.GITHUB_TOKEN
+}

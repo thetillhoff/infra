@@ -1,2 +1,2 @@
 kubenode_name = "pegasus"
-location = "nbg1"
+location      = "nbg1"

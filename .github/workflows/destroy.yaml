@@ -14,18 +14,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - run: |
-          echo "$KUBENODE_SSH_PRIVATE_KEY" > ./kubenode_ssh_private.key
-        working-directory: ./terraform
-        env:
-          KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
-
-      - run: |
-          terraform init \
-          -input=false
+          terraform init
         working-directory: ./terraform
 
       - run: |
-          terraform destroy \
+          terraform  destroy \
+          -input=false \
           -auto-approve
         working-directory: ./terraform
         env:
