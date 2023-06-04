@@ -16,6 +16,7 @@ jobs:
 
       - run: |
           echo "$KUBENODE_SSH_PRIVATE_KEY" > ./kubenode_ssh_private.key
+        working-directory: ./terraform
         env:
           KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
 
@@ -68,6 +69,7 @@ jobs:
 
       - run: |
           echo "$KUBENODE_SSH_PRIVATE_KEY" > ./kubenode_ssh_private.key
+        working-directory: ./terraform
         env:
           KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
 
@@ -97,6 +99,7 @@ jobs:
 
       - run: |
           echo "$KUBENODE_SSH_PRIVATE_KEY" > ./kubenode_ssh_private.key
+        working-directory: ./terraform
         env:
           KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
 
