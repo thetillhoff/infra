@@ -1,5 +1,5 @@
 data "tls_public_key" "infra" {
-  private_key_openssh = var.KUBENODE_SSH_PRIVATE_KEY
+  private_key_openssh = file("kubenode_ssh_private.key")
 }
 
 # SSH public key
