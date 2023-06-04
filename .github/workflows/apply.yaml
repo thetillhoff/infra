@@ -22,6 +22,7 @@ jobs:
           terraform validate
         working-directory: ./terraform
         env:
+          TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PRIVATE_KEY }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
@@ -47,6 +48,7 @@ jobs:
         env:
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
           TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
+          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
           CLUSTER_NAME: pegasus
 
   plan:
@@ -68,10 +70,9 @@ jobs:
           -input=false
         working-directory: ./terraform
         env:
+          TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PRIVATE_KEY }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
-          TF_VAR_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PRIVATE_KEY }}
 
   apply:
     needs: plan
@@ -93,10 +94,9 @@ jobs:
           -auto-approve
         working-directory: ./terraform
         env:
+          TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PRIVATE_KEY }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
-          TF_VAR_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PRIVATE_KEY }}
 
       - uses: dawidd6/action-ansible-playbook@v2
         with:
@@ -119,3 +119,5 @@ jobs:
         env:
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
           TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
+          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
+          CLUSTER_NAME: pegasus

@@ -15,7 +15,7 @@
 
 # Create deploy key file on kubenode
 - ansible.builtin.copy:
-    src: ../deploy.key
+    content: "{{ lookup('env', 'GIT_DEPLOY_KEY') }}"
     dest: ./deploy.key
 
 - shell: | # Bootstrap flux

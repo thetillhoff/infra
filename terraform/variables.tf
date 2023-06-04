@@ -10,11 +10,6 @@ variable "CLOUDFLARE_APITOKEN" {
   sensitive = true
 }
 
-variable "GITHUB_TOKEN" {
-  sensitive = true
-}
-
-
 
 #####
 
