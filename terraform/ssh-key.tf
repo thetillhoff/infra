@@ -5,5 +5,5 @@ data "tls_public_key" "infra" {
 # SSH public key
 resource "hcloud_ssh_key" "infra" {
   name       = "infra-key"
-  public_key = tls_public_key.infra
+  public_key = data.tls_public_key.infra
 }
