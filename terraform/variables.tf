@@ -2,6 +2,10 @@ variable "KUBENODE_SSH_PRIVATE_KEY" {
   sensitive = true
 }
 
+variable "KUBENODE_SSH_PUBLIC_KEY" {
+  sensitive = true
+}
+
 variable "HCLOUD_TOKEN" {
   sensitive = true
 }

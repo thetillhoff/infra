@@ -23,6 +23,7 @@ jobs:
         working-directory: ./terraform
         env:
           TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PRIVATE_KEY }}
+          TF_VAR_KUBENODE_SSH_PUBLIC_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PUBLIC_KEY }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
@@ -71,6 +72,7 @@ jobs:
         working-directory: ./terraform
         env:
           TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PRIVATE_KEY }}
+          TF_VAR_KUBENODE_SSH_PUBLIC_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PUBLIC_KEY }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
@@ -95,6 +97,7 @@ jobs:
         working-directory: ./terraform
         env:
           TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PRIVATE_KEY }}
+          TF_VAR_KUBENODE_SSH_PUBLIC_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PUBLIC_KEY }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
