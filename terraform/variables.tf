@@ -1,7 +1,4 @@
-variable "SSH_PUBLIC_KEY" {
-  sensitive = true
-}
-variable "SSH_PRIVATE_KEY" {
+variable "KUBENODE_SSH_PRIVATE_KEY" {
   sensitive = true
 }
 

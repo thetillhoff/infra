@@ -1,4 +1,4 @@
-- ufw: # allow connections from private ips
+- ufw: # allow connections to https
     rule: allow
     port: '443'
     proto: tcp
@@ -13,20 +13,28 @@
   args:
     creates: /usr/local/bin/flux
 
-- shell: |
-    flux bootstrap github \
-    --owner=thetillhoff \
-    --repository=infra \
+# Create deploy key file on kubenode
+- ansible.builtin.copy:
+    src: ./deploy.key
+    dest: ./deploy.key
+
+- shell: | # Bootstrap flux
+    flux bootstrap git \
+    --url=ssh://git@github.com/thetillhoff/infra
     --branch=main \
-    --path=kubernetes/clusters/{{ ansible_hostname }}
-  environment:
-    GITHUB_TOKEN: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+    --path=kubernetes/clusters/{{ ansible_hostname }} \
+    --private-key-file=deploy.key
 
-- shell: kubectl apply -k ./apps/{{ ansible_hostname }}-crds
-  args:
-    chdir: infra/kubernetes
+# Remove deploy key file from kubenode
+- ansible.builtin.file:
+    path: ./deploy.key
+    state: absent
 
-#- shell: kubectl apply --prune --all --prune-whitelist=apiextensions.k8s.io/v1/customresourcedefinition -k ./apps/{{ ansible_hostname }}
-- shell: kubectl apply -k ./apps/{{ ansible_hostname }}
-  args:
-    chdir: infra/kubernetes
+# - shell: kubectl apply -k ./apps/{{ ansible_hostname }}-crds
+#   args:
+#     chdir: infra/kubernetes
+
+# #- shell: kubectl apply --prune --all --prune-whitelist=apiextensions.k8s.io/v1/customresourcedefinition -k ./apps/{{ ansible_hostname }}
+# - shell: kubectl apply -k ./apps/{{ ansible_hostname }}
+#   args:
+#     chdir: infra/kubernetes

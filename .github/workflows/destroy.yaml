@@ -23,7 +23,6 @@ jobs:
           -auto-approve
         working-directory: ./terraform
         env:
-          TF_VAR_SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
           TF_VAR_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           TF_VAR_CLOUDFLARE_EMAIL: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
