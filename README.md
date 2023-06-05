@@ -3,9 +3,49 @@
 ## The vision `One place to rule them all`
 This repository contains several subfolders - each for its own tool:
 - .github: Contains Github actions, which call terraform and ansible with their respective folders.
-- terraform: Contains terraform code for Cluster-, DNS-, Storage-, Network-provisioning & initial configuration.
+- terraform: Contains terraform code for Cluster-, DNS-, Storage-, Network-provisioning & initial configuration (cloud-init).
 - ansible: Contains additional configuration management which terraform is not intended for.
 - kubernetes: Contains kubernetes manifests like helm charts and kustomizations.
+
+## The tools
+### Terraform
+The Terraform code should be formatted, and tested with git-hooks locally.
+The Github Action is the actual planner and executor.
+The state is stored in Terraform cloud.
+The secrets are stored in github (actions), with prefix `TF_VAR_*`.
+
+### Ansible
+Ansible playbook can be run from your local machine (ssh auth).
+But they are run from a Github Action anyway / as well.
+The Ansible inventory is created by Terraform during the Terraform apply step.
+
+### Kubernetes
+The Kubernetes distro of choice is k3s.
+It's installed with Ansible.
+The actual Kubernetes manifests are deployed/synced with FluxCD.
+
+### FluxCD
+The FluxCD bootstrap is executed each time the ansible playbook is run.
+> FluxCD just "skips" the bootstrap if it was already bootstrapped before.
+
+### Apps
+
+#### Logs
+
+#### Metrics
+
+#### Tracing
+
+#### Storage
+
+#### Backup
+
+#### Certificates
+
+#### VPN / Auth
+
+
+
 
 The flow is like this:
 1. Make changes
@@ -16,12 +56,19 @@ The flow is like this:
 6. Github action is triggered and executes the same module as before
 
 ### Github actions
-They require some setup on github side. For once, two environments should be created: `prod` and `dev (main)`.
+They require some setup on Github side. For once, two environments should be created: `prod` and `dev (main)`.
 The latter provides the ability to test stuff before putting it live in the `prod` environment.
 
 Many secrets are required in the process. Most are universal, but some are distinct per environment.
 
-`TF_VAR_DNS_SUFFIX`
+#- `KUBENODE_SSH_PRIVATE_KEY`
+- `GITHUB_TOKEN` # Automatically set by Github Actions
+- `TAILSCALE_AUTH_TOKEN`
+- `TERRAFORM_TOKEN`
+- `TF_VAR_CLOUDFLARE_APITOKEN`
+- `TF_VAR_HCLOUD_TOKEN`
+- `TF_VAR_ROOT_DOMAIN`
+- `TRANSCRYPT_PASSWORD`
 
 ### Kubernetes
 There are two options on how to deploy changes:
@@ -70,3 +117,9 @@ I tried it and it had several hickups that in summary rendered it unusable.
   But flux/kustomization does not support this use case: Before the CRDs are added, the framework tries to instantiate the CRs, which is not possible by that time and the whole deployment fails. Next retry it is the same, so it's not even that CRDs are deployed in the first try and CRs in the second... it just fails repeatedly.
   You don't have that if you first apply the CRDs (push them to the repo), and the resources in the next step, but that is not an idempotent workflow.
 - setting values for helm charts is all well and good, but if you change them, they often are not deployed. My guess on the root cause is that the configurations are deployed as configmaps, and updates of their contents don't restart its consumers. That's why flux/kustomize introduced configmapGenerators... But they are obviously not used in helm charts.
+
+
+TODO:
+- use pregenerated ssh key for git access from/by flux (aka deploy key)
+- setup two kustomizations, `infra-controllers` and `apps`, where `apps` depends on the former. That way all dependencies and crds can be set up that way.
+- setup sops with age for flux and on the repo so secrets can be encrypted
