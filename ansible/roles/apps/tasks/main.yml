@@ -23,7 +23,8 @@
     --url=ssh://git@github.com/thetillhoff/infra
     --branch=main \
     --path=kubernetes/clusters/{{ ansible_hostname }} \
-    --private-key-file=./deploy.key
+    --private-key-file=./deploy.key \
+    --silent
 
 # - shell: kubectl apply -k ./apps/{{ ansible_hostname }}-crds
 #   args:
