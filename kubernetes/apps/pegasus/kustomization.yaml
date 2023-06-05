@@ -5,5 +5,5 @@ resources:
 - thetillhoff
 - vaultwarden
 - link-shortener
-- umami
+#- umami
 #- global-tcp-udp-services.yaml
