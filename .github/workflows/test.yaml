@@ -1,0 +1,16 @@
+name: Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  validate:
+    runs-on: ubuntu-20.04
+    steps:
+      - run: |
+          python -v
+      - run: |
+          python -m pip -v
+      - run: |
+          pip -V

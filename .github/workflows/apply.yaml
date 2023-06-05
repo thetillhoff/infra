@@ -1,7 +1,7 @@
-name: Run deployment
+name: Apply
 
 on:
-  push:
+  # push:
   workflow_dispatch:
 
 jobs:
@@ -12,6 +12,15 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --user ansible==2.14
+          pip install -r requirements.txt
+
       - uses: actions/checkout@v3
 
       - run: |
@@ -27,25 +36,17 @@ jobs:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
-      - uses: dawidd6/action-ansible-playbook@v2
-        with:
-          # Required, playbook filepath
-          playbook: kubenodes.yaml
-          # Optional, directory where playbooks live
-          directory: ./ansible
-          # Optional, SSH private key
-          key: ${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}
-          # # Optional, SSH known hosts file content
-          # known_hosts: .known_hosts
-          # # Optional, encrypted vault password
-          # vault_password: ${{secrets.VAULT_PASSWORD}}
-          # Optional, galaxy requirements filepath
-          requirements: requirements.yaml
-          # Optional, additional flags to pass to ansible-playbook
-          options: |
-            --inventory ../inventory.ini
-            --verbose
-            --check
+          # TODO write ssh private key to file
+
+      - run: |
+          echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
+          ansible-galaxy install -r requirements.yaml
+          ansible-playbook kubenodes.yaml \
+          --inventory ../inventory.ini \
+          --verbose \
+          --private-key kubenode_ssh.key #TODO
+          --check
+        working-directory: ./ansible
         env:
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
           TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
