@@ -1,1 +1,8 @@
-**/*.gpg
+.terraform
+.terraform.lock.hcl
+*.gpg
+*.key
+*.pub
+
+secret.auto.tfvars
+
