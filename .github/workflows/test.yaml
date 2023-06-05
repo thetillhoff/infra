@@ -5,12 +5,12 @@ on:
 
 jobs:
 
-  validate:
+  test:
     runs-on: ubuntu-22.04
     steps:
       - run: |
-          python -v
-      - run: |
-          python -m pip -v
-      - run: |
           pip -V
+      - run: |
+          ansible-galaxy install -r requirements.yaml
+          ansible -v
+
