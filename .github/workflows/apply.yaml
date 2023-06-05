@@ -7,7 +7,7 @@ on:
 jobs:
 
   validate:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: hashicorp/setup-terraform@v2
         with:
@@ -55,7 +55,7 @@ jobs:
 
   plan:
     needs: validate
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     concurrency: ${{ github.workflow }}-terraform
     steps:
       - uses: hashicorp/setup-terraform@v2
@@ -79,7 +79,7 @@ jobs:
 
   apply:
     needs: plan
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     concurrency: ${{ github.workflow }}-terraform
     steps:
       - uses: hashicorp/setup-terraform@v2
