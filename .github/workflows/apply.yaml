@@ -36,7 +36,7 @@ jobs:
           ansible-playbook kubenodes.yaml \
           --inventory ../inventory.ini \
           --verbose \
-          --private-key ../kubenode_ssh.key
+          --private-key ../kubenode_ssh.key \
           --check
         working-directory: ./ansible
         env:
@@ -45,29 +45,27 @@ jobs:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
           CLUSTER_NAME: pegasus
 
-  # plan:
-  #   needs: validate
-  #   runs-on: ubuntu-22.04
-  #   concurrency: ${{ github.workflow }}-terraform
-  #   steps:
-  #     - uses: hashicorp/setup-terraform@v2
-  #       with:
-  #         cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-  #     - uses: actions/checkout@v3
+  plan:
+    needs: validate
+    runs-on: ubuntu-22.04
+    concurrency: ${{ github.workflow }}-terraform
+    steps:
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+      - uses: actions/checkout@v3
 
-  #     - run: |
-  #         terraform init
-  #       working-directory: ./terraform
+      - run: |
+          terraform init
+        working-directory: ./terraform
 
-  #     - run: |
-  #         terraform plan \
-  #         -input=false
-  #       working-directory: ./terraform
-  #       env:
-  #         TF_VAR_KUBENODE_SSH_PRIVATE_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PRIVATE_KEY }}
-  #         TF_VAR_KUBENODE_SSH_PUBLIC_KEY: ${{ secrets.TF_VAR_KUBENODE_SSH_PUBLIC_KEY }}
-  #         TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
-  #         TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+      - run: |
+          terraform plan \
+          -input=false
+        working-directory: ./terraform
+        env:
+          TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
+          TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
   # apply:
   #   needs: plan
