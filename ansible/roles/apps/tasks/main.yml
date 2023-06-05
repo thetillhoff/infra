@@ -16,7 +16,7 @@
 - copy:
     src: ../deploy.key
     dest: ./deploy.key
-    chmod: '0600'
+    mode: '0600'
 
 - shell: | # Bootstrap flux
     flux bootstrap git \
