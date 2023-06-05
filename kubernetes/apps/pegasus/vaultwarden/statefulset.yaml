@@ -27,10 +27,10 @@ spec:
         env:
         - name: DOMAIN
           value: https://pw.thetillhoff.de
-        # - name: SIGNUPS_DOMAINS_WHITELIST # Setting this ignores SIGNUPS_ALLOWED
-        #   value: "thetillhoff.de"
-        - name: SIGNUPS_ALLOWED # This is ignored if SIGNUPS_DOMAINS_WHITELIST is set
-          value: "false"
+        - name: SIGNUPS_DOMAINS_WHITELIST # Setting this ignores SIGNUPS_ALLOWED
+          value: "thetillhoff.de"
+        # - name: SIGNUPS_ALLOWED # This is ignored if SIGNUPS_DOMAINS_WHITELIST is set
+        #   value: "false"
         - name: SHOW_PASSWORD_HINT
           value: "false"
         - name: INVITATIONS_ALLOWED
