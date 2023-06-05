@@ -2,10 +2,10 @@
 - apt:
     pkg:
       - gnupg
-- ansible.builtin.apt_key:
+- apt_key:
     url: https://pkgs.tailscale.com/stable/debian/{{ ansible_distribution_release }}.noarmor.gpg
     state: present
-- ansible.builtin.apt_repository:
+- apt_repository:
     repo: deb https://pkgs.tailscale.com/stable/debian {{ ansible_distribution_release }} main
     update_cache: yes
 - apt:

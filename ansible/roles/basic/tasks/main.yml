@@ -25,20 +25,20 @@
     state: enabled
     policy: deny
 
-- ansible.builtin.lineinfile: # limit journald log size to 1G
+- lineinfile: # limit journald log size to 1G
     path: /etc/systemd/journald.conf
     regexp: '^SystemMaxUse'
     insertafter: '^#SystemMaxUse'
     line: 'SystemMaxUse=1G'
 
 # System basics
-- ansible.builtin.package:
+- package:
     name:
       - git
       - curl
     state: present
 
-- ansible.builtin.git:
+- git:
     repo: https://github.com/thetillhoff/infra
     dest: ./infra
     force: yes # discard local changes

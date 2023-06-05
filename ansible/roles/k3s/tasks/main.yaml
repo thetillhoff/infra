@@ -9,12 +9,12 @@
   register: k3s_config
 
 - when: not k3s_config.stat.exists
-  ansible.builtin.file:
+  file:
     path: /etc/rancher/k3s/
     state: directory
 
 - when: not k3s_config.stat.exists
-  ansible.builtin.copy:
+  copy:
     content: |
       disable: traefik
       # default storage path: /opt/local-path-provisioner
@@ -22,7 +22,7 @@
     dest: /etc/rancher/k3s/config.yaml
 
 # k3s
-- ansible.builtin.shell: curl -sfL https://get.k3s.io | sh -
+- shell: curl -sfL https://get.k3s.io | sh -
   args:
     creates: /usr/local/bin/k3s
 
@@ -32,7 +32,7 @@
   register: kube_config
 
 - when: not kube_config.stat.exists
-  ansible.builtin.file:
+  file:
     path: /root/.kube/
     state: directory
 
