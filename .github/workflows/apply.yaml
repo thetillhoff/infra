@@ -2,6 +2,9 @@ name: Apply
 
 on:
   push:
+    paths:
+    - 'terraform/**'
+    - 'ansible/**'
   workflow_dispatch:
 
 jobs:
