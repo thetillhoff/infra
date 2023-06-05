@@ -13,12 +13,17 @@
   args:
     creates: /usr/local/bin/flux
 
+- copy:
+    src: ../deploy.key
+    dest: ./deploy.key
+    chmod: '0600'
+
 - shell: | # Bootstrap flux
     flux bootstrap git \
     --url=ssh://git@github.com/thetillhoff/infra
     --branch=main \
     --path=kubernetes/clusters/{{ ansible_hostname }} \
-    --private-key-file=../deploy.key
+    --private-key-file=./deploy.key
 
 # - shell: kubectl apply -k ./apps/{{ ansible_hostname }}-crds
 #   args:
