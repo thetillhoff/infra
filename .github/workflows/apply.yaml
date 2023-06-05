@@ -36,6 +36,7 @@ jobs:
 
       - run: |
           ansible-galaxy install -r requirements.yaml
+        working-directory: ./ansible
 
       - run: |
           ansible-playbook kubenodes.yaml \
@@ -113,6 +114,7 @@ jobs:
 
       - run: |
           ansible-galaxy install -r requirements.yaml
+        working-directory: ./ansible
 
       - run: |
           ansible-playbook kubenodes.yaml \
