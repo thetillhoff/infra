@@ -10,7 +10,7 @@ resource "cloudflare_record" "k8s" {
 # grafana
 resource "cloudflare_record" "grafana" {
   zone_id = "94d9f474ce48a61513a68744b663f5e5"
-  name    = "grafana.thetillhoff.de"
+  name    = "logs.thetillhoff.de"
   value   = hcloud_server.kubenode.ipv4_address
   type    = "A"
   ttl     = 3600
