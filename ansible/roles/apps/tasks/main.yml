@@ -13,19 +13,12 @@
   args:
     creates: /usr/local/bin/flux
 
-- copy:
-    src: ../deploy.key
-    dest: ./deploy.key
-    mode: '0600'
-
 - shell: | # Bootstrap flux
-    flux bootstrap git \
-    --url=ssh://git@github.com/thetillhoff/infra
-    --branch=main \
-    --path=kubernetes/clusters/{{ ansible_hostname }} \
-    --private-key-file=./deploy.key \
-    --silent
-
+    flux bootstrap github \
+    --owner=thetillhoff --repository=infra --path=kubernetes/clusters/{{ ansible_hostname }}
+  environment:
+    GITHUB_TOKEN: "{{ lookup('env', 'GH_TOKEN_FOR_FLUX') }}"
+  
 # - shell: kubectl apply -k ./apps/{{ ansible_hostname }}-crds
 #   args:
 #     chdir: infra/kubernetes

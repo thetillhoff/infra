@@ -20,8 +20,6 @@ jobs:
           chmod 0400 kubenode_ssh.key
           echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
           chmod 0400 kubenode_ssh.key.pub
-          echo "${{ secrets.DEPLOY_KEY }}" > deploy.key
-          chmod 0400 deploy.key
 
       - run: |
           terraform init
@@ -66,8 +64,6 @@ jobs:
           chmod 0400 kubenode_ssh.key
           echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
           chmod 0400 kubenode_ssh.key.pub
-          echo "${{ secrets.DEPLOY_KEY }}" > deploy.key
-          chmod 0400 deploy.key
 
       - run: |
           terraform init
@@ -96,8 +92,6 @@ jobs:
           chmod 0400 kubenode_ssh.key
           echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
           chmod 0400 kubenode_ssh.key.pub
-          echo "${{ secrets.DEPLOY_KEY }}" > deploy.key
-          chmod 0400 deploy.key
 
       - run: |
           terraform init
@@ -125,5 +119,5 @@ jobs:
         env:
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
           TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
           CLUSTER_NAME: pegasus
