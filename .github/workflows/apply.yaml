@@ -17,8 +17,11 @@ jobs:
 
       - run: |
           echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
+          chmod 0400 kubenode_ssh.key
           echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
+          chmod 0400 kubenode_ssh.key.pub
           echo "${{ secrets.DEPLOY_KEY }}" > deploy.key
+          chmod 0400 deploy.key
 
       - run: |
           terraform init
@@ -59,8 +62,11 @@ jobs:
 
       - run: |
           echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
+          chmod 0400 kubenode_ssh.key
           echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
+          chmod 0400 kubenode_ssh.key.pub
           echo "${{ secrets.DEPLOY_KEY }}" > deploy.key
+          chmod 0400 deploy.key
 
       - run: |
           terraform init
@@ -86,8 +92,11 @@ jobs:
 
       - run: |
           echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
+          chmod 0400 kubenode_ssh.key
           echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
+          chmod 0400 kubenode_ssh.key.pub
           echo "${{ secrets.DEPLOY_KEY }}" > deploy.key
+          chmod 0400 deploy.key
 
       - run: |
           terraform init
