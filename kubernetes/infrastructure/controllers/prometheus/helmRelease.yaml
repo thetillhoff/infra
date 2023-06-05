@@ -7,10 +7,10 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: prometheus-community/kube-prometheus-stack
+      chart: kube-prometheus-stack
       version: "46.6.0"
       sourceRef:
         kind: HelmRepository
-        name: prometheus
+        name: prometheus-community
         namespace: flux-system
       interval: 1m
