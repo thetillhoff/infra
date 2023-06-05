@@ -1,11 +1,3 @@
-variable "KUBENODE_SSH_PRIVATE_KEY" {
-  sensitive = true
-}
-
-variable "KUBENODE_SSH_PUBLIC_KEY" {
-  sensitive = true
-}
-
 variable "HCLOUD_TOKEN" {
   sensitive = true
 }
@@ -19,3 +11,5 @@ variable "CLOUDFLARE_APITOKEN" {
 
 variable "kubenode_name" {}
 variable "location" {}
+variable "kubenode_ssh_private_key_location" {}
+variable "kubenode_ssh_public_key_location" {}
