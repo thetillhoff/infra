@@ -21,7 +21,7 @@ spec:
     - logs.thetillhoff.de
     secretName: ingress-tls
   rules:
-  - host: logs.prometheus.de
+  - host: logs.thetillhoff.de
     http:
       paths:
       - path: /
