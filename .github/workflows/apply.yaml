@@ -49,7 +49,7 @@ jobs:
         env:
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
           TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
           CLUSTER_NAME: pegasus
 
   plan:
