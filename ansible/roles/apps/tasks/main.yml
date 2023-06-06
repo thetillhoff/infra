@@ -25,7 +25,5 @@
   ignore_errors: true
 
 # Create sops-age secret after flux is bootstrapped, so the namespace exists beforehand, but only if it doesn't already exist
-- shell: kubectl create secret generic sops-age -n flux-system --from-literal=identity.agekey=$AGE_KEY
+- shell: kubectl create secret generic sops-age -n flux-system --from-literal=identity.agekey='{{ lookup('env', 'AGE_KEY') }}'
   when: get_sops_secret is failed
-  environment:
-    AGE_KEY: "{{ lookup('env', 'AGE_KEY') }}"
