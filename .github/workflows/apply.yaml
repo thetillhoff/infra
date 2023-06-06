@@ -50,6 +50,7 @@ jobs:
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
           TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
           GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
+          AGE_KEY: ${{ secrets.AGE_KEY }}
           CLUSTER_NAME: pegasus
 
   plan:
@@ -123,4 +124,5 @@ jobs:
           TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
           TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
           GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
+          AGE_KEY: ${{ secrets.AGE_KEY }}
           CLUSTER_NAME: pegasus
