@@ -3,6 +3,7 @@ name: Apply
 on:
   push:
     paths:
+    - '.github/**'
     - 'terraform/**'
     - 'ansible/**'
   workflow_dispatch:
