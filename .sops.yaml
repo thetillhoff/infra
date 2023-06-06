@@ -1,0 +1,6 @@
+# creation rules are evaluated sequentially, the first match wins
+creation_rules:
+  # upon creation of a file that matches the pattern *secret.yaml,
+  # AGE is used
+  - encrypted_regex: '^(data|stringData)$'
+    age: age1jmznk7lwandq9d7mm6fq69uwpa7hf79p6h6qztz0e20wj2yw2a8qylelvw # This is a public key and therefore doesn't have to be secret
