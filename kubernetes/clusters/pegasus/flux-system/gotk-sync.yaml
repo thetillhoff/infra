@@ -12,6 +12,11 @@ spec:
   secretRef:
     name: flux-system
   url: ssh://git@github.com/thetillhoff/infra
+  ignore: |
+    # exclude all
+    /*
+    # include kubernetes dir
+    !/kubernetes
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
