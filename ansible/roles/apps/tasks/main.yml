@@ -18,3 +18,14 @@
     --owner=thetillhoff --repository=infra --path=kubernetes/clusters/{{ ansible_hostname }}
   environment:
     GITHUB_TOKEN: "{{ lookup('env', 'GH_TOKEN_FOR_FLUX') }}"
+
+- shell: | # Check if sops-age secret exists
+    kubectl get secret -n flux-system sops-age
+  register: get_sops_secret
+  ignore_errors: true
+
+# Create sops-age secret after flux is bootstrapped, so the namespace exists beforehand, but only if it doesn't already exist
+- shell: echo "$AGE_KEY" | kubectl create secret generic sops-age -n flux-system --from-file=identity.agekey=/dev/stdin
+  when: get_sops_secret is failed
+  environment:
+    AGE_KEY: "{{ lookup('env', 'AGE_KEY') }}"
