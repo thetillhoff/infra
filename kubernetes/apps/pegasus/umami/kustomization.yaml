@@ -7,13 +7,5 @@ resources:
 - statefulset-umami.yaml
 - service-umami.yaml
 - ingress.yaml
-
-secretGenerator:
-- name: mariadb
-  namespace: umami
-  envs:
-  - mariadb.env.secret
-- name: umami
-  namespace: umami
-  envs:
-  - umami.env.secret
+- mariadb.secret.yaml
+- umami.secret.yaml
