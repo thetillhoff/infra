@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: umami
-        image: docker.umami.is/umami-software/umami:mysql-latest
+        image: docker.umami.dev/umami-software/umami:mysql-latest
         ports:
         - containerPort: 3000
         # livenessProbe:
