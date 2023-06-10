@@ -5,5 +5,4 @@ resources:
 - thetillhoff
 - vaultwarden
 - link-shortener
-- secret.yaml
 - umami
