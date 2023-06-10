@@ -5,3 +5,7 @@ resources:
 - deployment.yaml
 - service.yaml
 - ingress.yaml
+
+- image-scanning.yaml
+- image-policy.yaml
+- image-update.yaml
