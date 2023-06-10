@@ -17,8 +17,3 @@ spec:
         email: fluxcdbot@users.noreply.github.com
         name: fluxcdbot
       messageTemplate: '{{range .Updated.Images}}{{println .}}{{end}}'
-    push:
-      branch: main
-  update:
-    path: ./kubernetes/clusters/pegasus
-    strategy: Setters

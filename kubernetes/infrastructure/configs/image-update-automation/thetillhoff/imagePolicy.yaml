@@ -6,6 +6,9 @@ metadata:
 spec:
   imageRepositoryRef:
     name: thetillhoff
+  filterTags:
+    pattern: '^v(?P<version>.*)'
+    extract: '$version'
   policy:
     semver:
-      range: 1.0.x
+      range: '>=1.0.0'
