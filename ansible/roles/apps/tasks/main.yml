@@ -15,7 +15,7 @@
 
 - shell: | # Bootstrap flux
     flux bootstrap github \
-    --owner=thetillhoff --repository=infra --path=kubernetes/clusters/{{ ansible_hostname }}
+    --owner=thetillhoff --repository=infra --path=kubernetes/clusters/{{ ansible_hostname }} --components-extra=image-reflector-controller,image-automation-controller
   environment:
     GITHUB_TOKEN: "{{ lookup('env', 'GH_TOKEN_FOR_FLUX') }}"
 
