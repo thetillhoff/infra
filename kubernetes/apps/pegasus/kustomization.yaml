@@ -6,4 +6,4 @@ resources:
 - vaultwarden
 - link-shortener
 - secret.yaml
-- umami
+#- umami
