@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - cert-manager
 - discord-notifications
+- image-update-automation
