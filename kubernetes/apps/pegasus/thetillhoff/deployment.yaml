@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: thetillhoff
-        image: ghcr.io/thetillhoff/thetillhoff.de:v1.0.8 # {"$imagepolicy": "flux-system:thetillhoff"}
+        image: ghcr.io/thetillhoff/thetillhoff.de:v1.0.9 # {"$imagepolicy": "flux-system:thetillhoff"}
         ports:
         - containerPort: 80
         livenessProbe:
