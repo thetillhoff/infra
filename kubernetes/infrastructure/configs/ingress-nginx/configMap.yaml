@@ -15,7 +15,7 @@ data:
   keep-alive: 10 # seconds
 
   ssl-ciphers: EECDH+AESGCM:EDH+AESGCM
-  ssl_prefer_server_ciphers: true # set by default anyway
+  # ssl_prefer_server_ciphers is enabled by default
   ssl-dh-param: "ingress-nginx/dh-param" # name of the secret
 
   use-gzip: true
