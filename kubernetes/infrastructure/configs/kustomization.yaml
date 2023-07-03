@@ -1,6 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+- ingress-nginx
 - cert-manager
-- discord-notifications
 - image-update-automation
+- discord-notifications
