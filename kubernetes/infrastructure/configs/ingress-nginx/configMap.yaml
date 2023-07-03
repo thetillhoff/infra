@@ -6,19 +6,19 @@ metadata:
 data:
   ssl-protocols: TLSv1.2 TLSv1.3 # set by default anyway
 
-  enable-modsecurity: true
-  enable-owasp-modsecurity-crs: true
+  enable-modsecurity: "true"
+  enable-owasp-modsecurity-crs: "true"
 
   # hsts: true
   # hsts-max-age: ...
 
-  keep-alive: 10 # seconds
+  keep-alive: "10" # seconds
 
   ssl-ciphers: EECDH+AESGCM:EDH+AESGCM
   # ssl_prefer_server_ciphers is enabled by default
   ssl-dh-param: "ingress-nginx/dh-param" # name of the secret
 
-  use-gzip: true
-  enable-brotli: true
+  use-gzip: "true"
+  enable-brotli: "true"
 
   # enable-opentracing: true
