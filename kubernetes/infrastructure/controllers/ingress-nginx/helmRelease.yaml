@@ -13,7 +13,7 @@ spec:
       version: 4.7.1
       valuesFiles:
         - values.yaml
-  interval: 1h
+  interval: 10m
 
   values:
     controller:
