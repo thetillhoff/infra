@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: vaultwarden
-        image: vaultwarden/server
+        image: vaultwarden/server:1.28.1 # https://hub.docker.com/r/vaultwarden/server/tags
         ports:
         - containerPort: 80
         livenessProbe:
