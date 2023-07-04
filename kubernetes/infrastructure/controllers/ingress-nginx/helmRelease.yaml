@@ -11,6 +11,28 @@ spec:
         kind: HelmRepository
         name: ingress-nginx
       version: 4.7.1
+      valuesFiles:
+        - values.yaml
   interval: 1h
-  valuesFiles:
-    - values.yaml
+
+  values:
+    controller:
+      config:
+        ssl-protocols: TLSv1.2 TLSv1.3 # set by default anyway
+
+        enable-modsecurity: "true"
+        enable-owasp-modsecurity-crs: "true"
+
+        # hsts: true
+        # hsts-max-age: ...
+
+        keep-alive: "10" # seconds
+
+        ssl-ciphers: EECDH+AESGCM:EDH+AESGCM
+        # ssl_prefer_server_ciphers is enabled by default
+        ssl-dh-param: "ingress-nginx/dh-param" # name of the secret
+
+        use-gzip: "true"
+        enable-brotli: "true"
+
+        allow-snippet-annotations: "true" # enabled by default
