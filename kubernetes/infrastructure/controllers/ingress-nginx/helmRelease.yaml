@@ -35,4 +35,4 @@ spec:
         use-gzip: "true"
         enable-brotli: "true"
 
-        allow-snippet-annotations: "true" # enabled by default
+        # allow-snippet-annotations: "true" # enabled by default -> already defined in configmap
