@@ -11,8 +11,6 @@ spec:
         kind: HelmRepository
         name: ingress-nginx
       version: 4.7.1
-      valuesFiles:
-        - values.yaml
   interval: 10m
 
   values:
