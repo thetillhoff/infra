@@ -109,6 +109,31 @@ ZFS is deployed and configured via ansible. Integration with Kubernetes happens 
 - https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/cpu-default-namespace/
 - https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/
 
+## Maintenance
+- Github Action
+  - Update runner version
+  - Update github action versions in `.github/workflows/apply.yaml`
+  - Update cli versions within apply.yaml:
+    - Terraform
+  - Update github action versions in `.github/workflows/destroy.yaml`
+- Ansible modules
+  - k3s
+  - tailscale
+  - fluxcd cli
+- System -> manual apt-update && apt-upgrade -y
+- Kubernetes
+  - infra
+    - flux
+    - ingress-nginx
+    - cert-manager
+  - apps
+    - link-shortener caddy version
+    - umami, umami-mariadb -> currently latest, but never pulled again
+    - vaultwarden
+- Terraform
+  - Provider
+- Secret rotation TBD
+
 ## Why `flux` isn't there yet:
 I tried it and it had several hickups that in summary rendered it unusable.
 - two different types of `kustomization.yaml`s - one the plain kubernetes one, one is flux specific. Feels bad and it's a hassle to mix them.
