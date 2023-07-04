@@ -16,6 +16,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+          terraform_version: 1.5.2
 
       - uses: actions/checkout@v3
 
@@ -62,6 +63,8 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+          terraform_version: 1.5.2
+
       - uses: actions/checkout@v3
 
       - run: |
@@ -90,6 +93,8 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+          terraform_version: 1.5.2
+
       - uses: actions/checkout@v3
 
       - run: |
