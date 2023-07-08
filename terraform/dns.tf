@@ -1,3 +1,12 @@
+# caa letsencrypt
+resource "cloudflare_record" "caa" {
+  zone_id = "94d9f474ce48a61513a68744b663f5e5"
+  type    = "CAA"
+  name    = "thetillhoff.de"
+  value   = "0 issue \"letsencrypt.org\""
+  ttl     = 3600
+}
+
 # route to k8s cluster
 resource "cloudflare_record" "k8s" {
   zone_id = "94d9f474ce48a61513a68744b663f5e5"
@@ -26,8 +35,7 @@ resource "cloudflare_record" "root" {
 }
 
 # www website
-# website
-resource "cloudflare_record" "root" {
+resource "cloudflare_record" "www" {
   zone_id = "94d9f474ce48a61513a68744b663f5e5"
   type    = "CNAME"
   name    = "www.thetillhoff.de"
@@ -63,13 +71,6 @@ resource "cloudflare_record" "umami" {
 }
 
 # m365 config
-resource "cloudflare_record" "m655-spf" {
-  zone_id = "94d9f474ce48a61513a68744b663f5e5"
-  type    = "TXT"
-  name    = "thetillhoff.de"
-  value   = "v=spf1 include:spf.protection.outlook.com -all"
-  ttl     = 3600
-}
 resource "cloudflare_record" "spf" {
   zone_id = "94d9f474ce48a61513a68744b663f5e5"
   type    = "TXT"
