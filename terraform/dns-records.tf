@@ -33,6 +33,13 @@ resource "cloudflare_record" "root" {
   value   = hcloud_server.kubenode.ipv4_address
   ttl     = 3600
 }
+resource "cloudflare_record" "root-aaaa" {
+  zone_id = var.cloudflare_zone_id
+  type    = "AAAA"
+  name    = "thetillhoff.de"
+  value   = hcloud_server.kubenode.ipv6_address
+  ttl     = 3600
+}
 
 # www website
 resource "cloudflare_record" "www" {
