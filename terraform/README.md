@@ -21,3 +21,5 @@ GITHUB_TOKEN             = ""
 
 ## Debugging
 cloud-init logs are at /var/log/cloud-init-output.log
+
+example manual api call: `curl --request GET --url https://api.cloudflare.com/client/v4/zones -H 'Content-Type: application/json' -H "Authorization: Bearer <API-TOKEN>"`
