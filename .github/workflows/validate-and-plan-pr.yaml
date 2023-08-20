@@ -1,0 +1,136 @@
+name: Validate & Plan Pull-Request
+
+on:
+  pull_request_target:
+    paths:
+    - '.github/**'
+    - 'terraform/**'
+    - 'ansible/**'
+
+env:
+  TF_VERSION: "1.5.2"
+
+jobs:
+
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - uses: actions/checkout@v3
+
+      # - run: |
+      #     pre-commit -a
+
+      - run: |
+          echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
+          chmod 0400 kubenode_ssh.key
+          echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
+          chmod 0400 kubenode_ssh.key.pub
+
+      - id: tf-init
+        run: |
+          terraform init
+        working-directory: ./terraform
+        continue-on-error: true
+
+      - run: |
+          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-init.outputs.* }}"
+          echo "tf-init failed"
+          exit 1
+        if: ${{ steps.tf-init.outcome == 'failure' }}
+
+      - id: tf-validate
+        run: |
+          terraform validate #TODO
+        working-directory: ./terraform
+        continue-on-error: true
+        env:
+          TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
+          TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+
+      - run: |
+          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-validate.outputs.* }}"
+          echo "tf-validate failed"
+          exit 1
+        if: ${{ steps.tf-validate.outcome == 'failure' }}
+
+      - id: ansible-galaxy-install
+        run: |
+          ansible-galaxy install -r requirements.yaml #TODO
+        working-directory: ./ansible
+        continue-on-error: true
+
+      - run: |
+          gh pr comment "${{ github.event.number }}" --body "${{ steps.ansible-galaxy-install.outputs.* }}"
+          echo "ansible-galaxy-install failed"
+          exit 1
+        if: ${{ steps.ansible-galaxy-install.outcome == 'failure' }}
+
+      - id: ansible-playbook-check
+        run: |
+          ansible-playbook kubenodes.yaml \ #TODO
+          --inventory ../inventory.ini \
+          --verbose \
+          --private-key ../kubenode_ssh.key \
+          --check
+        working-directory: ./ansible
+        continue-on-error: true
+        env:
+          TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
+          TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
+          GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
+          AGE_KEY: ${{ secrets.AGE_KEY }}
+          CLUSTER_NAME: pegasus
+
+      - run: |
+          gh pr comment "${{ github.event.number }}" --body "${{ steps.ansible-playbook-check.outputs.* }}"
+          echo "ansible-playbook-check failed"
+          exit 1
+        if: ${{ steps.ansible-playbook-check.outcome == 'failure' }}
+
+  plan:
+    needs: validate
+    runs-on: ubuntu-22.04
+    concurrency: ${{ github.workflow }}-terraform
+    steps:
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - uses: actions/checkout@v3
+
+      - run: |
+          echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
+          chmod 0400 kubenode_ssh.key
+          echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
+          chmod 0400 kubenode_ssh.key.pub
+
+      - run: |
+          terraform init
+        working-directory: ./terraform
+
+      - id: tf-plan
+        run: |
+          terraform plan \
+          -input=false
+        working-directory: ./terraform
+        continue-on-error: true
+        env:
+          TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
+          TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+
+      - run: |
+          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-plan.outputs.* }}"
+          echo "tf-plan failed"
+        if: ${{ steps.tf-plan.outcome == 'success' }}
+
+      - run: |
+          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-plan.outputs.* }}"
+          echo "tf-plan failed"
+          exit 1
+        if: ${{ steps.tf-plan.outcome == 'failure' }}
