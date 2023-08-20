@@ -1,0 +1,100 @@
+name: Apply
+
+on:
+  pull_request:
+    paths:
+    - '.github/**'
+    - 'terraform/**'
+    - 'ansible/**'
+
+env:
+  TF_VERSION: "1.5.2"
+
+jobs:
+
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - uses: actions/checkout@v3
+
+      - run: |
+          echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
+          chmod 0400 kubenode_ssh.key
+          echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
+          chmod 0400 kubenode_ssh.key.pub
+
+      - id: tf-init
+        run: |
+          #terraform init #TODO
+          exit 123
+        working-directory: ./terraform
+
+      - run: |
+          #TODO
+          echo "$PR_NUMBER"
+        if: ${{ steps.tf-init.outcome == 'failure' }}
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+
+  #     - run: |
+  #         terraform validate #TODO
+  #       working-directory: ./terraform
+  #       env:
+  #         TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
+  #         TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+
+  #     - run: |
+  #         ansible-galaxy install -r requirements.yaml #TODO
+  #       working-directory: ./ansible
+
+  #     - run: |
+  #         ansible-playbook kubenodes.yaml \ #TODO
+  #         --inventory ../inventory.ini \
+  #         --verbose \
+  #         --private-key ../kubenode_ssh.key \
+  #         --check
+  #       working-directory: ./ansible
+  #       env:
+  #         TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
+  #         TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
+  #         GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
+  #         AGE_KEY: ${{ secrets.AGE_KEY }}
+  #         CLUSTER_NAME: pegasus
+
+  # plan:
+  #   needs: validate
+  #   runs-on: ubuntu-22.04
+  #   concurrency: ${{ github.workflow }}-terraform
+  #   steps:
+  #     - uses: hashicorp/setup-terraform@v2
+  #       with:
+  #         cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+  #         terraform_version: ${{ env.TF_VERSION }}
+
+  #     - uses: actions/checkout@v3
+
+  #     - run: |
+  #         echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
+  #         chmod 0400 kubenode_ssh.key
+  #         echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
+  #         chmod 0400 kubenode_ssh.key.pub
+
+  #     - run: |
+  #         terraform init #TODO
+  #       working-directory: ./terraform
+
+  #     - run: |
+  #         terraform plan \ #TODO
+  #         -input=false
+  #       working-directory: ./terraform
+  #       env:
+  #         TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
+  #         TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+
+  #         env:
+  #           PR_NUMBER: ${{ github.event.number }}
