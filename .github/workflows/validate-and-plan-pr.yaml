@@ -133,12 +133,12 @@ jobs:
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-plan.outputs.* }}"
+          gh pr comment "${{ github.event.number }}" --body `${{ steps.tf-plan.outputs.* }}`
           echo "tf-plan failed"
         if: ${{ steps.tf-plan.outcome == 'success' }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-plan.outputs.* }}"
+          gh pr comment "${{ github.event.number }}" --body `${{ steps.tf-plan.outputs.* }}`
           echo "tf-plan failed"
           exit 1
         env:
