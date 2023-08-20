@@ -103,7 +103,7 @@ jobs:
   plan:
     needs: validate
     runs-on: ubuntu-22.04
-    concurrency: ${{ github.workflow }}-terraform
+    concurrency: terraform-state
     steps:
       - uses: hashicorp/setup-terraform@v2
         with:
