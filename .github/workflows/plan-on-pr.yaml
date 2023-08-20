@@ -33,10 +33,13 @@ jobs:
           #terraform init #TODO
           exit 123
         working-directory: ./terraform
+        continue-on-error: true
 
       - run: |
           #TODO
           echo "$PR_NUMBER"
+          echo "tf-init failed"
+          exit 1
         if: ${{ steps.tf-init.outcome == 'failure' }}
         env:
           PR_NUMBER: ${{ github.event.number }}
