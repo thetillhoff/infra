@@ -1,4 +1,4 @@
-# Terraform.
+# Terraform
 
 ## Prerequisites
 - Create an ssh key with `ssh-keygen -t ed25519 -C "your_email@example.com"`.
