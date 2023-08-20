@@ -41,11 +41,13 @@ jobs:
           gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-init.outputs.* }}"
           echo "tf-init failed"
           exit 1
+        env:
+          GH_TOKEN: ${{ github.token }}
         if: ${{ steps.tf-init.outcome == 'failure' }}
 
       - id: tf-validate
         run: |
-          terraform validate #TODO
+          terraform validate
         working-directory: ./terraform
         continue-on-error: true
         env:
@@ -56,11 +58,13 @@ jobs:
           gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-validate.outputs.* }}"
           echo "tf-validate failed"
           exit 1
+        env:
+          GH_TOKEN: ${{ github.token }}
         if: ${{ steps.tf-validate.outcome == 'failure' }}
 
       - id: ansible-galaxy-install
         run: |
-          ansible-galaxy install -r requirements.yaml #TODO
+          ansible-galaxy install -r requirements.yaml
         working-directory: ./ansible
         continue-on-error: true
 
@@ -68,11 +72,13 @@ jobs:
           gh pr comment "${{ github.event.number }}" --body "${{ steps.ansible-galaxy-install.outputs.* }}"
           echo "ansible-galaxy-install failed"
           exit 1
+        env:
+          GH_TOKEN: ${{ github.token }}
         if: ${{ steps.ansible-galaxy-install.outcome == 'failure' }}
 
       - id: ansible-playbook-check
         run: |
-          ansible-playbook kubenodes.yaml \ #TODO
+          ansible-playbook kubenodes.yaml \
           --inventory ../inventory.ini \
           --verbose \
           --private-key ../kubenode_ssh.key \
@@ -90,6 +96,8 @@ jobs:
           gh pr comment "${{ github.event.number }}" --body "${{ steps.ansible-playbook-check.outputs.* }}"
           echo "ansible-playbook-check failed"
           exit 1
+        env:
+          GH_TOKEN: ${{ github.token }}
         if: ${{ steps.ansible-playbook-check.outcome == 'failure' }}
 
   plan:
@@ -133,4 +141,6 @@ jobs:
           gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-plan.outputs.* }}"
           echo "tf-plan failed"
           exit 1
+        env:
+          GH_TOKEN: ${{ github.token }}
         if: ${{ steps.tf-plan.outcome == 'failure' }}
