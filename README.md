@@ -1,4 +1,4 @@
-# infra
+# infra.
 
 ## The vision `One place to rule them all`
 This repository contains several subfolders - each for its own tool:
