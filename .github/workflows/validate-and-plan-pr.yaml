@@ -130,6 +130,8 @@ jobs:
       - run: |
           gh pr comment "${{ github.event.number }}" --body-file step.log
           echo "tf-plan failed"
+        env:
+          GH_TOKEN: ${{ github.token }}
         if: ${{ steps.tf-plan.outcome == 'success' }}
 
       - run: |
