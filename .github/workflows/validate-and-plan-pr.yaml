@@ -19,6 +19,7 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
 
       - uses: actions/checkout@v3
 
@@ -31,33 +32,13 @@ jobs:
           echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
           chmod 0400 kubenode_ssh.key.pub
 
-      - id: tf-init
-        run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
-          terraform init >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+      - run: |
+          terraform init
         working-directory: ./terraform
         continue-on-error: true
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-init.outputs.OUTPUT }}"
-          echo "tf-init failed"
-          exit 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.tf-init.outcome == 'failure' }}
-
-      - id: tf-validate
-        run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
-          terraform validate >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+          terraform validate -no-color
         working-directory: ./terraform
         continue-on-error: true
         env:
@@ -65,44 +46,17 @@ jobs:
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-validate.outputs.OUTPUT }}"
-          echo "tf-validate failed"
-          exit 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.tf-validate.outcome == 'failure' }}
-
-      - id: ansible-galaxy-install
-        run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
-          ansible-galaxy install -r requirements.yaml >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+          ansible-galaxy install -r requirements.yaml
         working-directory: ./ansible
         continue-on-error: true
 
-      - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.ansible-galaxy-install.outputs.OUTPUT }}"
-          echo "ansible-galaxy-install failed"
-          exit 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.ansible-galaxy-install.outcome == 'failure' }}
-
       - id: ansible-playbook-check
         run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
           ansible-playbook kubenodes.yaml \
           --inventory ../inventory.ini \
           --verbose \
           --private-key ../kubenode_ssh.key \
-          --check >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+          --check
         working-directory: ./ansible
         continue-on-error: true
         env:
@@ -111,14 +65,6 @@ jobs:
           GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
           AGE_KEY: ${{ secrets.AGE_KEY }}
           CLUSTER_NAME: pegasus
-
-      - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.ansible-playbook-check.outputs.OUTPUT }}"
-          echo "ansible-playbook-check failed"
-          exit 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.ansible-playbook-check.outcome == 'failure' }}
 
   plan:
     needs: validate
@@ -129,6 +75,7 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
 
       - uses: actions/checkout@v3
 
@@ -144,12 +91,11 @@ jobs:
 
       - id: tf-plan
         run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
-          terraform plan -input=false >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+          terraform refresh # Separating the refresh from the plan results in cleaner output
+          terraform plan -input=false -refresh=false -no-color -out=tfplan
+          echo '```' > tf.diff # Format body as code
+          terraform show -no-color tfplan | tee -a tf.diff
+          echo '```' >> tf.diff # Format body as code
         working-directory: ./terraform
         continue-on-error: true
         env:
@@ -157,14 +103,8 @@ jobs:
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body `${{ steps.tf-plan.outputs.OUTPUT }}`
-          echo "tf-plan failed"
-        if: ${{ steps.tf-plan.outcome == 'success' }}
-
-      - run: |
-          gh pr comment "${{ github.event.number }}" --body `${{ steps.tf-plan.outputs.OUTPUT }}`
-          echo "tf-plan failed"
-          exit 1
+          # Upsert comment
+          gh pr comment "${{ github.event.number }}" --body-file terraform/tf.diff --edit-last || gh pr comment "${{ github.event.number }}" --body-file terraform/tf.diff
         env:
           GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.tf-plan.outcome == 'failure' }}
+        if: ${{ steps.tf-plan.outcome == 'success' }}

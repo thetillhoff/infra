@@ -19,6 +19,7 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: 1.5.2
+          terraform_wrapper: false
 
       - uses: actions/checkout@v3
 
@@ -33,7 +34,7 @@ jobs:
         working-directory: ./terraform
 
       - run: |
-          terraform validate
+          terraform validate -no-color
         working-directory: ./terraform
         env:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
@@ -66,6 +67,7 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: 1.5.2
+          terraform_wrapper: false
 
       - uses: actions/checkout@v3
 
@@ -81,7 +83,8 @@ jobs:
 
       - run: |
           terraform plan \
-          -input=false
+          -input=false \
+          -no-color
         working-directory: ./terraform
         env:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
@@ -96,6 +99,7 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: 1.5.2
+          terraform_wrapper: false
 
       - uses: actions/checkout@v3
 
@@ -112,6 +116,7 @@ jobs:
       - run: |
           terraform apply \
           -input=false \
+          -no-color \
           -auto-approve
         working-directory: ./terraform
         env:
