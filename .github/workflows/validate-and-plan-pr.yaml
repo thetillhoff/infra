@@ -90,7 +90,9 @@ jobs:
       - id: tf-plan
         run: |
           terraform refresh # Separating the refresh from the plan results in cleaner output
-          terraform plan -input=false -refresh=false | tee tf.diff
+          echo "```" > tf.diff # Format body as code
+          terraform plan -input=false -refresh=false -no-color | tee -a tf.diff
+          echo "```" >> tf.diff # Format body as code
         working-directory: ./terraform
         continue-on-error: true
         env:
@@ -98,7 +100,8 @@ jobs:
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body-file terraform/tf.diff
+          # Upsert comment
+          gh pr comment "${{ github.event.number }}" --body-file terraform/tf.diff --edit-last || gh pr comment "${{ github.event.number }}" --body-file terraform/tf.diff
         env:
           GH_TOKEN: ${{ github.token }}
         if: ${{ steps.tf-plan.outcome == 'success' }}
