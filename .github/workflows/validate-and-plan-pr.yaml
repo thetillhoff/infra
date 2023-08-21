@@ -19,6 +19,7 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
 
       - uses: actions/checkout@v3
 
@@ -37,7 +38,7 @@ jobs:
         continue-on-error: true
 
       - run: |
-          terraform validate
+          terraform validate -no-color
         working-directory: ./terraform
         continue-on-error: true
         env:
@@ -74,6 +75,7 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
 
       - uses: actions/checkout@v3
 
