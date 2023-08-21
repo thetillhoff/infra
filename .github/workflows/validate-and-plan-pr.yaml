@@ -37,7 +37,7 @@ jobs:
         working-directory: ./terraform
         continue-on-error: true
       - run: |
-          gh pr comment "${{ github.event.number }}" --body-file step.log
+          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
           echo "tf-init failed"
           exit 1
         env:
@@ -53,7 +53,7 @@ jobs:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
       - run: |
-          gh pr comment "${{ github.event.number }}" --body-file step.log
+          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
           echo "tf-validate failed"
           exit 1
         env:
@@ -66,7 +66,7 @@ jobs:
         working-directory: ./ansible
         continue-on-error: true
       - run: |
-          gh pr comment "${{ github.event.number }}" --body-file step.log
+          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
           echo "ansible-galaxy-install failed"
           exit 1
         env:
@@ -89,7 +89,7 @@ jobs:
           AGE_KEY: ${{ secrets.AGE_KEY }}
           CLUSTER_NAME: pegasus
       - run: |
-          gh pr comment "${{ github.event.number }}" --body-file step.log
+          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
           echo "ansible-playbook-check failed"
           exit 1
         env:
@@ -128,14 +128,14 @@ jobs:
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body-file step.log
+          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
           echo "tf-plan failed"
         env:
           GH_TOKEN: ${{ github.token }}
         if: ${{ steps.tf-plan.outcome == 'success' }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body-file step.log
+          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
           echo "tf-plan failed"
           exit 1
         env:
