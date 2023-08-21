@@ -120,7 +120,7 @@ jobs:
 
       - id: tf-plan
         run: |
-          terraform plan -input=false | tee step.log
+          terraform plan -input=false -out=tf.plan | tee step.log
         working-directory: ./terraform
         continue-on-error: true
         env:
@@ -128,8 +128,8 @@ jobs:
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
-          echo "tf-plan failed"
+          gh pr comment "${{ github.event.number }}" --body-file terraform/tf.plan
+          echo "tf-plan successful"
         env:
           GH_TOKEN: ${{ github.token }}
         if: ${{ steps.tf-plan.outcome == 'success' }}
