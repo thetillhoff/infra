@@ -91,7 +91,7 @@ jobs:
         run: |
           terraform refresh # Separating the refresh from the plan results in cleaner output
           echo '```' > tf.diff # Format body as code
-          terraform plan -input=false -refresh=false -no-color | tee -a tf.diff
+          terraform plan -input=false -refresh=false -no-color -out=nirvana | tee -a tf.diff
           echo '```' >> tf.diff # Format body as code
         working-directory: ./terraform
         continue-on-error: true
