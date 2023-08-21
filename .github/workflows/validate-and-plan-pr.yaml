@@ -31,47 +31,23 @@ jobs:
           echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
           chmod 0400 kubenode_ssh.key.pub
 
-      - id: tf-init
-        run: |
-          terraform init | tee step.log
+      - run: |
+          terraform init
         working-directory: ./terraform
         continue-on-error: true
-      - run: |
-          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
-          echo "tf-init failed"
-          exit 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.tf-init.outcome == 'failure' }}
 
-      - id: tf-validate
-        run: |
-          terraform validate | tee step.log
+      - run: |
+          terraform validate
         working-directory: ./terraform
         continue-on-error: true
         env:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
-      - run: |
-          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
-          echo "tf-validate failed"
-          exit 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.tf-validate.outcome == 'failure' }}
 
-      - id: ansible-galaxy-install
-        run: |
-          ansible-galaxy install -r requirements.yaml | tee step.log
+      - run: |
+          ansible-galaxy install -r requirements.yaml
         working-directory: ./ansible
         continue-on-error: true
-      - run: |
-          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
-          echo "ansible-galaxy-install failed"
-          exit 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.ansible-galaxy-install.outcome == 'failure' }}
 
       - id: ansible-playbook-check
         run: |
@@ -79,7 +55,7 @@ jobs:
           --inventory ../inventory.ini \
           --verbose \
           --private-key ../kubenode_ssh.key \
-          --check | tee step.log
+          --check
         working-directory: ./ansible
         continue-on-error: true
         env:
@@ -88,13 +64,6 @@ jobs:
           GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
           AGE_KEY: ${{ secrets.AGE_KEY }}
           CLUSTER_NAME: pegasus
-      - run: |
-          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
-          echo "ansible-playbook-check failed"
-          exit 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.ansible-playbook-check.outcome == 'failure' }}
 
   plan:
     needs: validate
@@ -120,7 +89,8 @@ jobs:
 
       - id: tf-plan
         run: |
-          terraform plan -input=false | tee step.log
+          terraform refresh # Separating the refresh from the plan results in cleaner output
+          terraform plan -input=false -refresh=false | tee tf.diff
         working-directory: ./terraform
         continue-on-error: true
         env:
@@ -128,16 +98,7 @@ jobs:
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
-          echo "tf-plan failed"
+          gh pr comment "${{ github.event.number }}" --body-file terraform/tf.diff
         env:
           GH_TOKEN: ${{ github.token }}
         if: ${{ steps.tf-plan.outcome == 'success' }}
-
-      - run: |
-          gh pr comment "${{ github.event.number }}" --body-file terraform/step.log
-          echo "tf-plan failed"
-          exit 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        if: ${{ steps.tf-plan.outcome == 'failure' }}
