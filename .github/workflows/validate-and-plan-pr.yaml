@@ -33,17 +33,11 @@ jobs:
 
       - id: tf-init
         run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
-          terraform init >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+          terraform init | tee step.log
         working-directory: ./terraform
         continue-on-error: true
-
       - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-init.outputs.OUTPUT }}"
+          gh pr comment "${{ github.event.number }}" --body-file step.log
           echo "tf-init failed"
           exit 1
         env:
@@ -52,20 +46,14 @@ jobs:
 
       - id: tf-validate
         run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
-          terraform validate >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+          terraform validate | tee step.log
         working-directory: ./terraform
         continue-on-error: true
         env:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
-
       - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.tf-validate.outputs.OUTPUT }}"
+          gh pr comment "${{ github.event.number }}" --body-file step.log
           echo "tf-validate failed"
           exit 1
         env:
@@ -74,17 +62,11 @@ jobs:
 
       - id: ansible-galaxy-install
         run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
-          ansible-galaxy install -r requirements.yaml >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+          ansible-galaxy install -r requirements.yaml | tee step.log
         working-directory: ./ansible
         continue-on-error: true
-
       - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.ansible-galaxy-install.outputs.OUTPUT }}"
+          gh pr comment "${{ github.event.number }}" --body-file step.log
           echo "ansible-galaxy-install failed"
           exit 1
         env:
@@ -93,16 +75,11 @@ jobs:
 
       - id: ansible-playbook-check
         run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
           ansible-playbook kubenodes.yaml \
           --inventory ../inventory.ini \
           --verbose \
           --private-key ../kubenode_ssh.key \
-          --check >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+          --check | tee step.log
         working-directory: ./ansible
         continue-on-error: true
         env:
@@ -111,9 +88,8 @@ jobs:
           GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
           AGE_KEY: ${{ secrets.AGE_KEY }}
           CLUSTER_NAME: pegasus
-
       - run: |
-          gh pr comment "${{ github.event.number }}" --body "${{ steps.ansible-playbook-check.outputs.OUTPUT }}"
+          gh pr comment "${{ github.event.number }}" --body-file step.log
           echo "ansible-playbook-check failed"
           exit 1
         env:
@@ -144,12 +120,7 @@ jobs:
 
       - id: tf-plan
         run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "OUTPUT<<$delimiter" >> $GITHUB_ENV
-
-          terraform plan -input=false >> $GITHUB_ENV
-
-          echo "$delimiter" >> $GITHUB_ENV
+          terraform plan -input=false | tee step.log
         working-directory: ./terraform
         continue-on-error: true
         env:
@@ -157,12 +128,12 @@ jobs:
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body `${{ steps.tf-plan.outputs.OUTPUT }}`
+          gh pr comment "${{ github.event.number }}" --body-file step.log
           echo "tf-plan failed"
         if: ${{ steps.tf-plan.outcome == 'success' }}
 
       - run: |
-          gh pr comment "${{ github.event.number }}" --body `${{ steps.tf-plan.outputs.OUTPUT }}`
+          gh pr comment "${{ github.event.number }}" --body-file step.log
           echo "tf-plan failed"
           exit 1
         env:
