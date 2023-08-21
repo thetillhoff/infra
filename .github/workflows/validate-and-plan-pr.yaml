@@ -90,7 +90,7 @@ jobs:
       - id: tf-plan
         run: |
           terraform refresh # Separating the refresh from the plan results in cleaner output
-          terraform plan -input=false -refresh=false | tee tf.diff
+          terraform plan -input=false -refresh=false -no-color | tee tf.diff
         working-directory: ./terraform
         continue-on-error: true
         env:
