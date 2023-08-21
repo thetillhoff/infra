@@ -50,8 +50,7 @@ jobs:
         working-directory: ./ansible
         continue-on-error: true
 
-      - id: ansible-playbook-check
-        run: |
+      - run: |
           ansible-playbook kubenodes.yaml \
           --inventory ../inventory.ini \
           --verbose \
