@@ -114,5 +114,3 @@
 #   - name: 'backupp'
 #     passhash: '$6$somesalt$ZlH6KQUe0X5MfWe92Sb/SiHZVGUg25YKe/EeH9RpavT8GHPryq188CnOmddX1YBirKLfyoUVrlgIJS.RmPUF0/'
 #   register: smbusers
-
-

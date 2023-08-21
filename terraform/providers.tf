@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.5"
+
   backend "remote" {
     organization = "enforge"
 
@@ -8,6 +10,11 @@ terraform {
   }
 
   required_providers {
+    local = {
+      source  = "hashicorp/local"
+      version = "2.4.0"
+    }
+
     hcloud = {
       source  = "hetznercloud/hcloud"
       version = "1.41.0"
