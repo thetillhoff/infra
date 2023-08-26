@@ -129,7 +129,7 @@ jobs:
 
       - run: |
           ansible-playbook kubenodes.yaml \
-          --inventory ../inventory.ini \
+          --inventory inventory.yaml \
           --verbose \
           --private-key ../kubenode_ssh.key
         working-directory: ./ansible
