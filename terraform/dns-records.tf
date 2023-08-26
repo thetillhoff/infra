@@ -1,5 +1,11 @@
 # caa letsencrypt
 resource "cloudflare_record" "caa" {
+  lifecycle {
+    ignore_changes = [
+      data,
+    ]
+  }
+
   zone_id = var.cloudflare_zone_id
   type    = "CAA"
   name    = "thetillhoff.de"
