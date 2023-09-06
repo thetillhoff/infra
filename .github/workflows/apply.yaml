@@ -21,7 +21,7 @@ jobs:
           terraform_version: 1.5.2
           terraform_wrapper: false
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - run: |
           echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
@@ -69,7 +69,7 @@ jobs:
           terraform_version: 1.5.2
           terraform_wrapper: false
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - run: |
           echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
@@ -101,7 +101,7 @@ jobs:
           terraform_version: 1.5.2
           terraform_wrapper: false
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - run: |
           echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
