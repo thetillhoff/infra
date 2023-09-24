@@ -144,7 +144,6 @@ I tried it and it had several hickups that in summary rendered it unusable.
 - setting values for helm charts is all well and good, but if you change them, they often are not deployed. My guess on the root cause is that the configurations are deployed as configmaps, and updates of their contents don't restart its consumers. That's why flux/kustomize introduced configmapGenerators... But they are obviously not used in helm charts.
 
 
-TODO:
-- use pregenerated ssh key for git access from/by flux (aka deploy key)
-- setup two kustomizations, `infra-controllers` and `apps`, where `apps` depends on the former. That way all dependencies and crds can be set up that way.
-- setup sops with age for flux and on the repo so secrets can be encrypted
+Todos from Samba logs:
+- weak crypto allowed
+- unix password synx is set, but no valid passwd program parameter
