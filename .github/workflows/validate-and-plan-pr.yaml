@@ -15,7 +15,7 @@ jobs:
   validate:
     runs-on: ubuntu-22.04
     steps:
-      - uses: hashicorp/setup-terraform@v2
+      - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: ${{ env.TF_VERSION }}
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-22.04
     concurrency: terraform-state
     steps:
-      - uses: hashicorp/setup-terraform@v2
+      - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: ${{ env.TF_VERSION }}
