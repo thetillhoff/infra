@@ -16,7 +16,7 @@ spec:
   values:
     controller:
       config:
-        ssl-protocols: TLSv1.2 TLSv1.3 # set by default anyway
+        ssl-protocols: TLSv1.3
 
         enable-modsecurity: "true"
         enable-owasp-modsecurity-crs: "true"
@@ -26,9 +26,9 @@ spec:
 
         keep-alive: "10" # seconds
 
-        ssl-ciphers: EECDH+AESGCM:EDH+AESGCM
+        # ssl-ciphers: EECDH+AESGCM:EDH+AESGCM # not needed with TLS1.3
         # ssl_prefer_server_ciphers is enabled by default
-        ssl-dh-param: "ingress-nginx/dh-param" # name of the secret
+        # ssl-dh-param: "ingress-nginx/dh-param" # name of the secret
 
         use-gzip: "true"
         enable-brotli: "true"
