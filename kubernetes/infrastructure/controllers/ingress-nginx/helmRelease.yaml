@@ -33,4 +33,4 @@ spec:
         use-gzip: "true"
         enable-brotli: "true"
 
-        # allow-snippet-annotations: "true" # enabled by default -> already defined in configmap
+        allow-snippet-annotations: "true" # used to add additional headers in ingress
