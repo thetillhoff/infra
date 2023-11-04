@@ -33,4 +33,4 @@ spec:
         use-gzip: "true"
         enable-brotli: "true"
 
-        allow-snippet-annotations: "true" # used to add additional headers in ingress
+        allow-snippet-annotations: true # used to add additional headers in ingress
