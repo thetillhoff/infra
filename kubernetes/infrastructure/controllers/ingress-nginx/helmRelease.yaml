@@ -17,6 +17,9 @@ spec:
     controller:
       config:
         ssl-protocols: TLSv1.3
+        ssl-session-timeout: 1d
+        ssl-session-cache: shared:MozSSL:10m # about 40000 sessions
+        ssl-session-tickets: "off"
 
         enable-modsecurity: "true"
         enable-owasp-modsecurity-crs: "true"
@@ -33,4 +36,4 @@ spec:
         use-gzip: "true"
         enable-brotli: "true"
 
-        allow-snippet-annotations: true # used to add additional headers in ingress
+        #allow-snippet-annotations: true # used to add additional headers in ingress
