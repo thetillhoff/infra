@@ -38,6 +38,11 @@
       - curl
     state: present
 
+# Install homebrew
+- block:
+  - command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Download infra repository
 - git:
     repo: https://github.com/thetillhoff/infra
     dest: ./infra
