@@ -8,7 +8,7 @@
 
   roles:
     - basic
-    - tailscale
+    # - tailscale
     - k3s
     - helm
     - apps
