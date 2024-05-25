@@ -10,6 +10,8 @@
 
 # install fluxcd
 - shell: curl -s https://fluxcd.io/install.sh | sudo bash
+  # environment:
+  #   FLUX_VERSION: "2.3.0"
   args:
     creates: /usr/local/bin/flux
 
