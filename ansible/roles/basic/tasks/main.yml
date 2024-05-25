@@ -39,8 +39,14 @@
     state: present
 
 # Install homebrew
+- ansible.builtin.file:
+    # For some reason, the homebrew install script expects bash under /bin/bash, while ubuntu has it installed under /usr/bin/bash...
+    src: /usr/bin/bash
+    dest: /bin/bash
+    state: link
+
 - block:
-  - command: /usr/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  - command: bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Download infra repository
 - git:
