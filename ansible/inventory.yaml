@@ -1,6 +1,6 @@
 all:
   children:
-    blackhole:
+    pets:
       hosts:
         blackhole:
           ansible_user: user
