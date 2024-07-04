@@ -1,6 +1,17 @@
-# Secure the system
+# Update packages
 - apt:
-    pkg:
+    update_cache: yes # Run apt-get update
+    cache_valid_time: 3600 # Only update apt-cache if last update was at least 3600s ago
+- apt:
+    name: "*" # Apply to all packages
+    state: latest # Update packages
+- apt:
+    autoremove: yes # Remove unused packages
+    purge: true # Remove configuration files of unused packages
+
+# Secure the system
+- package:
+    name:
       - ufw
 - ufw: # refuse connections from IP addresses that attempt to log in or connect more than 6 times in 30 seconds
     rule: limit
