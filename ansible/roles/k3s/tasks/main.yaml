@@ -27,17 +27,11 @@
     creates: /usr/local/bin/k3s
 
 # kube config
-- stat:
-    path: /root/.kube/config
-  register: kube_config
-
-- when: not kube_config.stat.exists
-  file:
+- file:
     path: /root/.kube/
     state: directory
 
-- when: not kube_config.stat.exists
-  copy:
+- file:
     src: /etc/rancher/k3s/k3s.yaml
     dest: /root/.kube/config
-    remote_src: yes
+    state: link
