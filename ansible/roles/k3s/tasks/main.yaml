@@ -35,3 +35,14 @@
     src: /etc/rancher/k3s/k3s.yaml
     dest: /root/.kube/config
     state: link
+
+# certificate rotation
+- systemd_service:
+    name: k3s
+    state: stopped
+
+- command: "k3s certificate rotate" # https://docs.k3s.io/cli/certificate
+
+- systemd_service:
+    name: k3s
+    state: started
