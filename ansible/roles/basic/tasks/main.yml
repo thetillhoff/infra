@@ -6,6 +6,8 @@
     name: "*" # Apply to all packages
     state: latest # Update packages
 - apt:
+    upgrade: dist # Update OS
+- apt:
     autoremove: yes # Remove unused packages
     purge: true # Remove configuration files of unused packages
 
