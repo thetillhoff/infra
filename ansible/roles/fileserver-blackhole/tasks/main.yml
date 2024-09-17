@@ -72,10 +72,6 @@
 # Allow SMB port/s
 - ufw: # allow connections to port
     rule: allow
-    port: 139
-    proto: tcp
-- ufw: # allow connections to port
-    rule: allow
     port: 445
     proto: tcp
 
@@ -87,19 +83,23 @@
     recurse: yes
 
 # Start samba container
-- community.docker.docker_container:
-    name: samba
-    image: dperson/samba
-    state: started
-    restart: true
-    restart_policy: "always"
-    volumes:
-      - /mnt/cold/public:/share/public:rw
-      # - /mnt/cold/backup:/share/backup:rw
-    ports:
-      - "139:139"
-      - "445:445"
-    command: -p -s "public;/share/public;yes;no"
+- community.docker.docker_compose:
+    project_src: "{{ role_path }}/files/"
+    build: false
+
+# - community.docker.docker_container:
+#     name: samba
+#     image: dperson/samba
+#     state: started
+#     restart: true
+#     restart_policy: "always"
+#     volumes:
+#       - /mnt/cold/public:/share/public:rw
+#       # - /mnt/cold/backup:/share/backup:rw
+#     ports:
+#       - "139:139"
+#       - "445:445"
+#     command: -p -s "public;/share/public;yes;no"
 
 # ---
 
