@@ -82,6 +82,13 @@
     mode: '0777'
     recurse: yes
 
+# create backup folder and set permissions on it
+- file:
+    path: "/mnt/cold/backup"
+    state: directory
+    mode: '0777'
+    recurse: yes
+
 # Start samba container
 - community.docker.docker_compose_v2:
     project_src: "{{ role_path }}/files/"
