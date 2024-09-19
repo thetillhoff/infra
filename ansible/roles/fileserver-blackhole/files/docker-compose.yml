@@ -7,10 +7,7 @@ services:
     ports:
       - "445:445"
     volumes:
-      # mount user and group files to sync uids and gids
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
-      # mount smb.conf
       - ./smb.conf:/etc/samba/smb.conf:ro
       # mount data volumes into /mnt/<sharename>
-      - /mnt/NVME:/mnt/public:rw
+      - /mnt/NVME/public:/mnt/public:rw
+      - /mnt/NVME/user:/mnt/user:rw

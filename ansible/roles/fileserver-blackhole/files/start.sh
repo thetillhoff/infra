@@ -1,15 +1,13 @@
 #!/bin/bash
 
-# cat >> /etc/samba/smb.conf << EOL
+# loop over users and passwords to create them in the container and samba - make sure uid and gid are settable from config
+# Loop over shares, each with their own config
 
-# [public]
-#     path = /mnt/NVME
-#     public = yes
-#     # valid users = username
-#     read only = no
-#     browsable = yes
+useradd user
+(echo abc; echo abc) | smbpasswd -a user
 
-# EOL
+# /mnt is empty by default, and every share should be mounted into it
+chmod 0777 /mnt -R
 
 # From smb.conf:
 # NOTE: Whenever you modify this file you should run the command
@@ -22,4 +20,4 @@ testparm -s > /dev/null
 # /usr/sbin/smbd --foreground --no-process-group
 # --foreground: Keep the process in the foreground so Docker can see its output
 # --debug-stdout: Log to stdout
-# --no-process-group: Run as the main process (not a sub-process) -> Else there's an error `Failed to create session`
+# --no-process-group: Run as the main process (not a sub-process) -> Else there might be an error `Failed to create session`
