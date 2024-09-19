@@ -7,7 +7,10 @@ The roles in this folder are meant for *single-node* kubernetes clusters.
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 sudo python3 get-pip.py
 rm get-pip.py
-sudo python3 -m pip install ansible
+
+sudo apt-get install -y pipx
+pipx ensurepath
+pipx install --include-deps ansible
 ```
 
 ## Install requirements
