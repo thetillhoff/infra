@@ -1,6 +1,7 @@
 - name: Blackhole configuration
   hosts: blackhole
-  # connection: local
+  #hosts: localhost
+  #connection: local
 
   #####
 
