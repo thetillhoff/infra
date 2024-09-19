@@ -5,7 +5,7 @@
 # rm get-pip.py
 
 # sudo apt-get install -y pipx
-# pipx ensurepath
+pipx ensurepath
 # pipx install --include-deps ansible
 
 ansible-galaxy install -r "ansible/requirements.yaml"
