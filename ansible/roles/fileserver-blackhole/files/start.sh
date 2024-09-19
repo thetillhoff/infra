@@ -3,8 +3,8 @@
 # loop over users and passwords to create them in the container and samba - make sure uid and gid are settable from config
 # Loop over shares, each with their own config
 
-useradd backup
-(echo $BACKUP_PASSWORD; echo $BACKUP_PASSWORD) | smbpasswd -a backup
+# useradd username
+# (echo password; echo password) | smbpasswd -a username
 
 # /mnt is empty by default, and every share should be mounted into it
 chmod 0777 /mnt -R

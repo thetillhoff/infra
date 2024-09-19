@@ -12,4 +12,3 @@ services:
       - ./smb.conf:/etc/samba/smb.conf:ro
       # mount data volumes into /mnt/<sharename>
       - /mnt/cold/public:/mnt/public:rw
-      - /mnt/cold/backup:/mnt/backup:rw
