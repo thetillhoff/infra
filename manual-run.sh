@@ -1,17 +1,14 @@
 #!/bin/sh
 
-apt install python3-pip -y
+# curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+# sudo python3 get-pip.py
+# rm get-pip.py
 
-python3 -m pip install ansible
+# sudo apt-get install -y pipx
+# pipx ensurepath
+# pipx install --include-deps ansible
 
 ansible-galaxy install -r "ansible/requirements.yaml"
-
-# if [ -z "$GPG_PASSWORD" ]; then
-  # echo "GPG_PASSWORD is required."
-  # exit 0
-# fi
-# git reset --hard
-# find . -name '*.gpg' -exec gpg --batch --yes --decrypt --passphrase "$GPG_PASSWORD" -o '{}' '{}' \;
 
 CONTROL_PLANE_ENDPOINT="$(hostname)" \
   CLUSTER_NAME="$(hostname)" \
