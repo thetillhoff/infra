@@ -68,6 +68,10 @@
           - containerd.io
           - docker-buildx-plugin
           - docker-compose-plugin
+- ansible.builtin.user:
+    name: user
+    groups: docker
+    append: yes
 
 # Allow SMB port/s
 - ufw: # allow connections to port
