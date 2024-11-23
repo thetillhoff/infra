@@ -74,7 +74,7 @@ resource "talos_cluster_kubeconfig" "kubeconfig" {
   node                 = hcloud_server.kubenodes[0].ipv4_address
 }
 
-resource "local_file" "kubeconfig" {
+resource "local_sensitive_file" "kubeconfig" {
   depends_on = [
     talos_cluster_kubeconfig.kubeconfig
   ]
