@@ -7,8 +7,9 @@
 Place them in a `secret.auto.tfvars` file.
 ```
 # use \n as line seperator in ssh key
-KUBENODE_SSH_PRIVATE_KEY = ""
+# KUBENODE_SSH_PRIVATE_KEY = ""
 HCLOUD_TOKEN             = ""
+HCLOUD_TOKEN_HYDRA       = ""
 CLOUDFLARE_APITOKEN      = ""
 GITHUB_TOKEN             = ""
 ```

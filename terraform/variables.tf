@@ -3,7 +3,17 @@ variable "HCLOUD_TOKEN" {
   sensitive = true
 }
 
+variable "HCLOUD_TOKEN_HYDRA" {
+  type      = string
+  sensitive = true
+}
+
 variable "CLOUDFLARE_APITOKEN" {
+  type      = string
+  sensitive = true
+}
+
+variable "GITHUB_TOKEN" {
   type      = string
   sensitive = true
 }

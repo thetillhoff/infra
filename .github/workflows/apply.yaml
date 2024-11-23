@@ -89,11 +89,15 @@ jobs:
         env:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+          TF_VAR_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   apply:
     needs: plan
     runs-on: ubuntu-24.04
     concurrency: ${{ github.workflow }}-terraform
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - uses: hashicorp/setup-terraform@v3
         with:
@@ -122,6 +126,7 @@ jobs:
         env:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+          TF_VAR_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - run: |
           ansible-galaxy install -r requirements.yaml

@@ -11,7 +11,7 @@ chmod 0777 /mnt -R
 
 # From smb.conf:
 # NOTE: Whenever you modify this file you should run the command
-# "testparm" to check that you have not made any basic syntactic 
+# "testparm" to check that you have not made any basic syntactic
 # errors.
 testparm -s > /dev/null
 

@@ -1,5 +1,7 @@
 # Create server
 resource "hcloud_server" "kubenode" {
+  provider = hcloud.hcloud-pegasus
+
   name        = var.kubenode_name
   server_type = "cx21"
   image       = "debian-11"
