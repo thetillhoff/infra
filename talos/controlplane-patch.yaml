@@ -1,0 +1,31 @@
+machine:
+    network:
+        kubespan:
+            enabled: true
+    kubelet:
+        extraArgs:
+            rotate-server-certificates: true
+    # nodeTaints:
+    #     - cilium-agent-not-ready: node.cilium.io/agent-not-ready
+    # systemDiskEncryption:
+    #     ephemeral:
+    #         provider: luks2
+    #         keys:
+    #             - nodeID: {}
+    #               slot: 0
+    #     state:
+    #         provider: luks2
+    #         keys:
+    #             - nodeID: {}
+    #               slot: 0
+cluster:
+    network:
+        cni:
+            name: none # Disable default CNI
+    proxy:
+        disabled: true # Disable default proxy, as cilium brings its own
+    allowSchedulingOnControlPlanes: true
+    # externalCloudProvider:
+    #     enabled: true # TODO: disable at first?
+    discovery:
+        enabled: true
