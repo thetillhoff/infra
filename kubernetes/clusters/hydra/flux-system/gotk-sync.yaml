@@ -20,7 +20,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./kubernetes/clusters/pegasus
+  path: ./kubernetes/clusters/hydra
   prune: true
   sourceRef:
     kind: GitRepository
