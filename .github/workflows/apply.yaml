@@ -90,7 +90,7 @@ jobs:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
           TF_VAR_HCLOUD_TOKEN_HYDRA: ${{ secrets.TF_VAR_HCLOUD_TOKEN_HYDRA }}
-          TF_VAR_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_GITHUB_TOKEN: ${{ secrets.GH_PAT_FLUX }}
 
   apply:
     needs: plan

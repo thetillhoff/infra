@@ -1,14 +1,3 @@
-resource "tls_private_key" "flux" {
-  algorithm = "ED25519"
-}
-
-resource "github_repository_deploy_key" "flux" {
-  title      = "Flux"
-  repository = "infra"
-  key        = tls_private_key.flux.public_key_openssh
-  read_only  = "false"
-}
-
 resource "flux_bootstrap_git" "hydra" {
   depends_on = [
     time_sleep.wait_60_seconds_for_talos_bootstrap,

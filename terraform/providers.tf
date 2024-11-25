@@ -73,10 +73,6 @@ provider "cloudflare" {
   api_token = var.CLOUDFLARE_APITOKEN
 }
 
-provider "github" {
-  token = var.GITHUB_TOKEN
-}
-
 provider "flux" {
   kubernetes = {
     host = talos_cluster_kubeconfig.kubeconfig.kubernetes_client_configuration.host
@@ -86,10 +82,10 @@ provider "flux" {
     cluster_ca_certificate = base64decode(talos_cluster_kubeconfig.kubeconfig.kubernetes_client_configuration.ca_certificate)
   }
   git = {
-    url = "ssh://git@github.com/thetillhoff/infra.git"
-    ssh = {
-      username    = "git"
-      private_key = tls_private_key.flux.private_key_pem
+    url = "https://github.com/thetillhoff/infra"
+    http = {
+      username = "git" # This can be any string when using a personal access token
+      password = var.GITHUB_TOKEN
     }
   }
 }

@@ -11,7 +11,7 @@ Place them in a `secret.auto.tfvars` file.
 HCLOUD_TOKEN             = ""
 HCLOUD_TOKEN_HYDRA       = ""
 CLOUDFLARE_APITOKEN      = ""
-GITHUB_TOKEN             = ""
+GITHUB_TOKEN             = "" # Use GH_PAT_FLUX from github actions
 ```
 
 ## Execution
