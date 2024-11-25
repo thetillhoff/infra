@@ -1,7 +1,6 @@
 resource "helm_release" "cilium" {
   depends_on = [
-    time_sleep.wait_60_seconds_for_talos_bootstrap,
-    local_sensitive_file.kubeconfig
+    time_sleep.wait_60_seconds_for_talos_bootstrap
   ]
   name       = "cilium"
   namespace  = "kube-system"
