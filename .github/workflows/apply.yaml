@@ -96,9 +96,7 @@ jobs:
     needs: plan
     runs-on: ubuntu-24.04
     concurrency: ${{ github.workflow }}-terraform
-    permissions:
-      contents: read
-      deployments: write
+    permissions: write-all
     steps:
       - uses: hashicorp/setup-terraform@v3
         with:
