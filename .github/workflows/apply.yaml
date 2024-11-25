@@ -37,6 +37,7 @@ jobs:
           terraform validate -no-color
         working-directory: ./terraform
         env:
+          # TODO Can these be removed?
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
 
@@ -96,7 +97,6 @@ jobs:
     needs: plan
     runs-on: ubuntu-24.04
     concurrency: ${{ github.workflow }}-terraform
-    permissions: write-all
     steps:
       - uses: hashicorp/setup-terraform@v3
         with:
@@ -126,7 +126,7 @@ jobs:
           TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
           TF_VAR_HCLOUD_TOKEN_HYDRA: ${{ secrets.TF_VAR_HCLOUD_TOKEN_HYDRA }}
-          TF_VAR_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_GITHUB_TOKEN: ${{ secrets.GH_PAT_FLUX }}
 
       - run: |
           ansible-galaxy install -r requirements.yaml
