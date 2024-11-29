@@ -19,6 +19,7 @@ GITHUB_TOKEN             = "" # Use GH_PAT_FLUX from github actions
 `terraform init`
 `terraform plan`
 `terraform apply -input=false -auto-approve`
+`terraform apply -var="create_local_config_files=true"`
 
 ## Debugging
 cloud-init logs are at /var/log/cloud-init-output.log

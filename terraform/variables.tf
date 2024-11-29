@@ -20,6 +20,13 @@ variable "GITHUB_TOKEN" {
 
 #####
 
+variable "create_local_config_files" {
+  type    = bool
+  default = false
+}
+
+#####
+
 variable "cloudflare_zone_id" {
   type = string
 }
