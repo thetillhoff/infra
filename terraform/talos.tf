@@ -16,11 +16,13 @@ data "talos_machine_configuration" "controlplane" {
 
 # Apply the machine configuration to all kubenodes
 resource "talos_machine_configuration_apply" "main" {
-  count                       = length(hcloud_server.kubenodes)
+  for_each = {
+    for idx, node in hcloud_server.kubenodes : node.ipv4_address => node
+  }
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
-  node                        = hcloud_server.kubenodes[count.index].ipv4_address
-  endpoint                    = hcloud_server.kubenodes[count.index].ipv4_address
+  node                        = each.value.ipv4_address
+  endpoint                    = each.value.ipv4_address
   config_patches              = [file("${path.module}/../talos/controlplane-patch.yaml")]
   timeouts = {
     create = "1m"
