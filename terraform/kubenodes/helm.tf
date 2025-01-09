@@ -11,7 +11,7 @@ resource "helm_release" "cilium" {
   namespace  = "kube-system"
   repository = "https://helm.cilium.io"
   chart      = "cilium"
-  version    = "1.16.4"
+  version    = "1.16.5"
   values = [
     file("${path.module}/cilium.yaml")
   ]
