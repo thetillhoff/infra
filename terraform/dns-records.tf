@@ -22,16 +22,6 @@ resource "cloudflare_record" "k8s" {
   ttl     = 3600
 }
 
-# route to k8s cluster
-resource "cloudflare_record" "k8s-hydra" {
-  count   = length(hcloud_server.kubenodes)
-  zone_id = var.cloudflare_zone_id
-  type    = "A"
-  name    = "hydra.k8s.thetillhoff.de"
-  content = sort(hcloud_server.kubenodes[*].ipv4_address)[count.index]
-  ttl     = 60
-}
-
 # grafana
 resource "cloudflare_record" "grafana" {
   zone_id = var.cloudflare_zone_id
@@ -136,5 +126,14 @@ resource "cloudflare_record" "google-site-verification" {
   type    = "TXT"
   name    = "thetillhoff.de"
   content = "google-site-verification=2HI_U5cyyFCcB2OlrH1Ir1BahesDBofU35pVikOQQvg"
+  ttl     = 3600
+}
+
+# bluesky verification
+resource "cloudflare_record" "bluesky-verification" {
+  zone_id = var.cloudflare_zone_id
+  type    = "TXT"
+  name    = "_atproto.thetillhoff.de"
+  content = "did=did:plc:yfywvq4oa4bx5gtd2fk3uenw"
   ttl     = 3600
 }

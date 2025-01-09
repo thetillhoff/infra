@@ -1,7 +1,12 @@
 resource "helm_release" "cilium" {
   depends_on = [
-    time_sleep.wait_60_seconds_for_talos_bootstrap
+    time_sleep.wait_for_talos_bootstrap
   ]
+  lifecycle {
+    replace_triggered_by = [
+      talos_machine_bootstrap.main.id
+    ]
+  }
   name       = "cilium"
   namespace  = "kube-system"
   repository = "https://helm.cilium.io"

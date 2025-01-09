@@ -1,22 +1,12 @@
-data "hcloud_image" "packer_snapshot" {
-  provider = hcloud.hcloud-hydra
+module "kubenodes" {
+  source = "./kubenodes"
 
-  with_architecture = "x86"
-  #   with_architecture = "arm"
-  most_recent = true
-}
+  cloudflare_zone_id = var.cloudflare_zone_id
+  location           = var.location
 
-resource "hcloud_server" "kubenodes" {
-  provider = hcloud.hcloud-hydra
+  GITHUB_TOKEN        = var.GITHUB_TOKEN
+  CLOUDFLARE_APITOKEN = var.CLOUDFLARE_APITOKEN
+  HCLOUD_TOKEN        = var.HCLOUD_TOKEN_HYDRA
 
-  count       = 3
-  name        = "kubenode-${count.index}"
-  server_type = "cx22"
-  image       = data.hcloud_image.packer_snapshot.id
-  location    = var.location
-  user_data   = data.talos_machine_configuration.controlplane.machine_configuration
-  public_net {
-    ipv4_enabled = true
-    ipv6_enabled = true
-  }
+  create_local_config_files = true
 }

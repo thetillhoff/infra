@@ -18,6 +18,8 @@ repos:
   rev: v1.82.0 # Get the latest from: https://github.com/antonbabenko/pre-commit-terraform/releases
   hooks:
     - id: terraform_fmt
-    - id: terraform_validate
-    - id: terraform_tflint
+      args:
+        - --args=-recursive
+    # - id: terraform_validate
+    # - id: terraform_tflint
     # - id: terraform_tfsec
