@@ -4,22 +4,21 @@ terraform {
   required_providers {
     local = {
       source  = "hashicorp/local"
-      version = "2.5.2"
+      version = ">=2.5.2"
     }
 
     github = {
-      source  = "integrations/github"
-      version = "6.4.0"
+      source = "integrations/github"
     }
 
     hcloud = {
       source  = "hetznercloud/hcloud"
-      version = "1.49.1"
+      version = ">=1.49.1"
     }
 
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "4.47.0"
+      version = ">=4.50.0"
     }
 
     flux = {
