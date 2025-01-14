@@ -1,11 +1,13 @@
 resource "flux_bootstrap_git" "hydra" {
   depends_on = [
+    time_sleep.wait_for_dns,
     time_sleep.wait_for_talos_bootstrap,
     talos_cluster_kubeconfig.kubeconfig,
     helm_release.cilium
   ]
   lifecycle {
     replace_triggered_by = [
+      hcloud_server.kubenodes,
       talos_machine_bootstrap.main.id
     ]
   }

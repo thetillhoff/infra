@@ -8,7 +8,8 @@ terraform {
     }
 
     github = {
-      source = "integrations/github"
+      source  = "integrations/github"
+      version = ">=5.30.0"
     }
 
     hcloud = {
@@ -23,7 +24,7 @@ terraform {
 
     flux = {
       source  = "fluxcd/flux"
-      version = "1.4.0"
+      version = ">=1.4.0"
     }
 
     helm = {
@@ -33,7 +34,7 @@ terraform {
 
     time = {
       source  = "hashicorp/time"
-      version = "0.12.1"
+      version = ">=0.12.1"
     }
 
     talos = {
@@ -43,7 +44,7 @@ terraform {
 
     tls = {
       source  = "hashicorp/tls"
-      version = "4.0.6"
+      version = ">=4.0.6"
     }
   }
 }

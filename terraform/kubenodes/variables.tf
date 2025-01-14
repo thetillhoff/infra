@@ -28,3 +28,7 @@ variable "cloudflare_zone_id" {
 variable "location" {
   type = string
 }
+
+variable "node_count" {
+  type = number
+}

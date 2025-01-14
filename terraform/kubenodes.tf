@@ -9,4 +9,5 @@ module "kubenodes" {
   HCLOUD_TOKEN        = var.HCLOUD_TOKEN_HYDRA
 
   create_local_config_files = true
+  node_count                = 3
 }

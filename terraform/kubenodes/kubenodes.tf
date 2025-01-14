@@ -6,8 +6,8 @@ data "hcloud_image" "packer_snapshot" {
 }
 
 resource "hcloud_server" "kubenodes" {
-  count       = 3
-  name        = "kubenode-${count.index}"
+  for_each    = local.kubenodes
+  name        = each.value
   server_type = "cx22"
   image       = data.hcloud_image.packer_snapshot.id
   location    = var.location

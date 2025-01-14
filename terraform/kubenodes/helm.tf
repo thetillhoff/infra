@@ -4,7 +4,9 @@ resource "helm_release" "cilium" {
   ]
   lifecycle {
     replace_triggered_by = [
-      talos_machine_bootstrap.main.id
+      hcloud_server.kubenodes,
+      talos_machine_bootstrap.main.id,
+      time_sleep.wait_for_dns
     ]
   }
   name       = "cilium"
