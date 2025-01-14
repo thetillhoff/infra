@@ -6,9 +6,10 @@ on:
     - '.github/**'
     - 'terraform/**'
     - 'ansible/**'
+  workflow_dispatch:
 
 env:
-  TF_VERSION: "1.6.3"
+  TF_VERSION: "1.10.4"
 
 jobs:
 
