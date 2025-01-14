@@ -19,6 +19,6 @@ resource "flux_bootstrap_git" "hydra" {
   # disable_secret_creation = true
 
   timeouts = {
-    create = "5m"
+    create = "10m"
   }
 }
