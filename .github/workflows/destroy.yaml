@@ -3,8 +3,10 @@ name: Destroy
 on:
   workflow_dispatch:
 
-jobs:
+env:
+  TERRAFORM_VERSION: "1.10.4"
 
+jobs:
   delete:
     runs-on: ubuntu-24.04
     concurrency: terraform-state
@@ -15,7 +17,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-          terraform_version: 1.10.4
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       - uses: actions/checkout@v4
 

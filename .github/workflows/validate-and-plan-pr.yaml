@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  TF_VERSION: "1.10.4"
+  TERRAFORM_VERSION: "1.10.4"
 
 jobs:
 
@@ -19,7 +19,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-          terraform_version: ${{ env.TF_VERSION }}
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
       - uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-          terraform_version: ${{ env.TF_VERSION }}
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
       - uses: actions/checkout@v4

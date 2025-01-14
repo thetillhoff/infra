@@ -3,22 +3,24 @@ name: Apply
 on:
   push:
     branches:
-    - main
+      - main
     paths:
-    - '.github/**'
-    - 'terraform/**'
-    - 'ansible/**'
+      - ".github/**"
+      - "terraform/**"
+      - "ansible/**"
   workflow_dispatch:
 
-jobs:
+env:
+  TERRAFORM_VERSION: "1.10.4"
 
+jobs:
   validate:
     runs-on: ubuntu-24.04
     steps:
       - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-          terraform_version: 1.10.4
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
       - uses: actions/checkout@v4
@@ -67,7 +69,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-          terraform_version: 1.6.3
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
       - uses: actions/checkout@v4
@@ -101,7 +103,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-          terraform_version: 1.6.3
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
       - uses: actions/checkout@v4
