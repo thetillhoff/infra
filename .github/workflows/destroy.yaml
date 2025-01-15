@@ -35,3 +35,4 @@ jobs:
           TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
           TF_VAR_HCLOUD_TOKEN_HYDRA: ${{ secrets.TF_VAR_HCLOUD_TOKEN_HYDRA }}
           TF_VAR_GITHUB_TOKEN: ${{ secrets.GH_PAT_FLUX }}
+          TF_VAR_AGE_KEY: ${{ secrets.TF_VAR_AGE_KEY }}
