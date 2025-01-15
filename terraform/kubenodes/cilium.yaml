@@ -1,6 +1,8 @@
 ipam:
     mode: kubernetes
 kubeProxyReplacement: true
+gatewayAPI:
+  enabled: true
 securityContext:
     capabilities:
         ciliumAgent:
