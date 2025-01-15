@@ -18,6 +18,11 @@ variable "GITHUB_TOKEN" {
   sensitive = true
 }
 
+variable "AGE_KEY" {
+  type      = string
+  sensitive = true
+}
+
 #####
 
 variable "cloudflare_zone_id" {

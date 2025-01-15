@@ -32,3 +32,8 @@ variable "location" {
 variable "node_count" {
   type = number
 }
+
+variable "flux_system_agekey" {
+  type      = string
+  sensitive = true
+}

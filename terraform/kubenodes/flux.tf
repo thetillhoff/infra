@@ -14,11 +14,22 @@ resource "flux_bootstrap_git" "hydra" {
 
   path                 = "kubernetes/clusters/hydra"
   delete_git_manifests = false
-  # components = ["source-controller", "kustomize-controller", "helm-controller", "notification-controller"]
-  components_extra = ["image-reflector-controller", "image-automation-controller"]
-  # disable_secret_creation = true
+  components_extra     = ["image-reflector-controller", "image-automation-controller"]
 
   timeouts = {
     create = "10m"
+  }
+}
+
+resource "kubernetes_secret" "flux_system" {
+  depends_on = [
+    flux_bootstrap_git.hydra
+  ]
+  metadata {
+    namespace = "flux-system"
+    name      = "sops-age"
+  }
+  data = {
+    "sops.asc" = var.flux_system_agekey
   }
 }

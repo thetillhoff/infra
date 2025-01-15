@@ -10,4 +10,5 @@ module "kubenodes" {
 
   create_local_config_files = true
   node_count                = 3
+  flux_system_agekey        = var.AGE_KEY
 }
