@@ -30,6 +30,6 @@ resource "kubernetes_secret" "flux_system" {
     name      = "sops-age"
   }
   data = {
-    "sops.asc" = var.flux_system_agekey
+    "age.agekey" = var.flux_system_agekey
   }
 }
