@@ -108,7 +108,6 @@ ZFS is deployed and configured via ansible. Integration with Kubernetes happens 
   - ingress-nginx / traefik
 - https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/cpu-default-namespace/
 - https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/
-- talosconfig & kubeconfig as tf output instead of local file
 
 ## Maintenance
 - Github Action
