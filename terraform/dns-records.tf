@@ -88,7 +88,7 @@ resource "cloudflare_record" "spf" {
   zone_id = var.cloudflare_zone_id
   type    = "TXT"
   name    = "thetillhoff.de"
-  content = "v=spf1 include:spf.protection.outlook.com -all"
+  content = "\"v=spf1 include:spf.protection.outlook.com -all\""
   ttl     = 3600
 }
 resource "cloudflare_record" "outlook-autodiscover" {
@@ -125,7 +125,7 @@ resource "cloudflare_record" "google-site-verification" {
   zone_id = var.cloudflare_zone_id
   type    = "TXT"
   name    = "thetillhoff.de"
-  content = "google-site-verification=2HI_U5cyyFCcB2OlrH1Ir1BahesDBofU35pVikOQQvg"
+  content = "\"google-site-verification=2HI_U5cyyFCcB2OlrH1Ir1BahesDBofU35pVikOQQvg\""
   ttl     = 3600
 }
 
@@ -134,6 +134,6 @@ resource "cloudflare_record" "bluesky-verification" {
   zone_id = var.cloudflare_zone_id
   type    = "TXT"
   name    = "_atproto.thetillhoff.de"
-  content = "did=did:plc:yfywvq4oa4bx5gtd2fk3uenw"
+  content = "\"did=did:plc:yfywvq4oa4bx5gtd2fk3uenw\""
   ttl     = 3600
 }
