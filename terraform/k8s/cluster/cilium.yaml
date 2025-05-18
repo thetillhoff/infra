@@ -1,0 +1,40 @@
+# Values documented at https://artifacthub.io/packages/helm/cilium/cilium/1.17.4
+
+# namespaceOverride: cilium-system # default is kube-system
+
+# Docs for cilium on talos at https://www.talos.dev/v1.10/kubernetes-guides/network/deploying-cilium/#with-kube-proxy
+ipam:
+    mode: kubernetes
+kubeProxyReplacement: true
+securityContext:
+    capabilities:
+        ciliumAgent:
+            - CHOWN
+            - KILL
+            - NET_ADMIN
+            - NET_RAW
+            - IPC_LOCK
+            # - SYS_MODULE # "As Talos does not allow loading Kernel modules by Kubernetes workloads, SYS_MODULE needs to be dropped from the Cilium default capability list."
+            - SYS_ADMIN
+            - SYS_RESOURCE
+            - DAC_OVERRIDE
+            - FOWNER
+            - SETGID
+            - SETUID
+        cleanCiliumState:
+            - NET_ADMIN
+            - SYS_ADMIN
+            - SYS_RESOURCE
+cgroup:
+    autoMount:
+        enabled: false
+    hostRoot: /sys/fs/cgroup
+k8sServiceHost: localhost
+k8sServicePort: 7445
+# ---
+encryption:
+    enabled: true # This enabled encryption for pod-to-pod traffic
+    type: wireguard
+    # Node Encryption is not useful to add, since "Cilium automatically disables node-to-node encryption from and to Kubernetes control-plane nodes"
+    # More info at https://docs.cilium.io/en/stable/security/network/encryption-wireguard/#node-to-node-encryption-beta
+    # nodeEncryption: true

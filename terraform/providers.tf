@@ -10,19 +10,19 @@ terraform {
   }
 
   required_providers {
-    local = {
-      source  = "hashicorp/local"
-      version = "2.5.2"
-    }
-
     hcloud = {
       source  = "hetznercloud/hcloud"
-      version = "1.50.0"
+      version = "1.50.1"
     }
 
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "4.52.0"
+      version = "4.52.0" # to be upgraded to v5, but currently, v5 has a lot of issues in github (and docs are not very good)
+    }
+
+    talos = {
+      source  = "siderolabs/talos"
+      version = "0.8.1"
     }
   }
 }

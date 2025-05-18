@@ -20,6 +20,8 @@ resource "cloudflare_record" "k8s" {
   name    = "k8s.thetillhoff.de"
   content = hcloud_server.kubenode.ipv4_address
   ttl     = 3600
+
+  proxied = false
 }
 
 # grafana
@@ -29,6 +31,8 @@ resource "cloudflare_record" "grafana" {
   name    = "logs.thetillhoff.de"
   content = hcloud_server.kubenode.ipv4_address
   ttl     = 3600
+
+  proxied = false
 }
 
 # website
@@ -38,6 +42,8 @@ resource "cloudflare_record" "root" {
   name    = "thetillhoff.de"
   content = hcloud_server.kubenode.ipv4_address
   ttl     = 3600
+
+  proxied = false
 }
 resource "cloudflare_record" "root-aaaa" {
   zone_id = var.cloudflare_zone_id
@@ -45,6 +51,8 @@ resource "cloudflare_record" "root-aaaa" {
   name    = "thetillhoff.de"
   content = hcloud_server.kubenode.ipv6_address
   ttl     = 3600
+
+  proxied = false
 }
 
 # www website
@@ -54,6 +62,8 @@ resource "cloudflare_record" "www" {
   name    = "www.thetillhoff.de"
   content = "thetillhoff.de"
   ttl     = 3600
+
+  proxied = false
 }
 
 # link-shortener
@@ -63,6 +73,8 @@ resource "cloudflare_record" "link" {
   name    = "link.thetillhoff.de"
   content = hcloud_server.kubenode.ipv4_address
   ttl     = 3600
+
+  proxied = false
 }
 
 # vaultwarden
@@ -72,6 +84,8 @@ resource "cloudflare_record" "vaultwarden" {
   name    = "pw.thetillhoff.de"
   content = hcloud_server.kubenode.ipv4_address
   ttl     = 3600
+
+  proxied = false
 }
 
 # umami
@@ -81,6 +95,8 @@ resource "cloudflare_record" "umami" {
   name    = "analytics.thetillhoff.de"
   content = hcloud_server.kubenode.ipv4_address
   ttl     = 3600
+
+  proxied = false
 }
 
 # m365 config

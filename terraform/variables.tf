@@ -34,9 +34,15 @@ variable "kubenode_name" {
 variable "location" {
   type = string
 }
+
 variable "kubenode_ssh_private_key_location" {
   type = string
 }
 variable "kubenode_ssh_public_key_location" {
   type = string
+}
+
+variable "create_local_config_files" {
+  type    = bool
+  default = false # Retrieve from output instead - see ./k8s/README.md
 }

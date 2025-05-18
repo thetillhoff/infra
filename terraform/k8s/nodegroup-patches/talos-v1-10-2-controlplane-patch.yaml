@@ -1,0 +1,46 @@
+machine:
+  network:
+    kubespan:
+      enabled: true
+
+  # For now, this isn't needed, as using the nodes as endpoints works just fine
+  # # This makes nodes reachable via the same name as the k8s cluster
+  # # More info at https://www.talos.dev/v1.10/reference/configuration/v1alpha1/config/#Config.machine
+  # certSANs:
+  #   - "hydra.k8s.thetillhoff.de"
+
+  # The following config regarding node taints leads to non-running kube-schedulers, kube-apiservers & core-dns pods at cluster creation
+  # nodeTaints:
+  #   # Cilium needs this taint to automatically restart the pods on the affected nodes after cilium is running on it
+  #   # More info at https://docs.cilium.io/en/stable/installation/taints/ & https://docs.cilium.io/en/stable/installation/k8s-install-helm/#restart-unmanaged-pods
+  #   node.cilium.io/agent-not-ready: true:NoExecute
+
+# Certificate rotation disabled as it needs manual approval of new certs
+# More info at https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/#certificate-rotation
+#   kubelet:
+#     extraArgs:
+#       rotate-server-certificates: true
+
+# Disk encryption only makes sense with tpm / vtpm, which is not supported by hcloud
+# More info at https://docs.hetzner.com/cloud/servers/faq#do-the-cloud-servers-support-vtpm-or-tpm
+#   systemDiskEncryption:
+#     ephemeral:
+#       provider: luks2
+#       keys:
+#         - nodeID: {}
+#           slot: 0
+#     state:
+#       provider: luks2
+#       keys:
+#         - nodeID: {}
+#           slot: 0
+
+cluster:
+  network:
+    cni:
+      name: none # Disable default CNI
+  proxy:
+    disabled: true # Disable default proxy, as cilium brings its own
+  allowSchedulingOnControlPlanes: true
+  discovery:
+    enabled: true
