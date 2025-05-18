@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  chart:
+    spec:
+      chart: cert-manager
+      sourceRef:
+        kind: HelmRepository
+        name: cert-manager
+      version: v1.17.2
+  interval: 10m
+
+  valuesFrom:
+    - kind: configmap
+      name: cert-manager-helm-values # automatically overridden by kustomize
+      # valuesKey: values.yaml # `values.yaml` is the default key
