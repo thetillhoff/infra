@@ -28,6 +28,7 @@ resource "kubernetes_secret" "sops_age" {
   }
 
   data = {
+    # The `.agekey` suffix is required to specify an age private key for flux
     "age.agekey" = var.flux_system_agekey
   }
 }
@@ -47,7 +48,6 @@ resource "flux_bootstrap_git" "hydra" {
   version = var.flux_version
 
   path                 = "kubernetes/clusters/hydra"
-  secret_name          = kubernetes_secret.sops_age.metadata[0].name
   delete_git_manifests = false # Most probably related to destruction of this resource: Should it remove the cluster config from the git repo or not?
   components_extra     = ["image-reflector-controller", "image-automation-controller"]
 
