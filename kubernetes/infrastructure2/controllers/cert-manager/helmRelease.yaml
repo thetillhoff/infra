@@ -14,6 +14,6 @@ spec:
   interval: 10m
 
   valuesFrom:
-    - kind: configmap
+    - kind: ConfigMap # This value is case sensitive
       name: cert-manager-helm-values # automatically overridden by kustomize
       # valuesKey: values.yaml # `values.yaml` is the default key
