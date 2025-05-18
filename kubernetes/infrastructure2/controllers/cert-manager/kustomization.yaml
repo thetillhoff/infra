@@ -11,4 +11,4 @@ configMapGenerator:
   - values.yaml
 
 configurations:
-- kustomizeconfig.yaml # Used to map the configmap into the helmRelease
+- kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease
