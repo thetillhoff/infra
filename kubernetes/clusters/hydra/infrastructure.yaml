@@ -24,9 +24,10 @@ metadata:
 spec:
   dependsOn:
     - name: infrastructure-controllers
-  interval: 1h
+  interval: 10m0s
   path: ./kubernetes/infrastructure2/configs
   prune: true
+  wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system
