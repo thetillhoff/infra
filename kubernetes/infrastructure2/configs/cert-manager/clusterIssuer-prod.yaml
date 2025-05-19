@@ -14,4 +14,8 @@ spec:
     # Enable the HTTP-01 challenge provider
     solvers:
     - http01:
-        ingressClassName: cilium
+        gatewayHTTPRoute:
+          parentRefs:
+          - kind: Gateway
+            name: acme-resolver-gateway
+            namespace: cert-manager
