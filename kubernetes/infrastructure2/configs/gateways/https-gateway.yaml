@@ -3,12 +3,19 @@ kind: Gateway
 metadata:
   name: https-gateway
   namespace: gateways
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   gatewayClassName: cilium
   listeners:
     - name: https
       port: 443
       protocol: HTTPS
+      hostname: thetillhoff.de
       allowedRoutes:
         namespaces:
           from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: thetillhoff-de-tls
