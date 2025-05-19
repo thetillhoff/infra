@@ -13,7 +13,7 @@ spec:
       name: letsencrypt-staging
     # Enable the HTTP-01 challenge provider
     solvers:
-    # An empty 'selector' means that this solver matches all domains
-    - selector: {}
-      http01:
-        ingressClassName: nginx # TODO
+    - http01:
+        gatewayHTTPRoute:
+          parentRefs:
+          - acme-resolver-gateway
