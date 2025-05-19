@@ -17,5 +17,5 @@ spec:
         gatewayHTTPRoute:
           parentRefs:
           - kind: Gateway
-            name: acme-resolver-gateway
-            namespace: cert-manager
+            name: http-gateway
+            namespace: gateways

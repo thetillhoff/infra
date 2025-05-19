@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: acme-resolver-gateway
+  name: http-gateway
   namespace: cert-manager
 spec:
   gatewayClassName: cilium
