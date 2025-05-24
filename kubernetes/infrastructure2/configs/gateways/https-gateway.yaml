@@ -11,11 +11,10 @@ spec:
     - name: https
       port: 443
       protocol: HTTPS
-      hostname: dev.thetillhoff.de
       allowedRoutes:
         namespaces:
           from: All
       tls:
         mode: Terminate
         certificateRefs:
-          - name: thetillhoff-de-tls
+          - name: https-gateway-tls-certificate

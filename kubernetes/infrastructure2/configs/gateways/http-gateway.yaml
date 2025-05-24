@@ -9,7 +9,6 @@ spec:
     - name: http
       port: 80
       protocol: HTTP
-      hostname: dev.thetillhoff.de
       allowedRoutes:
         namespaces:
           from: All
