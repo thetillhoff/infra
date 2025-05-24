@@ -50,8 +50,8 @@ module "cluster" {
   }
 
   bootstrap_node = flatten([
-    for ng in values(module.nodegroup) : [
-      for node in values(ng.nodes) : {
+    for nodegroup in values(module.nodegroup) : [
+      for node in values(nodegroup.nodes) : {
         ipv4_address = node.ipv4_address
       }
     ]
