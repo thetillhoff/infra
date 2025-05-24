@@ -1,0 +1,7 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: thetillhoff-de
+spec:
+  image: ghcr.io/thetillhoff/thetillhoff.de
+  interval: 5m0s

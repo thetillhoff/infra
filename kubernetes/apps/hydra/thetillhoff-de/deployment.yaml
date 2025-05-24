@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: thetillhoff-de
-  # namespace: thetillhoff-de
 spec:
   selector:
     matchLabels:
@@ -15,8 +14,7 @@ spec:
     spec:
       containers:
       - name: thetillhoff-de
-        image: ghcr.io/thetillhoff/thetillhoff.de:v1.0.18
-        ## {"$imagepolicy": "flux-system:thetillhoff"}
+        image: ghcr.io/thetillhoff/thetillhoff.de:v1.0.18 # {"$imagepolicy": "thetillhoff-de:thetillhoff-de"}
         ports:
         - containerPort: 80
         livenessProbe:

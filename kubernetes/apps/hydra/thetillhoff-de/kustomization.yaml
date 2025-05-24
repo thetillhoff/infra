@@ -4,9 +4,9 @@ namespace: thetillhoff-de
 resources:
 - namespace.yaml
 - deployment.yaml
-# - service.yaml
+- service.yaml
 # - ingress.yaml
 
-# - imageRepository.yaml
-# - imagePolicy.yaml
-# - imageUpdateAutomation.yaml
+- imageRepository.yaml
+- imagePolicy.yaml
+- imageUpdateAutomation.yaml
