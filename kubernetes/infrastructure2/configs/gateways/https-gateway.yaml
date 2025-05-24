@@ -3,12 +3,12 @@ kind: Gateway
 metadata:
   name: https-gateway
   annotations:
-    cert-manager.io/cluster-issuer: selfsigned # letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   gatewayClassName: cilium
   listeners:
-    - name: https
-      hostname: dev.thetillhoff.de
+    - name: https-thetillhoff-de-root
+      hostname: thetillhoff.de
       port: 443
       protocol: HTTPS
       allowedRoutes:
@@ -17,4 +17,15 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: https-gateway-tls-certificate
+          - name: thetillhoff-de-tls-certificate
+    - name: https-thetillhoff-de-wildcard
+      hostname: "*.thetillhoff.de"
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: thetillhoff-de-tls-certificate
