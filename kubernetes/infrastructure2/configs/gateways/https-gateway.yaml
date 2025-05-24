@@ -3,7 +3,7 @@ kind: Gateway
 metadata:
   name: https-gateway
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: selfsigned # letsencrypt-staging
 spec:
   gatewayClassName: cilium
   listeners:
