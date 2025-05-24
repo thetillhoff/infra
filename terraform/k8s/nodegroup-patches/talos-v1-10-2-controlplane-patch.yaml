@@ -37,6 +37,12 @@ machine:
 
 cluster:
   network:
+    # podSubnets:
+    #   - 10.244.0.0/16
+    #   - fd00:10:244::/116
+    # serviceSubnets:
+    #   - 10.96.0.0/12
+    #   - fd00:10:96::/112
     cni:
       name: none # Disable default CNI
   proxy:

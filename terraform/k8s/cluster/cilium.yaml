@@ -32,6 +32,12 @@ cgroup:
 k8sServiceHost: localhost
 k8sServicePort: 7445
 # ---
+# Enabling IPv6
+# TODO: Enable this once we have IPv6 support in the cluster (talos)
+# More info at https://docs.cilium.io/en/stable/helm-reference/
+# ipv6:
+#   enabled: true
+# ---
 encryption:
   enabled: true # This enabled encryption for pod-to-pod traffic
   type: wireguard

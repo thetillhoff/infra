@@ -26,3 +26,5 @@ resource "helm_release" "cilium" {
   wait          = true # true is default, but we want to be explicit
   wait_for_jobs = true
 }
+
+# TODO: Add the kubectl restart command for all unmanaged pods - every time the helm release is created/changed/deleted
