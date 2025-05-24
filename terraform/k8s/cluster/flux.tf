@@ -48,7 +48,7 @@ resource "flux_bootstrap_git" "hydra" {
   version = var.flux_version
 
   path                 = "kubernetes/clusters/hydra"
-  delete_git_manifests = false # Most probably related to destruction of this resource: Should it remove the cluster config from the git repo or not?
+  delete_git_manifests = false # Removes the cluster manifest files from the git repo when this resource is destroyed.
   components_extra     = ["image-reflector-controller", "image-automation-controller"]
 
   timeouts = {
