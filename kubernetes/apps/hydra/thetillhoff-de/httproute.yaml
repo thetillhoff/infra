@@ -6,7 +6,7 @@ spec:
   parentRefs:
   - name: http-gateway
     namespace: gateways
-  - name: https-gateway
+  - name: https-gateway-thetillhoff-de
     namespace: gateways
   hostnames:
   - dev.thetillhoff.de
