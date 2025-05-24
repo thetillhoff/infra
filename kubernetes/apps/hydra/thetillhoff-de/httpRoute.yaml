@@ -4,8 +4,6 @@ metadata:
   name: thetillhoff-de
 spec:
   parentRefs:
-  - name: http-gateway
-    namespace: gateways
   - name: https-gateway-thetillhoff-de
     namespace: gateways
   hostnames:
