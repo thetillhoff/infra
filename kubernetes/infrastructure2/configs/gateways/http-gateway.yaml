@@ -2,7 +2,6 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: http-gateway
-  namespace: gateways
 spec:
   gatewayClassName: cilium
   listeners:
