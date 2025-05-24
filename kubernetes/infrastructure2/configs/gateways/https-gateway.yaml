@@ -8,6 +8,7 @@ spec:
   gatewayClassName: cilium
   listeners:
     - name: https
+      hostname: dev.thetillhoff.de
       port: 443
       protocol: HTTPS
       allowedRoutes:
