@@ -15,11 +15,6 @@ spec:
     - path:
         type: PathPrefix
         value: /
-    filters:
-    - type: ResponseHeaderModifier
-      responseHeaderModifier:
-        remove:
-        - server
     backendRefs:
     - name: thetillhoff-de
       port: 80
