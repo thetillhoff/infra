@@ -17,15 +17,15 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: thetillhoff-de-tls-certificate
-    # - name: https-thetillhoff-de-wildcard
-    #   hostname: "*.dev.thetillhoff.de"
-    #   port: 443
-    #   protocol: HTTPS
-    #   allowedRoutes:
-    #     namespaces:
-    #       from: All
-    #   tls:
-    #     mode: Terminate
-    #     certificateRefs:
-    #       - name: thetillhoff-de-tls-certificate
+          - name: thetillhoff-de-root-tls-certificate
+    - name: https-thetillhoff-de-wildcard
+      hostname: "*.dev.thetillhoff.de"
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: thetillhoff-de-wildcard-tls-certificate
