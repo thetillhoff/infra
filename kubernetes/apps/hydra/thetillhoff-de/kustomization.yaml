@@ -5,7 +5,7 @@ resources:
 - namespace.yaml
 - deployment.yaml
 - service.yaml
-- httpRoute.yaml
+# - httpRoute.yaml
 
 - imageRepository.yaml
 - imagePolicy.yaml
