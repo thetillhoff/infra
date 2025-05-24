@@ -4,4 +4,4 @@ namespace: gateways
 resources:
 - namespace.yaml
 - http-gateway.yaml
-- https-gateway.yaml
+# - https-gateway-thetillhoff-de.yaml
