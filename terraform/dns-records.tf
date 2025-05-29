@@ -99,15 +99,13 @@ resource "cloudflare_record" "umami" {
   proxied = false
 }
 
-# dev.thetillhoff.de
-resource "cloudflare_record" "ipv4_dev" {
-  for_each = toset(
-    flatten([
-      for nodegroup_name, nodegroup in module.k8s.nodegroups : [
-        for node_name, node in nodegroup.nodes : node.ipv4_address
-      ]
-    ])
-  )
+# dev.thetillhoff.de ipv4
+resource "cloudflare_record" "dev_ipv4" {
+  for_each = merge([
+    for nodegroup_name, nodegroup in module.k8s.nodegroups : {
+      for node_name, node in nodegroup.nodes : "${nodegroup_name}-${node_name}" => node.ipv4_address
+    }
+  ]...)
 
   zone_id = var.cloudflare_zone_id
   type    = "A"
@@ -117,14 +115,14 @@ resource "cloudflare_record" "ipv4_dev" {
 
   proxied = false
 }
-resource "cloudflare_record" "ipv6_dev" {
-  for_each = toset(
-    flatten([
-      for nodegroup_name, nodegroup in module.k8s.nodegroups : [
-        for node_name, node in nodegroup.nodes : node.ipv6_address
-      ]
-    ])
-  )
+
+# dev.thetillhoff.de ipv6
+resource "cloudflare_record" "dev_ipv6" {
+  for_each = merge([
+    for nodegroup_name, nodegroup in module.k8s.nodegroups : {
+      for node_name, node in nodegroup.nodes : "${nodegroup_name}-${node_name}" => node.ipv6_address
+    }
+  ]...)
 
   zone_id = var.cloudflare_zone_id
   type    = "AAAA"
