@@ -36,9 +36,7 @@ tasks:
 
   delete-nodes:
     desc: |
-      Delete nodes from k8s prior to deleting servers
-      Example usage:
-        task delete-nodes --dry -- <nodename1> <nodename2>
+      Delete nodes from k8s prior to deleting servers. Example usage: `task delete-nodes --dry -- <nodename1> <nodename2>`
     dir: '{{ .USER_WORKING_DIR }}'
     prompt:
       - This will remove the nodes '{{ .CLI_ARGS }}' from the cluster... Do you want to continue?
@@ -53,9 +51,7 @@ tasks:
   delete-node:
     internal: true # Not listed by `task -l`
     desc: |
-      Delete node from k8s prior to deleting hcloud server
-      Example usage:
-        task delete-node --dry -- <nodename>
+      Delete node from k8s prior to deleting hcloud server. Example usage: `task delete-node --dry -- <nodename>`
     dir: '{{ .USER_WORKING_DIR }}'
     preconditions:
       - msg: 'Node not found'
@@ -76,9 +72,7 @@ tasks:
 
   upgrade-k8s:
     desc: |
-      Upgrade k8s to the specified version
-      Example usage:
-        task upgrade-k8s -- 1.33.0
+      Upgrade k8s to the specified version. Example usage: `task upgrade-k8s -- 1.33.0`
     dir: '{{ .USER_WORKING_DIR }}'
     preconditions:
       - msg: 'kubeconfig not set'
