@@ -16,12 +16,13 @@ variable "subnet_cidr" {
 
 variable "nodegroups" {
   type = map(object({
-    location           = string
-    architecture       = string # Must match image_id
-    server_type        = string
+    count              = number
     talos_image_id     = string # Must match architecture
     talos_machine_type = string
-    count              = number
+    architecture       = string # Must match image_id
+    server_type        = string
+    location           = string
+    kubernetes_version = string
   }))
 }
 

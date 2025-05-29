@@ -12,7 +12,9 @@ resource "hcloud_server" "nodes" {
   server_type = var.server_type
   image       = data.hcloud_image.packer_snapshot.id
   location    = var.location
-  user_data   = data.talos_machine_configuration.main.machine_configuration
+
+  # User data is not needed, instead the machine-config is applied via talos_machine_configuration_apply
+  # user_data   = data.talos_machine_configuration.main.machine_configuration
 
   public_net {
     ipv4_enabled = true

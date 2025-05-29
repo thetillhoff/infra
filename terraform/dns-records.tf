@@ -101,7 +101,13 @@ resource "cloudflare_record" "umami" {
 
 # dev.thetillhoff.de
 resource "cloudflare_record" "ipv4_dev" {
-  for_each = toset(module.k8s.ipv4_addresses)
+  for_each = toset(
+    flatten([
+      for nodegroup_name, nodegroup in module.k8s.nodegroups : [
+        for node_name, node in nodegroup.nodes : node.ipv4_address
+      ]
+    ])
+  )
 
   zone_id = var.cloudflare_zone_id
   type    = "A"
@@ -112,7 +118,13 @@ resource "cloudflare_record" "ipv4_dev" {
   proxied = false
 }
 resource "cloudflare_record" "ipv6_dev" {
-  for_each = toset(module.k8s.ipv6_addresses)
+  for_each = toset(
+    flatten([
+      for nodegroup_name, nodegroup in module.k8s.nodegroups : [
+        for node_name, node in nodegroup.nodes : node.ipv6_address
+      ]
+    ])
+  )
 
   zone_id = var.cloudflare_zone_id
   type    = "AAAA"

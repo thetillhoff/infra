@@ -2,10 +2,11 @@
 
 version: '3'
 silent: true
+
 tasks:
   build:
     desc: Build hcloud image for talos
-    dir: '{{.USER_WORKING_DIR}}/packer'
+    dir: 'packer'
     cmds:
       - |
         docker run --rm -it \
@@ -16,8 +17,82 @@ tasks:
         -c \
         "export PKR_VAR_HCLOUD_TOKEN={{ .HCLOUD_TOKEN }} && packer init . && packer build -var-file=amd64.pkrvars.hcl talos-on-hcloud.pkr.hcl"
 
+  configure:
+    desc: Configure talosconfig and kubeconfig
+    dir: 'terraform'
+    cmds:
+      - |
+        terraform output -raw talosconfig > talosconfig
+        export TALOSCONFIG="$(pwd)/talosconfig"
+
+        terraform output -raw kubeconfig > kubeconfig
+        export KUBECONFIG="$(pwd)/kubeconfig"
+
   reconcile:
     desc: Reconcile flux sources
     dir: '{{.USER_WORKING_DIR}}'
     cmds:
       - flux reconcile source git flux-system
+
+  delete-nodes:
+    desc: |
+      Delete nodes from k8s prior to deleting servers
+      Example usage:
+        task delete-nodes --dry -- <nodename1> <nodename2>
+    dir: '{{ .USER_WORKING_DIR }}'
+    prompt:
+      - This will remove the nodes '{{ .CLI_ARGS }}' from the cluster... Do you want to continue?
+      - Sometimes, the `talosctl reset` command hangs. Use `Ctrl+C` to abort and continue after veryfing it was shutdown.
+    cmds:
+      - for:
+          var: CLI_ARGS
+        task: delete-node
+        vars:
+          CLI_ARGS: '{{ .ITEM }}'
+
+  delete-node:
+    internal: true # Not listed by `task -l`
+    desc: |
+      Delete node from k8s prior to deleting hcloud server
+      Example usage:
+        task delete-node --dry -- <nodename>
+    dir: '{{ .USER_WORKING_DIR }}'
+    preconditions:
+      - msg: 'Node not found'
+        sh: kubectl get node '{{ .NODE_NAME }}'
+      - msg: 'kubeconfig not set'
+        sh: kubectl version
+      - msg: 'talosconfig not set'
+        sh: talosctl version -n '{{ .NODE_IP }}'
+    cmds:
+      - |
+        talosctl -n '{{ .NODE_IP }}' reset --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL
+        kubectl delete node '{{ .NODE_NAME }}'
+        echo 'You can shutdown the server now.'
+    vars:
+      NODE_NAME: '{{ .CLI_ARGS }}'
+      NODE_IP:
+        sh: kubectl get nodes -owide | grep {{ .NODE_NAME }} | awk '{print $6}'
+
+  upgrade-k8s:
+    desc: |
+      Upgrade k8s to the specified version
+      Example usage:
+        task upgrade-k8s -- 1.33.0
+    dir: '{{ .USER_WORKING_DIR }}'
+    preconditions:
+      - msg: 'kubeconfig not set'
+        sh: kubectl version
+      - msg: 'talosconfig not set or node not reachable'
+        sh: talosctl version -n '{{ .NODE_IP }}'
+    cmds:
+      - |
+        talosctl upgrade-k8s \
+        -n '{{ .NODE_IP }}' \
+        --to '{{ .K8S_VERSION }}' \
+        --with-docs=false \
+        --with-examples=false
+    vars:
+      K8S_VERSION: '{{ .CLI_ARGS }}'
+      NODE_IP: # Need a random controlplane node to trigger the upgrade from
+        sh: kubectl get nodes -owide --no-headers | head -n1 | awk '{print $6}'

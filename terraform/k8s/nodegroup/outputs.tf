@@ -1,5 +1,7 @@
 output "nodes" {
-  value = hcloud_server.nodes
+  value = {
+    for name, node in hcloud_server.nodes : name => node
+  }
 }
 
 output "talosconfig" {

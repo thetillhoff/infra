@@ -38,8 +38,9 @@ module "nodegroup" {
     file("${path.module}/nodegroup-patches/${each.key}-patch.yaml")
   ] # Conscious choice to not use `fileexists` here, so it cannot be forgotten during upgrades
   # config_patches       = module.config.config_patches
-  network_id         = module.config.network_id
   cloudflare_zone_id = var.cloudflare_zone_id
+  kubernetes_version = each.value.kubernetes_version
+  network_id         = module.config.network_id
 }
 
 module "cluster" {

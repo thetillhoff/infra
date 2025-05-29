@@ -89,6 +89,10 @@ variable "config_patches" {
   type = list(string)
 }
 
+variable "kubernetes_version" {
+  type = string
+}
+
 variable "network_id" {
   type = string
 }
