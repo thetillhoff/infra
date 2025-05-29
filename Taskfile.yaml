@@ -1,0 +1,23 @@
+# https://taskfile.dev
+
+version: '3'
+silent: true
+tasks:
+  build:
+    desc: Build hcloud image for talos
+    dir: '{{.USER_WORKING_DIR}}/packer'
+    cmds:
+      - |
+        docker run --rm -it \
+        --entrypoint=/bin/sh \
+        -v $(pwd):/packer \
+        -w /packer \
+        hashicorp/packer:light-1.12.0 \
+        -c \
+        "export PKR_VAR_HCLOUD_TOKEN={{ .HCLOUD_TOKEN }} && packer init . && packer build -var-file=amd64.pkrvars.hcl talos-on-hcloud.pkr.hcl"
+
+  reconcile:
+    desc: Reconcile flux sources
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - flux reconcile source git flux-system

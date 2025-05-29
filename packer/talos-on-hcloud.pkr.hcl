@@ -30,6 +30,7 @@ variable "server_location" {
 
 variable "HCLOUD_TOKEN" {
   type    = string
+  sensitive = true
 }
 
 source "hcloud" "talos" {
