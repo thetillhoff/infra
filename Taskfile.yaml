@@ -23,10 +23,10 @@ tasks:
     cmds:
       - |
         terraform output -raw talosconfig > talosconfig
-        export TALOSCONFIG="$(pwd)/talosconfig"
+        echo export TALOSCONFIG="$(pwd)/talosconfig"
 
         terraform output -raw kubeconfig > kubeconfig
-        export KUBECONFIG="$(pwd)/kubeconfig"
+        echo export KUBECONFIG="$(pwd)/kubeconfig"
 
   reconcile:
     desc: Reconcile flux sources
