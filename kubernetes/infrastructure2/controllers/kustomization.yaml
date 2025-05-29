@@ -4,9 +4,4 @@ resources:
 - # Gateway API CRDs
   https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
 - cert-manager
-# - https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/baremetal/deploy.yaml
-
-# configMapGenerator:
-# - name: ingress-nginx-config
-#   files:
-#   - ingress-nginx.config
+- longhorn

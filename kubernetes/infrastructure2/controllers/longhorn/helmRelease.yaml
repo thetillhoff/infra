@@ -1,0 +1,18 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+spec:
+  chart:
+    spec:
+      chart: longhorn
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+      version: v1.8.1
+  interval: 10m
+
+  valuesFrom:
+    - kind: ConfigMap # This value is case sensitive
+      name: longhorn-helm-values # automatically overridden by kustomize
+      # valuesKey: values.yaml # `values.yaml` is the default key
