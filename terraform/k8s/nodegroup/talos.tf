@@ -4,7 +4,7 @@ data "talos_machine_configuration" "main" {
   cluster_endpoint = var.cluster_endpoint
   machine_secrets  = var.machine_secrets
   # Changing kubernetes_version might trigger changes to nodes, since it's provided as user_data
-  kubernetes_version = var.kubernetes_version # f.e. 1.25.4
+  kubernetes_version = var.kubernetes_version # f.e. 1.33.1
   examples           = false
   docs               = false
   config_patches     = var.config_patches

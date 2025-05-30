@@ -13,7 +13,7 @@ resource "hcloud_server" "nodes" {
   image       = data.hcloud_image.packer_snapshot.id
   location    = var.location
 
-  # User data is not needed, instead the machine-config is applied via talos_machine_configuration_apply
+  # User data is optional, since config-apply does the same
   # user_data   = data.talos_machine_configuration.main.machine_configuration
 
   public_net {
@@ -22,6 +22,13 @@ resource "hcloud_server" "nodes" {
   }
 
   shutdown_before_deletion = true # graceful shutdown on deletion
+
+  # lifecycle {
+  #   ignore_changes = [
+  #     # User data is only applied once. If a major change is needed, use a separate nodegroup instead
+  #     user_data
+  #   ]
+  # }
 }
 
 # resource "hcloud_server_network" "srvnetwork" {

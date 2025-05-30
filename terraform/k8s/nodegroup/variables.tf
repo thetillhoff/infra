@@ -12,12 +12,12 @@ variable "image_id" {
 
 variable "architecture" {
   type = string
-  # x86 or arm
+  # amd64 or arm64
 }
 
 variable "server_type" {
   type = string
-  # cx22
+  # like cx22
 }
 
 variable "location" {
