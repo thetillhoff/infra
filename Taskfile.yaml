@@ -23,7 +23,7 @@ tasks:
         - HCLOUD_TOKEN
 
   configure:
-    desc: Configure talosconfig and kubeconfig
+    desc: "Configure talosconfig and kubeconfig. Usage: task configure | source /dev/stdin"
     dir: 'terraform'
     cmds:
       - |
