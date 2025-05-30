@@ -5,7 +5,7 @@ silent: true
 
 tasks:
   build:
-    desc: Build hcloud image for talos
+    desc: "Build hcloud image for talos. Example usage: task build ARCH=amd64"
     dir: 'packer'
     cmds:
       - |
@@ -15,7 +15,12 @@ tasks:
         -w /packer \
         hashicorp/packer:light-1.12.0 \
         -c \
-        "export PKR_VAR_HCLOUD_TOKEN={{ .HCLOUD_TOKEN }} && packer init . && packer build -var-file=amd64.pkrvars.hcl talos-on-hcloud.pkr.hcl"
+        "export PKR_VAR_HCLOUD_TOKEN={{ .HCLOUD_TOKEN }} && packer init . && packer build -var-file={{ .ARCH }}.pkrvars.hcl talos-on-hcloud.pkr.hcl"
+    requires:
+      vars:
+        - name: ARCH
+          enum: [amd64, arm64]
+        - HCLOUD_TOKEN
 
   configure:
     desc: Configure talosconfig and kubeconfig
@@ -33,6 +38,12 @@ tasks:
     dir: '{{.USER_WORKING_DIR}}'
     cmds:
       - flux reconcile source git flux-system
+
+  flux-status:
+    desc: Show flux status
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - flux status # ?
 
   delete-nodes:
     desc: |

@@ -13,18 +13,18 @@ module "k8s" {
   subnet_cidr      = "10.1.0.0/16"
 
   nodegroups = {
-    "talos-v1-10-3-arm64-controlplane" = {
+    "talos-v1-10-3-controlplane" = {
       count              = 2
-      talos_image_id     = "240979498" # Retrieved from packer snapshot id
+      talos_image_id     = "241003589" # Retrieved from packer snapshot id
       talos_machine_type = "controlplane"
-      architecture       = "arm64"
-      server_type        = "cax21"
+      architecture       = "amd64"
+      server_type        = "cx32"
       location           = "nbg1"
       kubernetes_version = "1.13.1"
     }
   }
 
-  retrieve_talosconfig_from_nodegroup = "talos-v1-10-3-arm64-controlplane"
+  retrieve_talosconfig_from_nodegroup = "talos-v1-10-3-controlplane"
 
   cloudflare_zone_id = var.cloudflare_zone_id
 
