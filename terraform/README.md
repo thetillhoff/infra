@@ -12,6 +12,8 @@ HCLOUD_TOKEN             = ""
 HCLOUD_TOKEN_HYDRA       = ""
 CLOUDFLARE_APITOKEN      = ""
 GITHUB_TOKEN             = "" # Use GH_PAT_FLUX from github actions
+
+AGE_KEY = ""
 ```
 
 ## Execution
@@ -23,5 +25,3 @@ GITHUB_TOKEN             = "" # Use GH_PAT_FLUX from github actions
 
 ## Debugging
 cloud-init logs are at /var/log/cloud-init-output.log
-
-example manual api call: `curl --request GET --url https://api.cloudflare.com/client/v4/zones -H 'Content-Type: application/json' -H "Authorization: Bearer <API-TOKEN>"`
