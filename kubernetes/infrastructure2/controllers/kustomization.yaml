@@ -4,4 +4,4 @@ resources:
 - # Gateway API CRDs
   https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
 - cert-manager
-# - longhorn
+- longhorn
