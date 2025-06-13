@@ -1,0 +1,17 @@
+apiVersion: notification.toolkit.fluxcd.io/v1beta2
+kind: Alert
+metadata:
+  name: discord
+  namespace: flux-system
+spec:
+  summary: "hydra"
+  providerRef:
+    name: discord
+  eventSeverity: info
+  eventSources:
+    - kind: GitRepository
+      name: '*'
+    - kind: Kustomization
+      name: '*'
+  exclusionList:
+    - "^Dependencies.*" # "can be safely dropped as any reconcile errors will be reported separately" https://github.com/fluxcd/kustomize-controller/issues/492#issuecomment-1195300509
