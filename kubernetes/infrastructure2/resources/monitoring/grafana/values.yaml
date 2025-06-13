@@ -1,0 +1,6 @@
+# # Enabling persistent storage
+# # More info at https://grafana.com/docs/grafana/latest/setup-grafana/installation/helm/#enable-persistent-storage-recommended
+# persistence:
+#   type: pvc
+#   enabled: true
+#   # storageClassName: default
