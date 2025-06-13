@@ -97,55 +97,55 @@ jobs:
           TF_VAR_GITHUB_TOKEN: ${{ secrets.GH_PAT_FLUX }}
           TF_VAR_AGE_KEY: ${{ secrets.TF_VAR_AGE_KEY }}
 
-  apply:
-    needs: plan
-    runs-on: ubuntu-24.04
-    concurrency: ${{ github.workflow }}-terraform
-    steps:
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-          terraform_wrapper: false
+  # apply:
+  #   needs: plan
+  #   runs-on: ubuntu-24.04
+  #   concurrency: ${{ github.workflow }}-terraform
+  #   steps:
+  #     - uses: hashicorp/setup-terraform@v3
+  #       with:
+  #         cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+  #         terraform_version: ${{ env.TERRAFORM_VERSION }}
+  #         terraform_wrapper: false
 
-      - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v4
 
-      - run: |
-          echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
-          chmod 0400 kubenode_ssh.key
-          echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
-          chmod 0400 kubenode_ssh.key.pub
+  #     - run: |
+  #         echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
+  #         chmod 0400 kubenode_ssh.key
+  #         echo "${{ secrets.KUBENODE_SSH_PUBLIC_KEY }}" > kubenode_ssh.key.pub
+  #         chmod 0400 kubenode_ssh.key.pub
 
-      - run: |
-          terraform init
-        working-directory: ./terraform
+  #     - run: |
+  #         terraform init
+  #       working-directory: ./terraform
 
-      - run: |
-          terraform apply \
-          -input=false \
-          -no-color \
-          -auto-approve
-        working-directory: ./terraform
-        env:
-          TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
-          TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
-          TF_VAR_HCLOUD_TOKEN_HYDRA: ${{ secrets.TF_VAR_HCLOUD_TOKEN_HYDRA }}
-          TF_VAR_GITHUB_TOKEN: ${{ secrets.GH_PAT_FLUX }}
-          TF_VAR_AGE_KEY: ${{ secrets.TF_VAR_AGE_KEY }}
+  #     - run: |
+  #         terraform apply \
+  #         -input=false \
+  #         -no-color \
+  #         -auto-approve
+  #       working-directory: ./terraform
+  #       env:
+  #         TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
+  #         TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+  #         TF_VAR_HCLOUD_TOKEN_HYDRA: ${{ secrets.TF_VAR_HCLOUD_TOKEN_HYDRA }}
+  #         TF_VAR_GITHUB_TOKEN: ${{ secrets.GH_PAT_FLUX }}
+  #         TF_VAR_AGE_KEY: ${{ secrets.TF_VAR_AGE_KEY }}
 
-      - run: |
-          ansible-galaxy install -r requirements.yaml
-        working-directory: ./ansible
+  #     - run: |
+  #         ansible-galaxy install -r requirements.yaml
+  #       working-directory: ./ansible
 
-      - run: |
-          ansible-playbook kubenodes.yaml \
-          --inventory inventory.yaml \
-          --verbose \
-          --private-key ../kubenode_ssh.key
-        working-directory: ./ansible
-        env:
-          TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
-          TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.GH_PAT_FLUX }}
-          AGE_KEY: ${{ secrets.AGE_KEY }}
-          CLUSTER_NAME: pegasus
+  #     - run: |
+  #         ansible-playbook kubenodes.yaml \
+  #         --inventory inventory.yaml \
+  #         --verbose \
+  #         --private-key ../kubenode_ssh.key
+  #       working-directory: ./ansible
+  #       env:
+  #         TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
+  #         TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
+  #         GITHUB_TOKEN: ${{ secrets.GH_PAT_FLUX }}
+  #         AGE_KEY: ${{ secrets.AGE_KEY }}
+  #         CLUSTER_NAME: pegasus
