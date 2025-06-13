@@ -1,0 +1,15 @@
+name: infra
+description: infra
+runtime:
+  name: nodejs
+  options:
+    packagemanager: npm
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: typescript
+  # values are set via `pulumi config set <key> <value> --secret`
+  # hcloud:token:
+  #   value: 'TODO: var.hcloud_token'
+  # cloudflare:apiToken:
+  #   value: 'TODO: var.cloudflare_api_token'

@@ -1,0 +1,70 @@
+# Values documented at https://artifacthub.io/packages/helm/cilium/cilium/1.17.4
+
+# namespaceOverride: cilium-system # default is kube-system
+
+# Docs for cilium on talos at https://www.talos.dev/v1.10/kubernetes-guides/network/deploying-cilium/#without-kube-proxy
+ipam:
+  mode: kubernetes
+kubeProxyReplacement: true
+securityContext:
+  capabilities:
+    ciliumAgent:
+      - CHOWN
+      - KILL
+      - NET_ADMIN
+      - NET_RAW
+      - IPC_LOCK
+      # - SYS_MODULE # "As Talos does not allow loading Kernel modules by Kubernetes workloads, SYS_MODULE needs to be dropped from the Cilium default capability list."
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    cleanCiliumState:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
+k8sServiceHost: localhost
+k8sServicePort: 7445
+# ---
+# Enabling IPv6
+# TODO: Enable this once we have IPv6 support in the cluster (talos)
+# More info at https://docs.cilium.io/en/stable/helm-reference/
+# ipv6:
+#   enabled: true
+# ---
+encryption:
+  enabled: true # This enabled encryption for pod-to-pod traffic
+  type: wireguard
+  # Node Encryption is not useful to add, since "Cilium automatically disables node-to-node encryption from and to Kubernetes control-plane nodes"
+  # More info at https://docs.cilium.io/en/stable/security/network/encryption-wireguard/#node-to-node-encryption-beta
+  # nodeEncryption: true
+# ---
+# Enabling gatewayAPI
+# Using hostNetwork mode removes the need for separate loadbalancer
+# More info at https://docs.cilium.io/en/stable/network/servicemesh/gateway-api/gateway-api/#host-network-mode
+gatewayAPI:
+  enabled: true
+  hostNetwork:
+    enabled: true
+  # ALPN will attempt HTTP/2, then HTTP 1.1.
+  # Note that this will also enable appProtocol support, and services that wish to use HTTP/2 will need to indicate that via their `appProtocol`.
+  enableAlpn: true
+  enableAppProtocol: true
+# Enabling dedicated envoy daemonset for the gateway listener
+# The additional capabilities are required for gateways to listen on privileged ports
+# More info at https://docs.cilium.io/en/stable/network/servicemesh/gateway-api/gateway-api/#bind-to-privileged-port
+envoy:
+  enabled: true
+  securityContext:
+    capabilities:
+      keepCapNetBindService: true
+      envoy:
+        - NET_ADMIN
+        - SYS_ADMIN
+        - NET_BIND_SERVICE

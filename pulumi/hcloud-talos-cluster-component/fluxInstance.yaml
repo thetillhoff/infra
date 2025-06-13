@@ -1,0 +1,29 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+  annotations:
+    fluxcd.controlplane.io/reconcile: "enabled"
+    fluxcd.controlplane.io/reconcileEvery: "1h"
+spec:
+  distribution:
+    version: "2.6.1" # TODO: add update mechanism
+    registry: "ghcr.io/fluxcd"
+    artifact: "oci://ghcr.io/controlplaneio-fluxcd/flux-operator-manifests"
+  cluster:
+    domain: "cluster.local"
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+    - image-reflector-controller
+    - image-automation-controller
+  sync:
+    kind: GitRepository
+    url: "https://github.com/thetillhoff/infra.git"
+    ref: "refs/heads/main"
+    path: "kubernetes/clusters/hydra"
+    pullSecret: "git-auth"
+    interval: "10m" # Default is 1m

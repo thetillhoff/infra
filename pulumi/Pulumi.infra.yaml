@@ -1,0 +1,9 @@
+config:
+  hcloud:token:
+    secure: AAABAENYKcE0KAyAZ+Jybjw54EwkSk4lgK+vNGZKZDiyTENHACVE8VpCplzwoef1UDkVB3CKPSoVki8nMHmk28PY3To92H+l0UkGXfhUjohayYf/MVGmoL/3xH9+rJsb
+  cloudflare:apiToken:
+    secure: AAABACIC9fOTKMs075b6FVNBuMoq8zIvSBraA9G9kiIwJa8tesGUOu9AYgrqiFd5u3t3wZwuS1UyV7sqcfUVcV/R6qPWUYa1
+  infra:flux.sops-age:
+    secure: AAABAAmHGn4gVzJz0LZ+oaXsGbcJdwYBudj1JTJyoWGHnf2lD+t9+ftJnmXeNT5FfbPDQbHCIVQWtX3HBOK0GvwrZUmDehTi/FYE2Xi4JrcDJbKAzpp6w7wYEKyxqpPqNCaQq1o2MgSthQ==
+  infra:flux.git-auth:
+    secure: AAABAN0hRx9m/0N17ZWrpBs63hDemOLirCczgdDcXi8c5UeVKpO/Togsq0boALyTIhk7m2CtbU/SO9d4yK89aVhNXbwg+b9RJaTx7ZmPSqurQZQJTtZPtwYu66yBFfLv4g7KRVh+UFcsHrH0ZLN0UxwaFfQWOFVJC9TFU78=

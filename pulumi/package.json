@@ -1,0 +1,23 @@
+{
+  "name": "infra",
+  "main": "index.ts",
+  "scripts": {
+    "deploy": "pulumi up -y",
+    "destroy": "pulumi destroy -y",
+    "format": "prettier --write .",
+    "configure": "pulumi stack output --show-secrets kubeconfig > kubeconfig && echo export KUBECONFIG=\"$(pwd)/kubeconfig\" && pulumi stack output --show-secrets talosconfig > talosconfig && echo export TALOSCONFIG=\"$(pwd)/talosconfig\""
+  },
+  "devDependencies": {
+    "@types/node": "^18",
+    "prettier": "3.5.3",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@pulumi/cloudflare": "^6.3.0",
+    "@pulumi/hcloud": "^1.23.0",
+    "@pulumi/kubernetes": "^4.23.0",
+    "@pulumi/pulumi": "^3.113.0",
+    "@pulumiverse/talos": "^0.6.0",
+    "@pulumiverse/time": "^0.1.1"
+  }
+}

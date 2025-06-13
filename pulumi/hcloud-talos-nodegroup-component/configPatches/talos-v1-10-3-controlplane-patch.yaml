@@ -1,0 +1,91 @@
+machine:
+  # Enable Longhorn dependencies
+  # More info at https://longhorn.io/docs/1.8.1/advanced-resources/os-distro-specific/talos-linux-support/#v2-data-engine
+  sysctls:
+    vm.nr_hugepages: "1024"
+  kernel:
+    modules:
+      - name: nvme_tcp
+      - name: vfio_pci
+
+  # Enable the Talos KubeSpan feature
+  # More info at https://www.talos.dev/v1.10/talos-guides/network/kubespan/#enabling
+  network:
+    kubespan:
+      enabled: true
+
+  # For now, IPv6 isn't properly supported by talos, not even in dualstack mode
+  # # Enable DHCPv6
+  #     interfaces:
+  #     - interface: eth0 / enp0s1 # Mutually exclusive with deviceSelector
+  #       deviceSelector: # Mutually exclusive with interface
+  #         hardwareAddr: "*"
+  #         driver: "*"
+  #         physical: true # Select only physical devices
+  #       dhcp: true
+  #       dhcpOptions:
+  #         ipv4: true
+  #         ipv6: true
+
+  # For now, this isn't needed, as using the nodes as endpoints works just fine
+  # # This makes nodes reachable via the same name as the k8s cluster
+  # # More info at https://www.talos.dev/v1.10/reference/configuration/v1alpha1/config/#Config.machine
+  # certSANs:
+  #   - "hydra.k8s.thetillhoff.de"
+
+  # The following config regarding node taints leads to non-running kube-schedulers, kube-apiservers & core-dns pods at cluster creation
+  # nodeTaints:
+  #   # Cilium needs this taint to automatically restart the pods on the affected nodes after cilium is running on it
+  #   # More info at https://docs.cilium.io/en/stable/installation/taints/ & https://docs.cilium.io/en/stable/installation/k8s-install-helm/#restart-unmanaged-pods
+  #   node.cilium.io/agent-not-ready: true:NoExecute
+
+  # Certificate rotation disabled as it needs manual approval of new certs
+  # More info at https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/#certificate-rotation
+  #   kubelet:
+  #     extraArgs:
+  #       rotate-server-certificates: true
+
+  # Longhorn data path mounts
+  # More info at https://longhorn.io/docs/1.8.1/advanced-resources/os-distro-specific/talos-linux-support/#data-path-mounts
+  kubelet:
+    extraMounts:
+      - destination: /var/lib/longhorn
+        type: bind
+        source: /var/lib/longhorn
+        options:
+          - bind
+          - rshared
+          - rw
+
+# Disk encryption only makes sense with tpm / vtpm, which is not supported by hcloud
+# More info at https://docs.hetzner.com/cloud/servers/faq#do-the-cloud-servers-support-vtpm-or-tpm
+#   systemDiskEncryption:
+#     ephemeral:
+#       provider: luks2
+#       keys:
+#         - nodeID: {}
+#           slot: 0
+#     state:
+#       provider: luks2
+#       keys:
+#         - nodeID: {}
+#           slot: 0
+
+cluster:
+  network:
+    # Don't use podSubnets & serviceSubnets from this section (to enable ipv6)! Instead configure them on the kubelet option in the machine section
+    # More info at https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/#kubelet-config-k8s-io-v1beta1-KubeletConfiguration
+    # And https://www.talos.dev/v1.10/reference/configuration/v1alpha1/config/#Config.machine.kubelet
+    # podSubnets:
+    #   - 10.244.0.0/16
+    #   - fd00:10:244::/116
+    # serviceSubnets:
+    #   - 10.96.0.0/12
+    #   - fd00:10:96::/112
+    cni:
+      name: none # Disable default CNI
+  proxy:
+    disabled: true # Disable default proxy, as cilium brings its own
+  allowSchedulingOnControlPlanes: true
+  discovery:
+    enabled: true
