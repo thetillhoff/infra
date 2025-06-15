@@ -4,6 +4,6 @@ namespace: monitoring
 resources:
 - namespace.yaml
 - helmRepository-grafana-labs.yaml
-- grafana
+# - grafana
 - prometheus
 # - loki
