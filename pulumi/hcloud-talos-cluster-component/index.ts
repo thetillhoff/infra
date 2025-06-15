@@ -1,6 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as talos from "@pulumiverse/talos";
 import * as kubernetes from "@pulumi/kubernetes";
+import * as time from "@pulumiverse/time";
 
 export interface HcloudTalosClusterArgs {
   bootstrapNodeIpAddress: pulumi.Input<string>;
@@ -29,7 +30,7 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       opts,
     );
 
-    new talos.machine.Bootstrap(
+    const talosBootstrap = new talos.machine.Bootstrap(
       "talosBootstrap",
       {
         clientConfiguration: props.talosSecrets.clientConfiguration,
@@ -41,6 +42,14 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       {
         parent: this,
         ignoreChanges: ["node"],
+      },
+    );
+
+    const talosBootstrapWaiter = new time.Sleep(
+      `waitForTalosBootstrap`,
+      { createDuration: "10s" },
+      {
+        dependsOn: [talosBootstrap],
       },
     );
 
@@ -75,6 +84,7 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       {
         parent: this,
         provider: kubernetesProvider,
+        dependsOn: [talosBootstrapWaiter],
       },
     );
 
