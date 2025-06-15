@@ -22,16 +22,16 @@ tasks:
           enum: [amd64, arm64]
         - HCLOUD_TOKEN
 
-  configure:
-    desc: "Configure talosconfig and kubeconfig. Usage: task configure | source /dev/stdin"
-    dir: 'terraform'
-    cmds:
-      - |
-        terraform output -raw talosconfig > talosconfig
-        echo export TALOSCONFIG="$(pwd)/talosconfig"
+  # configure:
+  #   desc: "Configure talosconfig and kubeconfig. Usage: task configure | source /dev/stdin"
+  #   dir: 'terraform'
+  #   cmds:
+  #     - |
+  #       terraform output -raw talosconfig > talosconfig
+  #       echo export TALOSCONFIG="$(pwd)/talosconfig"
 
-        terraform output -raw kubeconfig > kubeconfig
-        echo export KUBECONFIG="$(pwd)/kubeconfig"
+  #       terraform output -raw kubeconfig > kubeconfig
+  #       echo export KUBECONFIG="$(pwd)/kubeconfig"
 
   reconcile:
     desc: Reconcile flux sources
