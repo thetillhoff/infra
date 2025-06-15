@@ -4,7 +4,7 @@ resources:
 - helmRelease.yaml
 
 configMapGenerator:
-- name: grafana-helm-values
+- name: loki-helm-values
   files:
   - values.yaml
 

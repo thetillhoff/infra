@@ -5,7 +5,7 @@ resources:
 - helmRelease.yaml
 
 configMapGenerator:
-- name: grafana-helm-values
+- name: prometheus-helm-values
   files:
   - values.yaml
 

@@ -14,5 +14,5 @@ spec:
 
   valuesFrom:
     - kind: ConfigMap # This value is case sensitive
-      name: grafana-helm-values # automatically overridden by kustomize
+      name: loki-helm-values # automatically overridden by kustomize
       # valuesKey: values.yaml # `values.yaml` is the default key
