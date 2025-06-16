@@ -3,7 +3,5 @@ kind: Kustomization
 namespace: monitoring
 resources:
 - namespace.yaml
-- helmRepository-grafana-labs.yaml
-# - grafana
 - prometheus
-# - loki
+- loki
