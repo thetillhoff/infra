@@ -1,0 +1,6 @@
+additionalDataSources:
+- name: Loki
+  type: loki
+  url: http://loki-gateway.monitoring.svc.cluster.local
+  access: proxy
+  isDefault: true
