@@ -43,8 +43,9 @@ singleBinary:
       value: 1750MiB
 
 chunksCache:
-  # default is 500MB, with limited memory keep this smaller
-  writebackSizeLimit: 10MB
+  enabled: false
+  # # default is 500MB, with limited memory keep this smaller
+  # writebackSizeLimit: 10MB
 
 # Enable minio for storage
 minio:
