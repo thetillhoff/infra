@@ -9,7 +9,7 @@ configMapGenerator:
   - values.yaml
 - name: alloy-config
   files:
-  - alloy.conf
+  - config.alloy
   options:
     disableNameSuffixHash: true
 

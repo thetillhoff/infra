@@ -2,4 +2,4 @@ alloy:
   configMap:
     create: false
     name: alloy-config
-    key: alloy-config
+    key: config.alloy
