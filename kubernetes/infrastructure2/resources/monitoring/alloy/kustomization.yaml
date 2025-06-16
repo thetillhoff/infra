@@ -10,6 +10,8 @@ configMapGenerator:
 - name: alloy-config
   files:
   - alloy.conf
+  options:
+    disableNameSuffixHash: true
 
 configurations:
 - kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease
