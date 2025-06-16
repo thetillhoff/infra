@@ -4,4 +4,4 @@ resources:
 - gateways
 - cert-manager
 - discord-notifications
-- monitoring
+# - monitoring
