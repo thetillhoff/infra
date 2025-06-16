@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- helmRepository.yaml
+- helmRelease.yaml
+
+configMapGenerator:
+- name: loki-helm-values
+  files:
+  - values.yaml
+
+configurations:
+- kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease
