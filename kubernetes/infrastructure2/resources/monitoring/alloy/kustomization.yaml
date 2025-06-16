@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- helmRelease.yaml
+
+configMapGenerator:
+- name: alloy-helm-values
+  files:
+  - values.yaml
+- name: alloy-config
+  files:
+  - alloy.conf
+
+configurations:
+- kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease

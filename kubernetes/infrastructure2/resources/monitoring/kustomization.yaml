@@ -6,4 +6,4 @@ resources:
 - helmRepository-grafana-labs.yaml
 - prometheus
 - loki
-# - promtail
+- alloy
