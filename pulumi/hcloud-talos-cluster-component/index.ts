@@ -118,6 +118,7 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       {
         parent: this,
         provider: kubernetesProvider,
+        dependsOn: [talosBootstrapWaiter],
       },
     );
 
