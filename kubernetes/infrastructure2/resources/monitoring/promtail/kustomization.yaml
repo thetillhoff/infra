@@ -4,7 +4,7 @@ resources:
 - helmRelease.yaml
 
 configMapGenerator:
-- name: loki-helm-values
+- name: promtail-helm-values
   files:
   - values.yaml
 
