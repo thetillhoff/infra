@@ -81,8 +81,8 @@ const dnsNames = [
   // "logs.thetillhoff.de",
 ];
 
-dnsNames.forEach((dnsName) => {
-  nodegroups.ipv4Addresses.apply((ipv4Addresses) => {
+nodegroups.ipv4Addresses.apply((ipv4Addresses) => {
+  dnsNames.forEach((dnsName) => {
     ipv4Addresses.forEach((ipv4Address, i) => {
       new cloudflare.DnsRecord(
         `${dnsName}-aRecord-${i}`,
@@ -90,24 +90,7 @@ dnsNames.forEach((dnsName) => {
           name: dnsName,
           type: "A",
           ttl: 60,
-          content: ipv4Addresses[i],
-          zoneId: cloudflareZoneId,
-        },
-        {
-          dependsOn: [hcloudTalosCluster],
-        },
-      );
-    });
-  });
-  nodegroups.ipv6Addresses.apply((ipv6Addresses) => {
-    ipv6Addresses.forEach((ipv6Address, i) => {
-      new cloudflare.DnsRecord(
-        `${dnsName}-aaaaRecord-${i}`,
-        {
-          name: dnsName,
-          type: "AAAA",
-          ttl: 60,
-          content: ipv6Addresses[i],
+          content: ipv4Address,
           zoneId: cloudflareZoneId,
         },
         {
@@ -118,16 +101,33 @@ dnsNames.forEach((dnsName) => {
   });
 });
 
-new cloudflare.DnsRecord(
-  `www-thetillhoff-de-cname`,
-  {
-    name: "www.thetillhoff.de",
-    type: "CNAME",
-    ttl: 600,
-    content: "thetillhoff.de",
-    zoneId: cloudflareZoneId,
-  },
-);
+nodegroups.ipv6Addresses.apply((ipv6Addresses) => {
+  dnsNames.forEach((dnsName) => {
+    ipv6Addresses.forEach((ipv6Address, i) => {
+      new cloudflare.DnsRecord(
+        `${dnsName}-aaaaRecord-${i}`,
+        {
+          name: dnsName,
+          type: "AAAA",
+          ttl: 60,
+          content: ipv6Address,
+          zoneId: cloudflareZoneId,
+        },
+        {
+          dependsOn: [hcloudTalosCluster],
+        },
+      );
+    });
+  });
+});
+
+new cloudflare.DnsRecord(`www-thetillhoff-de-cname`, {
+  name: "www.thetillhoff.de",
+  type: "CNAME",
+  ttl: 600,
+  content: "thetillhoff.de",
+  zoneId: cloudflareZoneId,
+});
 
 export const talosconfig =
   nodegroups.nodegroups[primaryControlplaneNodegroupName].talosconfig;
