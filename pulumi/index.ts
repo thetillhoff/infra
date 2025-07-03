@@ -78,6 +78,7 @@ const hcloudTalosCluster = new HcloudTalosCluster(
 const dnsNames = [
   "thetillhoff.de",
   "link.thetillhoff.de",
+  "analytics.dev.thetillhoff.de",
   // "logs.thetillhoff.de",
 ];
 

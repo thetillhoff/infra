@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - thetillhoff-de
 - link-shortener
+- umami
