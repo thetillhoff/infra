@@ -9,7 +9,7 @@ import * as path from "path";
 const talosSecrets = new talos.machine.Secrets("talosSecrets", {});
 
 const clusterName = "hydra";
-const clusterEndpointDomain = "k8s.hydra.thetillhoff.de";
+const clusterEndpointDomain = "k8s.hydra.thetillhoff.de"; // TODO change to hydra.k8s.thetillhoff.de
 const cloudflareZoneId = "94d9f474ce48a61513a68744b663f5e5";
 
 const nodegroups = new HcloudTalosNodegroups(
@@ -75,23 +75,59 @@ const hcloudTalosCluster = new HcloudTalosCluster(
   },
 );
 
-nodegroups.ipv4Addresses.apply((ipv4Addresses) => {
-  for (let i = 0; i < ipv4Addresses.length; i++) {
-    new cloudflare.DnsRecord(
-      `dev-aRecord-${i}`,
-      {
-        name: "dev.thetillhoff.de",
-        type: "A",
-        ttl: 60,
-        content: ipv4Addresses[i],
-        zoneId: cloudflareZoneId,
-      },
-      {
-        dependsOn: [hcloudTalosCluster],
-      },
-    );
-  }
+const dnsNames = [
+  "thetillhoff.de",
+  "link.thetillhoff.de",
+  // "logs.thetillhoff.de",
+];
+
+dnsNames.forEach((dnsName) => {
+  nodegroups.ipv4Addresses.apply((ipv4Addresses) => {
+    ipv4Addresses.forEach((ipv4Address, i) => {
+      new cloudflare.DnsRecord(
+        `${dnsName}-aRecord-${i}`,
+        {
+          name: dnsName,
+          type: "A",
+          ttl: 60,
+          content: ipv4Addresses[i],
+          zoneId: cloudflareZoneId,
+        },
+        {
+          dependsOn: [hcloudTalosCluster],
+        },
+      );
+    });
+  });
+  nodegroups.ipv6Addresses.apply((ipv6Addresses) => {
+    ipv6Addresses.forEach((ipv6Address, i) => {
+      new cloudflare.DnsRecord(
+        `${dnsName}-aaaaRecord-${i}`,
+        {
+          name: dnsName,
+          type: "AAAA",
+          ttl: 60,
+          content: ipv6Addresses[i],
+          zoneId: cloudflareZoneId,
+        },
+        {
+          dependsOn: [hcloudTalosCluster],
+        },
+      );
+    });
+  });
 });
+
+new cloudflare.DnsRecord(
+  `www-thetillhoff-de-cname`,
+  {
+    name: "www.thetillhoff.de",
+    type: "CNAME",
+    ttl: 600,
+    content: "thetillhoff.de",
+    zoneId: cloudflareZoneId,
+  },
+);
 
 export const talosconfig =
   nodegroups.nodegroups[primaryControlplaneNodegroupName].talosconfig;

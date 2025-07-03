@@ -9,7 +9,7 @@ spec:
   - name: https-gateway-thetillhoff-de
     namespace: gateways
   hostnames:
-  - dev.thetillhoff.de
+  - thetillhoff.de
   rules:
   - matches:
     - path:

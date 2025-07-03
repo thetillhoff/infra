@@ -7,7 +7,7 @@ spec:
   - name: http-gateway
     namespace: gateways
   hostnames:
-  - link.dev.thetillhoff.de
+  - link.thetillhoff.de
   rules:
   - matches:
     - path:
@@ -16,3 +16,9 @@ spec:
     backendRefs:
     - name: link-shortener
       port: 80
+  # # Redirect to https:
+  # - filters:
+  #   - type: RequestRedirect
+  #     requestRedirect:
+  #       scheme: https
+  #       statusCode: 301

@@ -24,54 +24,12 @@ resource "cloudflare_record" "k8s" {
   proxied = false
 }
 
-# grafana
-resource "cloudflare_record" "grafana" {
-  zone_id = var.cloudflare_zone_id
-  type    = "A"
-  name    = "logs.thetillhoff.de"
-  content = hcloud_server.kubenode.ipv4_address
-  ttl     = 3600
-
-  proxied = false
-}
-
-# website
-resource "cloudflare_record" "root" {
-  zone_id = var.cloudflare_zone_id
-  type    = "A"
-  name    = "thetillhoff.de"
-  content = hcloud_server.kubenode.ipv4_address
-  ttl     = 3600
-
-  proxied = false
-}
-resource "cloudflare_record" "root-aaaa" {
-  zone_id = var.cloudflare_zone_id
-  type    = "AAAA"
-  name    = "thetillhoff.de"
-  content = hcloud_server.kubenode.ipv6_address
-  ttl     = 3600
-
-  proxied = false
-}
-
 # www website
 resource "cloudflare_record" "www" {
   zone_id = var.cloudflare_zone_id
   type    = "CNAME"
   name    = "www.thetillhoff.de"
   content = "thetillhoff.de"
-  ttl     = 3600
-
-  proxied = false
-}
-
-# link-shortener
-resource "cloudflare_record" "link" {
-  zone_id = var.cloudflare_zone_id
-  type    = "A"
-  name    = "link.thetillhoff.de"
-  content = hcloud_server.kubenode.ipv4_address
   ttl     = 3600
 
   proxied = false
@@ -94,40 +52,6 @@ resource "cloudflare_record" "umami" {
   type    = "A"
   name    = "analytics.thetillhoff.de"
   content = hcloud_server.kubenode.ipv4_address
-  ttl     = 3600
-
-  proxied = false
-}
-
-# dev.thetillhoff.de ipv4
-resource "cloudflare_record" "dev_ipv4" {
-  for_each = merge([
-    for nodegroup_name, nodegroup in module.k8s.nodegroups : {
-      for node_name, node in nodegroup.nodes : "${nodegroup_name}-${node_name}" => node.ipv4_address
-    }
-  ]...)
-
-  zone_id = var.cloudflare_zone_id
-  type    = "A"
-  name    = "dev.thetillhoff.de"
-  content = each.value
-  ttl     = 3600
-
-  proxied = false
-}
-
-# dev.thetillhoff.de ipv6
-resource "cloudflare_record" "dev_ipv6" {
-  for_each = merge([
-    for nodegroup_name, nodegroup in module.k8s.nodegroups : {
-      for node_name, node in nodegroup.nodes : "${nodegroup_name}-${node_name}" => node.ipv6_address
-    }
-  ]...)
-
-  zone_id = var.cloudflare_zone_id
-  type    = "AAAA"
-  name    = "dev.thetillhoff.de"
-  content = each.value
   ttl     = 3600
 
   proxied = false
