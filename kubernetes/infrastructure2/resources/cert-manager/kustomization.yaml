@@ -2,5 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - clusterIssuer-selfsigned.yaml
+- certificate-selfsigned-ca.yaml
+- clusterIssuer-selfsigned-ca.yaml
 - clusterIssuer-staging.yaml
 - clusterIssuer-prod.yaml
