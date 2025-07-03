@@ -13,10 +13,10 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@pulumi/cloudflare": "^6.3.0",
+    "@pulumi/cloudflare": "^6.3.1",
     "@pulumi/hcloud": "^1.23.0",
     "@pulumi/kubernetes": "^4.23.0",
-    "@pulumi/pulumi": "^3.113.0",
+    "@pulumi/pulumi": "^3.181.0",
     "@pulumiverse/talos": "^0.6.0",
     "@pulumiverse/time": "^0.1.1"
   }
