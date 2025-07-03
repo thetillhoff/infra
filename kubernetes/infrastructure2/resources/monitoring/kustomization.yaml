@@ -4,6 +4,8 @@ namespace: monitoring
 resources:
 - namespace.yaml
 - metrics-server
+
+# All of the following are disabled until https://github.com/grafana/loki/issues/17371 was fixed & a new version contains the fix
 # - helmRepository-grafana-labs.yaml
 # - prometheus
 # - loki

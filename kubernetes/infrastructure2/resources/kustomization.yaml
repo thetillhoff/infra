@@ -4,4 +4,4 @@ resources:
 - gateways
 - cert-manager
 - discord-notifications
-# - monitoring # Disabled until https://github.com/grafana/loki/issues/17371 was fixed & a new version contains the fix
+- monitoring
