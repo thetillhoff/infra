@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: link-shortener
+spec:
+  selector:
+    matchLabels:
+      app: link-shortener
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: link-shortener
+    spec:
+      containers:
+      - name: link-shortener
+        image: caddy:2.6.4 # {"$imagepolicy": "link-shortener:link-shortener"}
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            port: 8080
+          initialDelaySeconds: 5
+        volumeMounts:
+        - name: caddyfile
+          subPath: Caddyfile
+          mountPath: /etc/caddy/Caddyfile
+      volumes:
+      - name: caddyfile
+        configMap:
+          name: caddyfile

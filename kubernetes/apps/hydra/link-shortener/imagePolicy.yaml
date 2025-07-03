@@ -1,0 +1,13 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: link-shortener
+spec:
+  imageRepositoryRef:
+    name: caddy
+  filterTags:
+    pattern: '^(?P<version>.*)'
+    extract: '$version'
+  policy:
+    semver:
+      range: '>=2.0.0'
