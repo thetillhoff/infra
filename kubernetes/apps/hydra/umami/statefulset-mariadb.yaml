@@ -55,7 +55,7 @@ spec:
       name: mariadb-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "local-path" # TODO change
+      storageClassName: "longhorn"
       resources:
         requests:
           storage: 10Gi
