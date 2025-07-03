@@ -4,10 +4,10 @@ resources:
 - helmRepository.yaml
 - helmRelease.yaml
 
-# configMapGenerator:
-# - name: metrics-server-helm-values
-#   files:
-#   - values.yaml
+configMapGenerator:
+- name: metrics-server-helm-values
+  files:
+  - values.yaml
 
-# configurations:
-# - kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease
+configurations:
+- kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease
