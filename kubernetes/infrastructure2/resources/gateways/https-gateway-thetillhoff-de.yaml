@@ -7,7 +7,7 @@ metadata:
 spec:
   gatewayClassName: cilium
   listeners:
-    - name: https-thetillhoff-de-root
+    - name: dev-thetillhoff-de
       hostname: dev.thetillhoff.de
       port: 443
       protocol: HTTPS
@@ -18,8 +18,8 @@ spec:
         mode: Terminate
         certificateRefs:
           - name: thetillhoff-de-tls-certificate
-    - name: https-thetillhoff-de-wildcard
-      hostname: "*.dev.thetillhoff.de"
+    - name: link-dev-thetillhoff-de
+      hostname: "link.dev.thetillhoff.de"
       port: 443
       protocol: HTTPS
       allowedRoutes:
