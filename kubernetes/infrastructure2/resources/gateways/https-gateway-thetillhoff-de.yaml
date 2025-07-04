@@ -3,7 +3,7 @@ kind: Gateway
 metadata:
   name: https-gateway-thetillhoff-de
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   gatewayClassName: cilium
   listeners:
