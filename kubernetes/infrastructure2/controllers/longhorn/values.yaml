@@ -1,0 +1,12 @@
+persistence:
+  defaultClassReplicaCount: 2
+csi:
+  attacherReplicaCount: 2
+  provisionerReplicaCount: 2
+  resizerReplicaCount: 2
+  snapshotterReplicaCount: 2
+longhornUI:
+  replicas: 1
+defaultSettings:
+  defaultReplicaCount: 2
+  replicaAutoBalance: best-effort
