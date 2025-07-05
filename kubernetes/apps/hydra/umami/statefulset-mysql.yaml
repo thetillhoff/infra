@@ -15,7 +15,10 @@ spec:
     spec:
       containers:
       - name: mysql
-        image: mysql:9.3.0 # TODO change from latest and add image update policy
+        # mysql9 doesn't seem to be supported by umami yet.
+        # Error: Unable to connect to the database: Error querying the database: Unknown authentication plugin `sha256_password'.
+        # In the umami docs it says mysql 8 is supported though.
+        image: mysql:8.4.5 # TODO change from latest and add image update policy
         ports:
         - containerPort: 3306
         livenessProbe:
