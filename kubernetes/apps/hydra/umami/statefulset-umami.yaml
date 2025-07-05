@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: umami
-        image: docker.umami.dev/umami-software/umami:mysql-latest # TODO change from latest and add image update policy
+        image: ghcr.io/umami-software/umami:mysql-v2.18.1 # TODO change from latest and add image update policy
         ports:
         - containerPort: 3000
         # TODO add livenessProbe
