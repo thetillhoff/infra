@@ -7,11 +7,14 @@ resources:
 - service-mysql.yaml
 - statefulset-umami.yaml
 - service-umami.yaml
+- mysql.secret.yaml
+- umami.secret.yaml
 
-secretGenerator:
-  - name: mysql
-    envs:
-      - mysql.secret.env
-  - name: umami
-    envs:
-      - umami.secret.env
+# Disabled until https://github.com/getsops/sops/issues/1886 is solved
+# secretGenerator:
+#   - name: mysql
+#     envs:
+#       - mysql.secret.env
+#   - name: umami
+#     envs:
+#       - umami.secret.env
