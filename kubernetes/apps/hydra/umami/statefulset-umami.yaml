@@ -20,11 +20,11 @@ spec:
         image: ghcr.io/umami-software/umami:postgresql-v2.18.1 # TODO change from latest and add image update policy
         ports:
         - containerPort: 3000
-        # TODO add livenessProbe
-        # livenessProbe:
-        #   httpGet:
-        #     port: 3000
-        #   initialDelaySeconds: 5
+          livenessProbe:
+            initialDelaySeconds: 30
+            httpGet:
+              path: /api/heartbeat
+              port: 3000
 
         env:
         - name: HOSTNAME

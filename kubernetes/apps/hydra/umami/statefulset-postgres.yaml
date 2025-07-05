@@ -18,11 +18,10 @@ spec:
         image: postgres:17.5 # TODO change from latest and add image update policy
         ports:
         - containerPort: 5432
-        # TODO add liveness probe
-        # livenessProbe:
-        #   exec:
-        #     command: ["mysqladmin", "ping"]
-        #   initialDelaySeconds: 5
+          livenessProbe:
+            initialDelaySeconds: 30
+            exec:
+              command: ["pg_isready"]
 
         env:
         - name: POSTGRES_PASSWORD
