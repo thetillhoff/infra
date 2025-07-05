@@ -39,15 +39,26 @@ machine:
   #   # More info at https://docs.cilium.io/en/stable/installation/taints/ & https://docs.cilium.io/en/stable/installation/k8s-install-helm/#restart-unmanaged-pods
   #   node.cilium.io/agent-not-ready: true:NoExecute
 
-  # Certificate rotation disabled as it needs manual approval of new certs
-  # More info at https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/#certificate-rotation
-  #   kubelet:
-  #     extraArgs:
-  #       rotate-server-certificates: true
-
-  # Longhorn data path mounts
-  # More info at https://longhorn.io/docs/1.8.1/advanced-resources/os-distro-specific/talos-linux-support/#data-path-mounts
   kubelet:
+    # Certificate rotation disabled as it needs manual approval of new certs
+    # More info at https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/#certificate-rotation
+    # extraArgs:
+    #   rotate-server-certificates: true
+
+    extraConfig:
+      # rotateCertificates enables client certificate rotation. The Kubelet will request a new certificate from the certificates.k8s.io API. This requires an approver to approve the certificate signing requests. Default: false
+      # rotateCertificates: true
+
+      # serverTLSBootstrap enables server certificate bootstrap.
+      # Instead of self signing a serving certificate, the Kubelet
+      # will request a certificate from the 'certificates.k8s.io' API.
+      # This requires an approver to approve the certificate signing
+      # requests (CSR). The RotateKubeletServerCertificate feature
+      # must be enabled when setting this field.
+      serverTLSBootstrap: true
+
+    # Longhorn data path mounts
+    # More info at https://longhorn.io/docs/1.8.1/advanced-resources/os-distro-specific/talos-linux-support/#data-path-mounts
     extraMounts:
       - destination: /var/lib/longhorn
         type: bind
