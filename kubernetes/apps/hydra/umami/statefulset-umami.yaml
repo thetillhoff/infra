@@ -28,9 +28,9 @@ spec:
 
         env:
         - name: HOSTNAME
-          value: analytics.dev.thetillhoff.de
-        - name: FORCE_SSL
-          value: "1"
+          value: 0.0.0.0
+        # - name: FORCE_SSL
+        #   value: "0"
         - name: DISABLE_TELEMETRY
           value: "1"
         - name: DATABASE_URL
