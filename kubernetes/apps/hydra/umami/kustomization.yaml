@@ -7,5 +7,11 @@ resources:
 - service-mysql.yaml
 - statefulset-umami.yaml
 - service-umami.yaml
-- mysql.secret.yaml
-- umami.secret.yaml
+
+secretGenerator:
+  - name: mysql
+    files:
+      - mysql.secret.yaml
+  - name: umami
+    files:
+      - umami.secret.yaml
