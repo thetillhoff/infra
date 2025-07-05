@@ -10,8 +10,8 @@ resources:
 
 secretGenerator:
   - name: mysql
-    files:
-      - mysql.secret.yaml
+    envs:
+      - mysql.secret.env
   - name: umami
-    files:
-      - umami.secret.yaml
+    envs:
+      - umami.secret.env
