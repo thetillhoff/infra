@@ -26,4 +26,4 @@ spec:
     ref: "refs/heads/main"
     path: "kubernetes/clusters/hydra"
     pullSecret: "git-auth"
-    interval: "10m" # Default is 1m
+    # interval: "10m" # Default is 1m
