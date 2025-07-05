@@ -1,0 +1,6 @@
+args:
+  # This is required to allow the metrics server to connect to the kubelet
+  # without TLS.
+  # There is a better way, with using kubelet-csr-approver.
+  # For now, we'll use this and mark it as TODO.
+  - --kubelet-insecure-tls
