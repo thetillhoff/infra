@@ -3,11 +3,10 @@ kind: Kustomization
 namespace: umami
 resources:
 - namespace.yaml
-# - statefulset-mysql.yaml
 - statefulset-postgres.yaml
 - service-db.yaml
-# - statefulset-umami.yaml
-# - service-umami.yaml
+- statefulset-umami.yaml
+- service-umami.yaml
 - db.secret.yaml
 - umami.secret.yaml
 
