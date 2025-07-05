@@ -36,6 +36,14 @@ spec:
               name: db
               key: POSTGRES_USER
 
+        # Fixing the following error:
+        # initdb: error: directory "/var/lib/postgresql/data" exists but is not empty
+        # initdb: detail: It contains a lost+found directory, perhaps due to it being a mount point.
+        # initdb: hint: Using a mount point directly as the data directory is not recommended.
+        # Create a subdirectory under the mount point.
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+
         volumeMounts:
         - name: db-data
           mountPath: "/var/lib/postgresql/data"
