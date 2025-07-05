@@ -28,12 +28,12 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres
+              name: db
               key: POSTGRES_PASSWORD
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: postgres
+              name: db
               key: POSTGRES_USER
 
         volumeMounts:
