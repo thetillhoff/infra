@@ -1,4 +1,5 @@
-providerRegex: '^node-\d+-\w+$'
+providerRegex: '.*'
+# providerRegex: '^node-\d+-\w+$'
 bypass-dns-resolution: true
 bypass-hostname-check: true
 skipDenyStep: true
