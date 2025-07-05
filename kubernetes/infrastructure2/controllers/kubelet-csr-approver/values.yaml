@@ -1,1 +1,3 @@
+providerRegex: '^node-\d+-\w+$'
 # bypass-hostname-check: true
+# bypass-dns-resolution: true
