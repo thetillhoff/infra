@@ -3,9 +3,9 @@ kind: Kustomization
 namespace: umami
 resources:
 - namespace.yaml
-- statefulset-mariadb.yaml
-- service-mariadb.yaml
+- statefulset-mysql.yaml
+- service-mysql.yaml
 - statefulset-umami.yaml
 - service-umami.yaml
-- mariadb.secret.yaml
+- mysql.secret.yaml
 - umami.secret.yaml
