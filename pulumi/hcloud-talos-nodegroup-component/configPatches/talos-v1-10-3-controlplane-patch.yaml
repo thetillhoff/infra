@@ -46,16 +46,18 @@ machine:
     #   rotate-server-certificates: true
 
     extraConfig:
-      # rotateCertificates enables client certificate rotation. The Kubelet will request a new certificate from the certificates.k8s.io API. This requires an approver to approve the certificate signing requests. Default: false
+      # rotateCertificates enables client certificate rotation. The
+      # Kubelet will request a new certificate from the
+      # certificates.k8s.io API. This requires an approver to approve
+      # the certificate signing requests.
       # rotateCertificates: true
 
       # serverTLSBootstrap enables server certificate bootstrap.
       # Instead of self signing a serving certificate, the Kubelet
       # will request a certificate from the 'certificates.k8s.io' API.
       # This requires an approver to approve the certificate signing
-      # requests (CSR). The RotateKubeletServerCertificate feature
-      # must be enabled when setting this field.
-      serverTLSBootstrap: true
+      # requests (CSR).
+      # serverTLSBootstrap: true
 
     # Longhorn data path mounts
     # More info at https://longhorn.io/docs/1.8.1/advanced-resources/os-distro-specific/talos-linux-support/#data-path-mounts

@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
 - # Gateway API CRDs
   https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
-- kubelet-csr-approver
+# - kubelet-csr-approver # TODO see pulumi/hcloud-talos-nodegroup-component/configPatches/talos-*-controlplane-patch.yaml for more info
 - cert-manager
 - longhorn
