@@ -40,3 +40,25 @@ spec:
         mode: Terminate
         certificateRefs:
           - name: thetillhoff-de-tls-certificate
+    - name: pw-dev-thetillhoff-de
+      hostname: "pw.dev.thetillhoff.de"
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: thetillhoff-de-tls-certificate
+    - name: pw-thetillhoff-de
+      hostname: "pw.thetillhoff.de"
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: thetillhoff-de-tls-certificate
