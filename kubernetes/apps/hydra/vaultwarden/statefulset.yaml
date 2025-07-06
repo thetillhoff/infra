@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vaultwarden
+spec:
+  serviceName: vaultwarden
+  selector:
+    matchLabels:
+      app: vaultwarden
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vaultwarden
+    spec:
+      containers:
+      - name: vaultwarden
+        image: ghcr.io/dani-garcia/vaultwarden:1.34.1  # {"$imagepolicy": "vaultwarden:vaultwarden"}
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            port: 80
+          initialDelaySeconds: 5
+
+        env:
+        - name: DOMAIN
+          value: https://pw.dev.thetillhoff.de
+        - name: SIGNUPS_DOMAINS_WHITELIST # Setting this ignores SIGNUPS_ALLOWED
+          value: "thetillhoff.de"
+        - name: SIGNUPS_ALLOWED # This is ignored if SIGNUPS_DOMAINS_WHITELIST is set
+          value: "false"
+        - name: SHOW_PASSWORD_HINT
+          value: "false"
+        - name: INVITATIONS_ALLOWED
+          value: "false"
+
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: vaultwarden
+
+  volumeClaimTemplates:
+  - metadata:
+      name: vaultwarden
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "longhorn"
+      resources:
+        requests:
+          storage: 2Gi

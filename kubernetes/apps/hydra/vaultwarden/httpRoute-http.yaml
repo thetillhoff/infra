@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: pw-thetillhoff-de-http
+spec:
+  parentRefs:
+  - name: http-gateway
+    namespace: gateways
+  hostnames:
+  - pw.dev.thetillhoff.de
+  rules:
+  - filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: https
+        statusCode: 301

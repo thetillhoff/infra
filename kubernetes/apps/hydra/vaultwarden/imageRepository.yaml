@@ -1,0 +1,7 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: vaultwarden
+spec:
+  image: ghcr.io/dani-garcia/vaultwarden
+  interval: 5m0s
