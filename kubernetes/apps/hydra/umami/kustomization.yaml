@@ -9,6 +9,8 @@ resources:
 - service-umami.yaml
 - db.secret.yaml
 - umami.secret.yaml
+- httpRoute-http.yaml
+- httpRoute-https.yaml
 
 # Disabled until https://github.com/getsops/sops/issues/1886 is solved
 # secretGenerator:
