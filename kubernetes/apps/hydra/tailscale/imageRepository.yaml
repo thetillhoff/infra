@@ -1,0 +1,7 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: tailscale
+spec:
+  image: ghcr.io/tailscale/tailscale
+  interval: 5m0s

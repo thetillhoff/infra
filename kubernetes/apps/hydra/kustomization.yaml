@@ -5,3 +5,4 @@ resources:
 - link-shortener
 - umami
 - vaultwarden
+- tailscale
