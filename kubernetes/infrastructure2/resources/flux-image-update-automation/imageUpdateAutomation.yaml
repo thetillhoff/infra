@@ -1,13 +1,12 @@
 apiVersion: image.toolkit.fluxcd.io/v1beta1
 kind: ImageUpdateAutomation
 metadata:
-  name: link-shortener
+  name: flux-image-update-automation
 spec:
   interval: 5m0s
   sourceRef:
     kind: GitRepository
     name: flux-system
-    namespace: flux-system
   git:
     checkout:
       ref:
