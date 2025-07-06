@@ -1,8 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-- namespace.yaml
-- pvc.yaml
-- deployment.yaml
-- service.yaml
-#- ingress.yaml # currently not applicable because it shouldn't be publicly available and I haven't set up vpn properly yet
