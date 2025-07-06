@@ -24,33 +24,11 @@ resource "cloudflare_record" "k8s" {
   proxied = false
 }
 
-# www website
-resource "cloudflare_record" "www" {
-  zone_id = var.cloudflare_zone_id
-  type    = "CNAME"
-  name    = "www.thetillhoff.de"
-  content = "thetillhoff.de"
-  ttl     = 3600
-
-  proxied = false
-}
-
 # vaultwarden
 resource "cloudflare_record" "vaultwarden" {
   zone_id = var.cloudflare_zone_id
   type    = "A"
   name    = "pw.thetillhoff.de"
-  content = hcloud_server.kubenode.ipv4_address
-  ttl     = 3600
-
-  proxied = false
-}
-
-# umami
-resource "cloudflare_record" "umami" {
-  zone_id = var.cloudflare_zone_id
-  type    = "A"
-  name    = "analytics.thetillhoff.de"
   content = hcloud_server.kubenode.ipv4_address
   ttl     = 3600
 
