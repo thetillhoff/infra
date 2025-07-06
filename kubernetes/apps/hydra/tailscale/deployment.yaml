@@ -26,8 +26,14 @@ spec:
         #     - NET_ADMIN
         #     - SYS_MODULE
         env:
+        - name: TS_HOSTNAME
+          value: "hydra"
         - name: TS_ENABLE_HEALTH_CHECK
           value: "true"
+        - name: TS_KUBE_SECRET
+          value: "" # default is 'tailscale'
+        - name: TS_STATE_DIR # required as replacement for the KUBE_SECRET
+          value: "/var/lib/tailscale"
         - name: TS_AUTHKEY
           valueFrom:
             secretKeyRef:
