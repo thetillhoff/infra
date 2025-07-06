@@ -13,17 +13,6 @@ resource "cloudflare_record" "caa" {
   ttl     = 3600
 }
 
-# route to k8s cluster
-resource "cloudflare_record" "k8s" {
-  zone_id = var.cloudflare_zone_id
-  type    = "A"
-  name    = "k8s.thetillhoff.de"
-  content = hcloud_server.kubenode.ipv4_address
-  ttl     = 3600
-
-  proxied = false
-}
-
 # m365 config
 resource "cloudflare_record" "spf" {
   zone_id = var.cloudflare_zone_id
