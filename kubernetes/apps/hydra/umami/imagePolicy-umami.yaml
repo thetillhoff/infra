@@ -6,7 +6,7 @@ spec:
   imageRepositoryRef:
     name: umami
   filterTags:
-    pattern: '^postgres-v(?P<version>.*)'
+    pattern: '^postgresql-v(?P<version>.*)'
     extract: '$version'
   policy:
     semver:
