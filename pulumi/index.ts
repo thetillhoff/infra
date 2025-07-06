@@ -79,6 +79,7 @@ const dnsNames = [
   "thetillhoff.de",
   "link.thetillhoff.de",
   "analytics.thetillhoff.de",
+  "pw.dev.thetillhoff.de",
   // "logs.thetillhoff.de",
 ];
 
