@@ -39,3 +39,5 @@ spec:
             secretKeyRef:
               name: tailscale
               key: authkey
+        - name: TS_EXTRA_ARGS
+          value: "--advertise-exit-node"
