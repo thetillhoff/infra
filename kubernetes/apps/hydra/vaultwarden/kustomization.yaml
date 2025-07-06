@@ -5,6 +5,8 @@ resources:
 - namespace.yaml
 - statefulset.yaml
 - service.yaml
+- httpRoute-http.yaml
+- httpRoute-https.yaml
 
 - imageRepository.yaml
 - imagePolicy.yaml
