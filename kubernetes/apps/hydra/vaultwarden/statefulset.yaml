@@ -38,10 +38,6 @@ spec:
           volumeMounts:
             - name: vaultwarden
               mountPath: /data
-      # volumes:
-      #   - name: data
-      #     persistentVolumeClaim:
-      #       claimName: vaultwarden
 
   volumeClaimTemplates:
     - metadata:
