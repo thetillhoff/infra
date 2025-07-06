@@ -25,7 +25,7 @@ spec:
   dependsOn:
     - name: infrastructure-controllers
   interval: 10m0s
-  path: ./kubernetes/infrastructure2/resources
+  path: ./kubernetes/infrastructure/resources
   prune: true
   wait: true
   sourceRef:
