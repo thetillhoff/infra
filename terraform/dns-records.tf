@@ -24,17 +24,6 @@ resource "cloudflare_record" "k8s" {
   proxied = false
 }
 
-# vaultwarden
-resource "cloudflare_record" "vaultwarden" {
-  zone_id = var.cloudflare_zone_id
-  type    = "A"
-  name    = "pw.thetillhoff.de"
-  content = hcloud_server.kubenode.ipv4_address
-  ttl     = 3600
-
-  proxied = false
-}
-
 # m365 config
 resource "cloudflare_record" "spf" {
   zone_id = var.cloudflare_zone_id

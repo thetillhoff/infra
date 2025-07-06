@@ -7,7 +7,7 @@ spec:
   - name: http-gateway
     namespace: gateways
   hostnames:
-  - pw.dev.thetillhoff.de # TODO change to pw.thetillhoff.de
+  - pw.thetillhoff.de
   rules:
   - filters:
     - type: RequestRedirect
