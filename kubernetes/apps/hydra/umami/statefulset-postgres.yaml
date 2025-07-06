@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: postgres:17.5 # {"$imagepolicy": "umami:postgres"}
+        image: postgres:17.5 # No image policy set, to prevent major updates from breaking things
         ports:
         - containerPort: 5432
           livenessProbe:
