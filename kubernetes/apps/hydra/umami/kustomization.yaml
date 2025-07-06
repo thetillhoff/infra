@@ -12,6 +12,11 @@ resources:
 - httpRoute-http.yaml
 - httpRoute-https.yaml
 
+- imageRepository-umami.yaml
+- imagePolicy-umami.yaml
+- imageRepository-postgres.yaml
+- imagePolicy-postgres.yaml
+
 # Disabled until https://github.com/getsops/sops/issues/1886 is solved
 # secretGenerator:
 #   - name: mysql

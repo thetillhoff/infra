@@ -16,8 +16,7 @@ spec:
     spec:
       containers:
       - name: umami
-        # image: ghcr.io/umami-software/umami:mysql-v2.18.1 # TODO change from latest and add image update policy
-        image: ghcr.io/umami-software/umami:postgresql-v2.18.1 # TODO change from latest and add image update policy
+        image: ghcr.io/umami-software/umami:postgresql-v2.18.1 # {"$imagepolicy": "umami:umami"}
         ports:
         - containerPort: 3000
           livenessProbe:
