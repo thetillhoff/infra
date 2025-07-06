@@ -6,8 +6,8 @@ spec:
   imageRepositoryRef:
     name: postgres
   filterTags:
-    pattern: '^(?P<version>.*)'
+    pattern: '^17.(?P<version>.*)'
     extract: '$version'
   policy:
-    semver:
-      range: '>=17.0'
+    numerical:
+      order: asc
