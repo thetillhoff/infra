@@ -20,6 +20,11 @@ spec:
             port: 9002
             path: /healthz
           initialDelaySeconds: 30
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_MODULE
         env:
         - name: TS_ENABLE_HEALTH_CHECK
           value: "true"
