@@ -12,6 +12,22 @@ spec:
       labels:
         app: tailscaile
     spec:
+      initContainers:
+        # In order to run as a proxy we need to enable IP Forwarding inside
+        # the container. The `net.ipv4.ip_forward` sysctl is not allowlisted
+        # in Kubelet by default.
+      - name: sysctler
+        image: "ghcr.io/tailscale/tailscale:latest"
+        securityContext:
+          privileged: true
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - sysctl -w net.ipv4.ip_forward=1 net.ipv6.conf.all.forwarding=1
+        resources:
+          requests:
+            cpu: 1m
+            memory: 1Mi
       containers:
       - name: tailscaile
         image: ghcr.io/tailscale/tailscale:v1.84.3 # {"$imagepolicy": "tailscale:tailscale"}
@@ -27,13 +43,17 @@ spec:
         #     - SYS_MODULE
         env:
         - name: TS_HOSTNAME
-          value: "hydra"
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         - name: TS_ENABLE_HEALTH_CHECK
           value: "true"
+        - name: TS_USERSPACE
+          value: "false"
         - name: TS_KUBE_SECRET
           value: "" # default is 'tailscale'
-        - name: TS_STATE_DIR # required as replacement for the KUBE_SECRET
-          value: "/var/lib/tailscale"
+        # - name: TS_STATE_DIR # required as replacement for the KUBE_SECRET # Doesn't seem to be required, just a cool thing in case state should be persisted
+        #   value: "/tsstate"
         - name: TS_AUTHKEY
           valueFrom:
             secretKeyRef:
@@ -41,3 +61,16 @@ spec:
               key: authkey
         - name: TS_EXTRA_ARGS
           value: "--advertise-exit-node"
+        # - name: POD_NAME
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: metadata.name
+        # - name: POD_UID
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: metadata.uid
+        securityContext:
+          privileged: true
+        # volumeMounts:
+        #   - name: tsstate
+        #     mountPath: /tsstate
