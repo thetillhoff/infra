@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment # TODO make this a DaemonSet
 metadata:
   name: tailscaile
 spec:
