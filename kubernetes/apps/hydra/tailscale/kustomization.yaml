@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: tailscale
 resources:
 - namespace.yaml
-- deployment.yaml
+- daemonset.yaml
 - tailscale.secret.yaml
 
 - imageRepository.yaml

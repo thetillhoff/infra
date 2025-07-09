@@ -1,12 +1,11 @@
 apiVersion: apps/v1
-kind: Deployment # TODO make this a DaemonSet
+kind: DaemonSet
 metadata:
   name: tailscaile
 spec:
   selector:
     matchLabels:
       app: tailscaile
-  replicas: 1
   template:
     metadata:
       labels:
@@ -36,11 +35,6 @@ spec:
             port: 9002
             path: /healthz
           initialDelaySeconds: 30
-        # securityContext:
-        #   capabilities:
-        #     add:
-        #     - NET_ADMIN
-        #     - SYS_MODULE
         env:
         - name: TS_HOSTNAME
           valueFrom:
@@ -61,14 +55,6 @@ spec:
               key: authkey
         - name: TS_EXTRA_ARGS
           value: "--advertise-exit-node"
-        # - name: POD_NAME
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: metadata.name
-        # - name: POD_UID
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: metadata.uid
         securityContext:
           privileged: true
         # volumeMounts:
