@@ -71,13 +71,13 @@ envoy:
 # ---
 # Set hubble tls method to certmanager to prevent continuous drift of the hubble certificate
 # More info at https://docs.cilium.io/en/latest/observability/hubble/configuration/tls/#enable-tls-on-the-hubble-api
-hubble:
-  tls:
-    auto:
-      enabled: true
-      method: certmanager
-      certValidityDuration: 365
-      certManagerIssuerRef:
-        group: "cert-manager.io"
-        kind: "ClusterIssuer"
-        name: "selfsigned-ca"
+# hubble:
+#   tls:
+#     auto:
+#       enabled: true
+#       method: certmanager
+#       certValidityDuration: 365
+#       certManagerIssuerRef:
+#         group: "cert-manager.io"
+#         kind: "ClusterIssuer"
+#         name: "selfsigned-ca"

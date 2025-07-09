@@ -22,7 +22,7 @@ spec:
     - image-automation-controller
   sync:
     kind: GitRepository
-    url: "https://github.com/thetillhoff/infra.git"
+    url: "https://github.com/thetillhoff/infra.git" # TODO make configurable
     ref: "refs/heads/main"
     path: "kubernetes/clusters/hydra"
     pullSecret: "git-auth"

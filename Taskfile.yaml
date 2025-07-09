@@ -5,7 +5,7 @@ silent: true
 
 tasks:
   build:
-    desc: "Build hcloud image for talos. Example usage: task build ARCH=amd64"
+    desc: "Build hcloud image for talos. Example usage: task build ARCH=amd64 HCLOUD_TOKEN=..."
     dir: 'packer'
     cmds:
       - |

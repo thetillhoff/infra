@@ -7,6 +7,7 @@ import * as time from "@pulumiverse/time";
 export interface HcloudTalosNodegroupArgs {
   clusterName: pulumi.Input<string>;
   clusterEndpointDomain: pulumi.Input<string>;
+  clusterDnsNames: pulumi.Input<string>[];
   talosSecrets: talos.machine.Secrets;
   machineType: pulumi.Input<string>; // 'controlplane' or 'worker'
   kubernetesVersion: pulumi.Input<string>; // like 'v1.33.1'
@@ -58,10 +59,12 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
         ),
       );
 
+      for (const dnsName of [props.clusterEndpointDomain, ...props.clusterDnsNames]) {
+
       const dnsARecord = new cloudflare.DnsRecord(
-        `aRecord-node-${i}`,
+        `aRecord-${dnsName}-node-${i}`,
         {
-          name: props.clusterEndpointDomain,
+          name: dnsName,
           type: "A",
           ttl: 60,
           content: this.nodes[i].ipv4Address,
@@ -74,13 +77,38 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
 
       this.dnsTTLWaiters.push(
         new time.Sleep(
-          `waitForDnsARecordTTL-node-${i}`,
+          `waitForDnsARecordTTL-${dnsName}-node-${i}`,
           { createDuration: "60s" },
           {
             dependsOn: [dnsARecord],
           },
         ),
       );
+
+      const dnsAAAARecord = new cloudflare.DnsRecord(
+        `aaaaRecord-${dnsName}-node-${i}`,
+        {
+          name: dnsName,
+          type: "AAAA",
+          ttl: 60,
+          content: this.nodes[i].ipv6Address,
+          zoneId: props.cloudflareZoneId,
+        },
+        {
+          parent: this,
+        },
+      );
+
+      this.dnsTTLWaiters.push(
+        new time.Sleep(
+          `waitForDnsAAAARecordTTL-${dnsName}-node-${i}`,
+          { createDuration: "60s" },
+          {
+            dependsOn: [dnsAAAARecord],
+          },
+        ),
+      );
+    };
 
       const talosMachineConfiguration = talos.machine.getConfigurationOutput({
         clusterName: props.clusterName,

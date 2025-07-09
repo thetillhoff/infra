@@ -3,9 +3,12 @@ import * as talos from "@pulumiverse/talos";
 import * as kubernetes from "@pulumi/kubernetes";
 import * as time from "@pulumiverse/time";
 
+import { HcloudTalosNodegroups } from "../hcloud-talos-nodegroup-component/nodegroups";
+
 export interface HcloudTalosClusterArgs {
-  bootstrapNodeIpAddress: pulumi.Input<string>;
   clusterEndpointDomain: pulumi.Input<string>;
+  clusterNodegroups: HcloudTalosNodegroups;
+  cloudflareZoneId: pulumi.Input<string>;
   talosSecrets: talos.machine.Secrets;
   ciliumVersion: pulumi.Input<string>;
   gatewayApiCrdsVersion: pulumi.Input<string>;
@@ -30,11 +33,14 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       opts,
     );
 
+    const bootstrapNodeIpAddress =
+      props.clusterNodegroups.controlplaneIpv4Addresses[0];
+
     const talosBootstrap = new talos.machine.Bootstrap(
       "talosBootstrap",
       {
         clientConfiguration: props.talosSecrets.clientConfiguration,
-        node: props.bootstrapNodeIpAddress,
+        node: bootstrapNodeIpAddress,
         timeouts: {
           create: "3m",
         },
@@ -47,8 +53,9 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
 
     const talosBootstrapWaiter = new time.Sleep(
       `waitForTalosBootstrap`,
-      { createDuration: "10s" },
+      { createDuration: "30s" },
       {
+        parent: this,
         dependsOn: [talosBootstrap],
       },
     );
@@ -57,7 +64,7 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       "talosKubeconfig",
       {
         clientConfiguration: props.talosSecrets.clientConfiguration,
-        node: props.bootstrapNodeIpAddress,
+        node: bootstrapNodeIpAddress,
       },
       {
         parent: this,
@@ -73,6 +80,7 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       },
       {
         parent: this,
+        // dependsOn: [dnsRecords],
       },
     );
 
@@ -118,7 +126,7 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       {
         parent: this,
         provider: kubernetesProvider,
-        dependsOn: [talosBootstrapWaiter],
+        dependsOn: [ciliumHelmRelease],
       },
     );
 
@@ -133,7 +141,7 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       {
         parent: this,
         provider: kubernetesProvider,
-        dependsOn: [ciliumHelmRelease, fluxNamespace],
+        dependsOn: [fluxNamespace],
       },
     );
 
@@ -189,7 +197,6 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
           fluxOperatorHelmRelease,
           fluxGitAuthSecret,
           fluxSopsAgeSecret,
-          fluxNamespace,
         ],
       },
     );
