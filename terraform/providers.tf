@@ -13,7 +13,7 @@ terraform {
 
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "4.52.0" # to be upgraded to v5, but currently, v5 has a lot of issues in github (and docs are not very good)
+      version = "5.6.0" # to be upgraded to v5, but currently, v5 has a lot of issues in github (and docs are not very good)
     }
   }
 }
