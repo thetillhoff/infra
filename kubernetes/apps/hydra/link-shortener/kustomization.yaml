@@ -10,6 +10,7 @@ resources:
 
 - imageRepository.yaml
 - imagePolicy.yaml
+- imageUpdateAutomation.yaml
 
 configMapGenerator:
 - name: caddyfile
