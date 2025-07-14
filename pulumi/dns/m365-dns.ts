@@ -7,12 +7,16 @@ interface M365DnsArgs {
 }
 
 export function createM365DnsRecords(args: M365DnsArgs) {
+  const domainWithDashes = pulumi
+    .output(args.domain)
+    .apply((domain) => domain.replace(/\./g, "-"));
+
   new cloudflare.DnsRecord("mx-record", {
     name: args.domain,
     type: "MX",
     ttl: 3600,
     priority: 10,
-    content: `${args.domain}.mail.protection.outlook.com`,
+    content: pulumi.interpolate`${domainWithDashes}.mail.protection.outlook.com`,
     zoneId: args.cloudflareZoneId,
   });
 
