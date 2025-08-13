@@ -68,6 +68,10 @@ envoy:
         - NET_ADMIN
         - SYS_ADMIN
         - NET_BIND_SERVICE
+# Removing the built-in pod restart selector to make cilium restart all unmanaged pods, not just kube-dns
+operator:
+  extraArgs:
+  - '--pod-restart-selector=""'
 # ---
 # Set hubble tls method to certmanager to prevent continuous drift of the hubble certificate
 # More info at https://docs.cilium.io/en/latest/observability/hubble/configuration/tls/#enable-tls-on-the-hubble-api
