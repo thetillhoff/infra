@@ -19,7 +19,7 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - run: |
           terraform init
