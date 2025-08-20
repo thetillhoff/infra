@@ -22,7 +22,7 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # - run: |
       #     pre-commit -a
@@ -77,7 +77,7 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - run: |
           echo "${{ secrets.KUBENODE_SSH_PRIVATE_KEY }}" > kubenode_ssh.key
