@@ -22,8 +22,24 @@ tasks:
           enum: [amd64, arm64]
         - HCLOUD_TOKEN
 
-  configure:
-    desc: "Configure talosconfig and kubeconfig. Usage: task configure | source /dev/stdin"
+  deploy:
+    desc: "Deploy pulumi stack. Example usage: task deploy"
+    dir: 'pulumi'
+    cmds:
+      - pulumi up
+
+  configure-files:
+    desc: "Configure talosconfig and kubeconfig. Usage: task configure-files"
+    dir: 'pulumi'
+    generates:
+      - './talosconfig'
+      - './kubeconfig'
+    cmds:
+      - pulumi stack output --show-secrets talosconfig > talosconfig
+      - pulumi stack output --show-secrets kubeconfig > kubeconfig
+
+  configure-env:
+    desc: "Configure talosconfig and kubeconfig env vars. Usage: task configure-env | source /dev/stdin"
     dir: 'pulumi'
     cmds:
       - |

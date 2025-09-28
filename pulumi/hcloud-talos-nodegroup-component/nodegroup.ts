@@ -39,7 +39,7 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
     for (let i = 0; i < props.nodeCount; i++) {
       this.nodes.push(
         new hcloud.Server(
-          `node-${i}`,
+          `${name}-node-${i}`,
           {
             // name: props.name, // Using auto-names instead
             image: props.hcloudImageId,
@@ -62,7 +62,7 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
       for (const dnsName of [props.clusterEndpointDomain, ...props.clusterDnsNames]) {
 
       const dnsARecord = new cloudflare.DnsRecord(
-        `aRecord-${dnsName}-node-${i}`,
+        `${name}-aRecord-${dnsName}-node-${i}`,
         {
           name: dnsName,
           type: "A",
@@ -77,7 +77,7 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
 
       this.dnsTTLWaiters.push(
         new time.Sleep(
-          `waitForDnsARecordTTL-${dnsName}-node-${i}`,
+          `${name}-waitForDnsARecordTTL-${dnsName}-node-${i}`,
           { createDuration: "60s" },
           {
             dependsOn: [dnsARecord],
@@ -86,7 +86,7 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
       );
 
       const dnsAAAARecord = new cloudflare.DnsRecord(
-        `aaaaRecord-${dnsName}-node-${i}`,
+        `${name}-aaaaRecord-${dnsName}-node-${i}`,
         {
           name: dnsName,
           type: "AAAA",
@@ -101,7 +101,7 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
 
       this.dnsTTLWaiters.push(
         new time.Sleep(
-          `waitForDnsAAAARecordTTL-${dnsName}-node-${i}`,
+          `${name}-waitForDnsAAAARecordTTL-${dnsName}-node-${i}`,
           { createDuration: "60s" },
           {
             dependsOn: [dnsAAAARecord],
@@ -128,7 +128,7 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
       });
 
       new talos.machine.ConfigurationApply(
-        `configurationApply-node-${i}`,
+        `${name}-configurationApply-node-${i}`,
         {
           clientConfiguration: clientConfiguration.clientConfiguration,
           machineConfigurationInput:
