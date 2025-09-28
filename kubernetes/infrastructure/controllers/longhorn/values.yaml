@@ -1,4 +1,6 @@
 persistence:
+  defaultClassReplicaCount: 2
+  reclaimPolicy: Retain
   defaultClassReplicaCount: 1
 csi:
   attacherReplicaCount: 1
@@ -8,5 +10,4 @@ csi:
 longhornUI:
   replicas: 1
 defaultSettings:
-  defaultReplicaCount: 1
   replicaAutoBalance: best-effort
