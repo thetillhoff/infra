@@ -6,8 +6,6 @@ services:
     restart: always
     ports:
       - "445:445"
-    environment:
-      - BACKUP_PASSWORD={{ BACKUP_PASSWORD }}
     volumes:
       - ./smb.conf:/etc/samba/smb.conf:ro
       # mount data volumes into /mnt/<sharename>

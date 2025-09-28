@@ -147,14 +147,3 @@ I tried it and it had several hickups that in summary rendered it unusable.
 Todos from Samba logs:
 - weak crypto allowed
 - unix password synx is set, but no valid passwd program parameter
-
-
----
-
-## Getting started
-
-```sh
-task -l
-terraform apply terraform
-
-```
