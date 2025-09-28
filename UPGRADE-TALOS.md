@@ -1,4 +1,4 @@
-# How to Upgrade
+# How to upgrade talos nodegroups
 
 ## 1. Build new talos image via packer.
 
