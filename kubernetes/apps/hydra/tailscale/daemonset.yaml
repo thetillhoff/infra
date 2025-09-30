@@ -29,7 +29,7 @@ spec:
             memory: 1Mi
       containers:
       - name: tailscaile
-        image: ghcr.io/tailscale/tailscale:v1.88.2 # {"$imagepolicy": "tailscale:tailscale"}
+        image: ghcr.io/tailscale/tailscale:v1.88.3 # {"$imagepolicy": "tailscale:tailscale"}
         livenessProbe:
           httpGet:
             port: 9002
