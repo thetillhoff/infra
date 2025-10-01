@@ -1,7 +1,8 @@
 persistence:
   defaultClassReplicaCount: 2
   reclaimPolicy: Retain
-  defaultClassReplicaCount: 1
+  dataEngine: v2
+  defaultDataLocality: best-effort
 csi:
   attacherReplicaCount: 1
   provisionerReplicaCount: 1
