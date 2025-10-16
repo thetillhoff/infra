@@ -5,4 +5,4 @@ resources:
 - link-shortener
 - umami
 - vaultwarden
-# - tailscale
+# - tailscale # tailscale requires a new token every 90 days...
