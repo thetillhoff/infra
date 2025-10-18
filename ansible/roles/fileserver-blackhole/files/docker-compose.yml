@@ -6,7 +6,16 @@ services:
     restart: always
     ports:
       - "445:445"
+    environment:
+      # Comma-separated list of users to create Samba shares for
+      # This needs to match to a corresponding mounted volume at `/mnt/<username>`
+      # Example: SAMBA_USERS=user1,user2,user3
+      - SAMBA_USERS=backup
     volumes:
-      - ./smb.conf:/etc/samba/smb.conf:ro
-      # mount data volumes into /mnt/<sharename>
-      - /mnt/cold/public:/mnt/public:rw
+      # Mount host system user database files for authentication
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/group:/etc/group:ro
+      # Mount data volumes into /mnt/<username>
+      - /mnt/cold/public:/mnt/public:rw # Configured statically in the smb.conf file
+      - /mnt/cold/backup:/mnt/backup:rw # Configured dynamically in the start.sh script

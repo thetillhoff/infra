@@ -4,10 +4,15 @@ FROM ubuntu:latest
 RUN \
   apt-get update && \
   apt-get upgrade -y && \
-  apt-get install -y samba && \
+  apt-get install -y samba samba-common-bin && \
   rm -rf /var/lib/apt/lists/*
 
+# Copy configuration and startup script
 COPY --chmod=0744 start.sh /start.sh
+COPY smb.conf /etc/samba/smb.conf
+
+# Note: No user creation here - we'll use host system users via mounted files
+# Samba will automatically create necessary directories (/var/log/samba, /var/lib/samba, etc.)
 
 CMD ["/usr/bin/bash", "-c", "/start.sh"]
 

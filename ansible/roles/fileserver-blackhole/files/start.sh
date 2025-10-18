@@ -1,22 +1,71 @@
 #!/bin/bash
 
-# loop over users and passwords to create them in the container and samba - make sure uid and gid are settable from config
-# Loop over shares, each with their own config
+# Exit on any error
+set -e
 
-# useradd username
-# (echo password; echo password) | smbpasswd -a username
+echo "Starting Samba with host system authentication..."
 
 # /mnt is empty by default, and every share should be mounted into it
 chmod 0777 /mnt -R
 
-# From smb.conf:
-# NOTE: Whenever you modify this file you should run the command
-# "testparm" to check that you have not made any basic syntactic
-# errors.
-testparm -s > /dev/null
+# Convert comma-separated string to array
+IFS=',' read -ra USER_ARRAY <<< "$SAMBA_USERS"
 
-# Start samba
-/usr/sbin/smbd --foreground --debug-stdout --no-process-group
+# Loop over users and perform required operations
+for username in "${USER_ARRAY[@]}"; do
+    # Remove any leading/trailing whitespace
+    username=$(echo "$username" | xargs)
+    
+    echo "Creating Samba user: $username"
+    smbpasswd -a "$username"
+    
+    echo "Setting user directory permissions: /mnt/$username"
+    chown "$username:$username" "/mnt/$username"
+    chmod 755 "/mnt/$username"
+    
+    # Add share definition to smb.conf
+    echo "Adding share definition for: $username"
+    cat >> /etc/samba/smb.conf << EOF
+
+[$username]
+   # Private share for $username
+   path = /mnt/$username
+   
+   # Do not allow guest access to this share
+   public = no
+   
+   # Only allow the '$username' account to access this share
+   valid users = $username
+   
+   # Allow write access to the share
+   writeable = yes
+   
+   # Make this share visible when browsing the server
+   browsable = yes
+   
+   # File creation mask: permissions for new files (0664 = rw-rw-r--)
+   # Owner and group can read/write, others can only read
+   create mask = 0664
+   
+   # Directory creation mask: permissions for new directories (0775 = rwxrwxr-x)
+   # Owner and group can read/write/execute, others can read/execute
+   directory mask = 0775
+EOF
+done
+
+# Test Samba configuration
+echo "Testing Samba configuration..."
+testparm -s > /dev/null
+if [ $? -eq 0 ]; then
+    echo "Samba configuration is valid"
+else
+    echo "Error: Samba configuration is invalid"
+    exit 1
+fi
+
+# Start Samba daemon
+echo "Starting Samba daemon..."
+exec /usr/sbin/smbd --foreground --debug-stdout --no-process-group
 # /usr/sbin/smbd --foreground --no-process-group
 # --foreground: Keep the process in the foreground so Docker can see its output
 # --debug-stdout: Log to stdout
