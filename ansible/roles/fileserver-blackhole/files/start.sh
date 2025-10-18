@@ -5,9 +5,6 @@ set -e
 
 echo "Starting Samba with host system authentication..."
 
-# /mnt is empty by default, and every share should be mounted into it
-chmod 0777 /mnt -R
-
 # Check if users file exists
 users_file="/mnt/config/users.txt"
 if [ ! -f "$users_file" ]; then
