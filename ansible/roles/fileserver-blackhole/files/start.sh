@@ -56,7 +56,7 @@ while IFS=':' read -r username password; do
    # Owner and group can read/write/execute, others can read/execute
    directory mask = 0775
 EOF
-done
+done < "$users_file"
 
 # Test Samba configuration
 echo "Testing Samba configuration..."
