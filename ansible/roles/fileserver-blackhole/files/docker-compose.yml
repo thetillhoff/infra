@@ -8,7 +8,8 @@ services:
       - "445:445"
     environment:
       # Comma-separated list of users to create Samba shares for
-      # This needs to match to a corresponding mounted volume at `/mnt/<username>`
+      # These users need to be created on the host system first
+      # For each user, a corresponding mount at `/mnt/<username>` needs to be created
       # Example: SAMBA_USERS=user1,user2,user3
       - SAMBA_USERS=backup
     volumes:
