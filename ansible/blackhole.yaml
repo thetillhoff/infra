@@ -1,11 +1,7 @@
 - name: Blackhole configuration
-  hosts: blackhole
-  #hosts: localhost
-  #connection: local
-
-  #####
-
-  # This server should run Ubuntu server 20
+  # hosts: blackhole # use this for remote execution
+  hosts: localhost # use this for local execution
+  connection: local # use this for local execution
 
   #####
 
@@ -17,5 +13,4 @@
     - basic
     - fileserver-blackhole
     #- k3s
-    #- apps
     - disk-spindown
