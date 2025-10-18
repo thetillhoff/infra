@@ -6,3 +6,4 @@ resources:
 # - kubelet-csr-approver # TODO see pulumi/hcloud-talos-nodegroup-component/configPatches/talos-*-controlplane-patch.yaml for more info
 - cert-manager
 - longhorn
+- tailscale
