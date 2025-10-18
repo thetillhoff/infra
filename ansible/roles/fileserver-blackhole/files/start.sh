@@ -8,17 +8,24 @@ echo "Starting Samba with host system authentication..."
 # /mnt is empty by default, and every share should be mounted into it
 chmod 0777 /mnt -R
 
-# Convert comma-separated string to array
-IFS=',' read -ra USER_ARRAY <<< "$SAMBA_USERS"
+# Check if users file exists
+users_file="/etc/samba/users.txt"
+if [ ! -f "$users_file" ]; then
+    echo "Error: Users file not found: $users_file"
+    exit 1
+fi
+
+echo "Reading users from file: $users_file"
 
 # Loop over users and perform required operations
-for username in "${USER_ARRAY[@]}"; do
-    # Remove any leading/trailing whitespace
-    username=$(echo "$username" | xargs)
+while IFS=':' read -r username password; do
+    # Skip empty lines and comments
+    [ -z "$username" ] && continue
+    [[ "$username" =~ ^#.*$ ]] && continue
     
     echo "Creating Samba user: $username"
-    # Create Samba user with username as password (unattended)
-    echo -e "$username\n$username" | smbpasswd -a "$username"
+    # Create Samba user with custom password (unattended)
+    echo -e "$password\n$password" | smbpasswd -a "$username"
     
     echo "Setting user directory permissions: /mnt/$username"
     chown "$username:$username" "/mnt/$username"

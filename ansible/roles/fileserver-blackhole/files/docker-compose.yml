@@ -6,17 +6,15 @@ services:
     restart: always
     ports:
       - "445:445"
-    environment:
-      # Comma-separated list of users to create Samba shares for
-      # These users need to be created on the host system first
-      # For each user, a corresponding mount at `/mnt/<username>` needs to be created
-      # Example: SAMBA_USERS=user1,user2,user3
-      - SAMBA_USERS=backup
     volumes:
       # Mount host system user database files for authentication
       - /etc/passwd:/etc/passwd:ro
       - /etc/shadow:/etc/shadow:ro
       - /etc/group:/etc/group:ro
+      # Mount encrypted users configuration file (USER:PASSWORD format)
+      # This file contains Samba user credentials and is encrypted with SOPS
+      # Format: username:password (one per line, comments start with #)
+      - /mnt/cold/users.txt:/etc/samba/users.txt:ro
       # Mount data volumes into /mnt/<username>
       - /mnt/cold/public:/mnt/public:rw # Configured statically in the smb.conf file
       - /mnt/cold/backup:/mnt/backup:rw # Configured dynamically in the start.sh script
