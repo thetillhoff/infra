@@ -9,7 +9,7 @@ echo "Starting Samba with host system authentication..."
 chmod 0777 /mnt -R
 
 # Check if users file exists
-users_file="/etc/samba/users.txt"
+users_file="/mnt/config/users.txt"
 if [ ! -f "$users_file" ]; then
     echo "Error: Users file not found: $users_file"
     exit 1
