@@ -5,4 +5,3 @@ resources:
 - cert-manager
 - discord-notifications
 - monitoring
-- tailscale
