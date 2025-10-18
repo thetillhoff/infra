@@ -17,7 +17,8 @@ for username in "${USER_ARRAY[@]}"; do
     username=$(echo "$username" | xargs)
     
     echo "Creating Samba user: $username"
-    smbpasswd -a "$username"
+    # Create Samba user with username as password (unattended)
+    echo -e "$username\n$username" | smbpasswd -a "$username"
     
     echo "Setting user directory permissions: /mnt/$username"
     chown "$username:$username" "/mnt/$username"
