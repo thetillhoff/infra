@@ -6,6 +6,7 @@ resources:
 - operator-oauth.secret.yaml
 - helmRepository.yaml
 - helmRelease.yaml
+- connector.yaml
 
 configMapGenerator:
 - name: tailscale-helm-values
