@@ -22,6 +22,11 @@ So clone this repo, and check the `ansible/README.md`.
 It can also be run from another machine in the same network via SSH.
 Check out the config in `ansible/blackhole.yaml` for insights on what needs to be adjusted.
 
+### Packer
+
+Packer is used to create the images for the cloud.
+Check out the `packer/README.md`.
+
 ### Kubernetes
 
 The Kubernetes distro of choice is talos.
@@ -48,12 +53,16 @@ A private key can be set temporarily with `export SOPS_AGE_KEY=<value>` or `SOPS
 ## Storage
 
 Rook was too complex and had too harsh requirements for a homelab.
-Longhorn is used for the cloud setup.
-Bare-metal ZFS is used and configured via ansible.
+Longhorn is used for storage in kubernetes.
+Bare-metal ZFS is used and configured via ansible for the snowflake-storage-server blackhole.
 
 The hostpath provider could be used to integrate zfs with k8s if needed.
 
 ### Apps
+
+- tailscale as vpn
+- samba as file-share provider
+- stash as on-prem movie UI
 
 #### Logs
 
@@ -74,6 +83,7 @@ The hostpath provider could be used to integrate zfs with k8s if needed.
 - tailscale vpn between blackhole and pegasus (non-k8s)
 - https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/cpu-default-namespace/
 - https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/
+- renovate for all versions that flux doesn't cover.
 
 ## Maintenance
 - Ansible modules
