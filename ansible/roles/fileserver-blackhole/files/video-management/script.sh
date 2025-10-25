@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# Enable strict mode for better error handling
 set -euo pipefail
 
 # Set default directories if not provided
@@ -9,7 +8,7 @@ WORKDIR_DIR="/data"
 # Supported file extensions
 # mp4 is a special case, as it will only be downscaled to 1080p if necessary.
 # Feel free to add more extensions, but verify whether they work first.
-declare -a SUPPORTED_EXTENSIONS=("mp4" "avi" "rmvb" "flv" "mpg")
+declare -a SUPPORTED_EXTENSIONS=("mp4" "avi" "flv" "mkv" "mov" "mpg" "rmvb" "webm" "wmv")
 
 echo "Supported extensions: ${SUPPORTED_EXTENSIONS[*]}"
 
@@ -104,8 +103,7 @@ process_file() {
             fi
             
             # Common ffmpeg flags
-            # TODO change to slow
-            FFMPEG_FLAGS="-c:v libx264 -pix_fmt yuv420p -preset fast -crf 23 -hide_banner -loglevel error"
+            FFMPEG_FLAGS="-c:v libx264 -pix_fmt yuv420p -preset slow -crf 23 -hide_banner -loglevel error"
 
             if [[ "$height" -gt 1080 ]]; then
                 FFMPEG_FLAGS="$FFMPEG_FLAGS -vf scale=-2:1080"
@@ -145,8 +143,6 @@ process_file() {
     fi
 }
 
-# Use a different approach to avoid subshell issues
-# Process files one by one and update counters in the main shell
 # Store files in an array to avoid process substitution issues
 mapfile -d '' files < <(find "$WORKDIR_DIR" -type f -print0)
 
@@ -180,15 +176,13 @@ for INPUT_FILENAME in "${files[@]}"; do
                     echo "SIZE DETECTION DURATION: ${duration}s"
                 fi
 
-                if [[ "$output_size" -lt "$original_size" ]]; then
-                    echo "Removing original file: $INPUT_FILENAME"
+                if [[ "$original_size" -lt "$output_size" ]]; then
+                    echo "Output file is smaller than original file, removing original file: $INPUT_FILENAME"
                     rm "$INPUT_FILENAME"
                 else
-                    echo "Original file is larger than output file, keeping original: $INPUT_FILENAME"
+                    echo "Original file is smaller than output file, removing output file: $OUTPUT_FILENAME"
                     rm "$OUTPUT_FILENAME"
                 fi
-
-                # TODO rm original file if smaller, but bigger than 50kb
             fi
             
             ;;
