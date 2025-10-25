@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -uo pipefail
 
 # Set default directories if not provided
 WORKDIR_DIR="/data"
