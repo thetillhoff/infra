@@ -43,7 +43,7 @@ Use `sops edit <filename>` to view and edit it in plaintext.
 To encrypt/decript in place use `sops encrypt -i <filename>` and `sops decrypt -i <filename>`, respectively.
 
 Default keys can be configured in `~/.config/sops/age/keys.txt` with one private age key per line.
-A private key can be set temporarily with `export SOPS_AGE_KEY=<value>`.
+A private key can be set temporarily with `export SOPS_AGE_KEY=<value>` or `SOPS_AGE_KEY=<value> sops ...`.
 
 ## Storage
 

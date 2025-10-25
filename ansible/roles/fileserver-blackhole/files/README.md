@@ -5,7 +5,7 @@ To make those users work with samba, they are mapped into samba by reading from 
 Creating a new user/share requires to run `sudo adduser --no-create-home --disabled-password --disabled-login <username>` on the host machine first (while leaving all the prompts on default settings), then add an entry to the `users.txt` file and restart the container.
 
 Requires the `users.txt` to be unencrypted on the host system and mounted into the container at `/mnt/config/users.txt`.
-It can be decrypted from the `users.secret.txt` in this folder via sops.
+It can be decrypted from the `users.secret.txt` in this folder via sops (`sops decrypt users.secret.txt --output /mnt/cold/users.txt`).
 This is not done automatically.
 
 A user-specific share is created per user. The configuration for this happens in the `start.sh`.
