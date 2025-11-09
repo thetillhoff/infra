@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:24.04
 
 # Install Samba (v4.15.13-Ubuntu at time of writing)
 RUN \
