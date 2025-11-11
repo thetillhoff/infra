@@ -44,6 +44,12 @@
     insertafter: '^#SystemMaxUse'
     line: 'SystemMaxUse=1G'
 
+# Add current user to sudoers
+- user:
+    name: "{{ ansible_user_id }}"
+    groups: sudo
+    append: yes
+
 # System basics
 - package:
     name:

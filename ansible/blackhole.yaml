@@ -12,5 +12,4 @@
   roles:
     - basic
     - fileserver-blackhole
-    #- k3s
     - disk-spindown
