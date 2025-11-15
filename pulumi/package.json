@@ -8,7 +8,7 @@
     "configure": "pulumi stack output --show-secrets kubeconfig > kubeconfig && echo export KUBECONFIG=\"$(pwd)/kubeconfig\" && pulumi stack output --show-secrets talosconfig > talosconfig && echo export TALOSCONFIG=\"$(pwd)/talosconfig\""
   },
   "devDependencies": {
-    "@types/node": "24.10.0",
+    "@types/node": "24.10.1",
     "prettier": "3.6.2",
     "typescript": "5.9.3"
   },
