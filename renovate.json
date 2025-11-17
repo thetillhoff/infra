@@ -2,6 +2,9 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "schedule": ["every weekend"],
   "extends": ["config:best-practices", ":disableDependencyDashboard"],
+  "flux": {
+    "managerFilePatterns": ["^/kubernetes/.*\\.yaml$"]
+  },
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
