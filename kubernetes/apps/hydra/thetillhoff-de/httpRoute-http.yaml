@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: thetillhoff-de
+  name: thetillhoff-de-http
 spec:
   parentRefs:
   - name: http-gateway
