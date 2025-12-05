@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: umami
-        image: ghcr.io/umami-software/umami:postgresql-v2.19.0 # {"$imagepolicy": "umami:umami"}
+        image: ghcr.io/umami-software/umami:postgresql-v2.20.0 # {"$imagepolicy": "umami:umami"}
         ports:
         - containerPort: 3000
           livenessProbe:
