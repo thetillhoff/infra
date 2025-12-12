@@ -310,14 +310,14 @@ def convert_video(file_path: Path, output_path: Path, ffmpeg_flags: List[str],
         subprocess.run(
             cmd_audio_copy,
             capture_output=True,
-            check=True,
-            stderr=subprocess.DEVNULL
+            check=True
         )
         duration = int(time() - start_time)
         print(f"✓ Successfully converted: {file_path} (with audio copy) in {duration}s")
         stats.processed += 1
         return True
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        # Audio copy failed, will try AAC fallback
         pass
 
     # Fallback to AAC re-encoding
@@ -332,17 +332,21 @@ def convert_video(file_path: Path, output_path: Path, ffmpeg_flags: List[str],
     ]
 
     try:
-        subprocess.run(
+        result = subprocess.run(
             cmd_aac,
             capture_output=True,
+            text=True,
             check=True
         )
         duration = int(time() - start_time)
         print(f"✓ Successfully converted: {file_path} (with AAC re-encoding) in {duration}s")
         stats.processed += 1
         return True
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        error_msg = e.stderr.strip() if e.stderr else "Unknown error"
         print(f"✗ Failed to convert: {file_path}", file=sys.stderr)
+        if error_msg:
+            print(f"  Error: {error_msg}", file=sys.stderr)
         stats.failed += 1
         return False
 
