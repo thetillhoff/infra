@@ -1,19 +1,12 @@
 services:
   video-converter:
-    image: jrottenberg/ffmpeg:7.1-ubuntu-edge
-    entrypoint: ["/bin/bash", "-c"]
+    build: .
+    entrypoint: ["python3"]
     command:
-      - |
-        python3 /script.py > /logs/video-management.log 2> /logs/video-management.error
+      - /script.py
     volumes:
       - ./script.py:/script.py:ro
       - /mnt/cold/public/videos:/data:rw
-      - ./logs:/logs:rw
     working_dir: /data
     environment:
       - PYTHONUNBUFFERED=1 # Ensure Python output is not buffered
-    logging:
-      driver: "local"
-      options:
-        max-size: "10m"
-        max-file: "3"
