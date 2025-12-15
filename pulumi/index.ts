@@ -13,7 +13,7 @@ const enableM365Dns = true;
 const enableGoogleSiteVerification = "2HI_U5cyyFCcB2OlrH1Ir1BahesDBofU35pVikOQQvg";
 const enableBlueskyVerification = "did:plc:yfywvq4oa4bx5gtd2fk3uenw";
 const versions = {
-  kubernetes: "v1.33.1",
+  kubernetes: "v1.34.2",
   talos: "v1.10.3",
   cilium: "1.17.4", // From https://github.com/cilium/cilium/releases
   gatewayApiCrds: "v1.3.0", // From https://github.com/kubernetes-sigs/gateway-api/releases
