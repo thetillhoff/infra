@@ -16,6 +16,9 @@ DEFAULT_WORKDIR = Path("/data")
 MAX_HEIGHT = 1080
 CRF_VALUE = 23
 FFMPEG_PRESET = "slow"
+MAX_FILENAME_LEN = 255
+# If the converted file is smaller than this fraction of the original, treat it as suspicious.
+MIN_OUTPUT_SIZE_RATIO = 0.20
 
 # Supported file extensions
 # mp4 is a special case, as it will only be downscaled to 1080p if necessary.
@@ -169,6 +172,15 @@ def get_output_path(file_path: Path, extension: str, workdir: Path) -> Tuple[Opt
     else:
         output_filename = file_path.stem + ".mp4"
 
+    # Ensure the filename itself does not exceed filesystem limits
+    if len(output_filename) > MAX_FILENAME_LEN:
+        print(
+            f"Output filename too long ({len(output_filename)} > {MAX_FILENAME_LEN}), skipping: "
+            f"{output_filename}",
+            file=sys.stderr,
+        )
+        return None, ProcessResult.SKIPPED
+
     output_path = workdir / parent_dir / output_filename
 
     if output_path.exists():
@@ -268,13 +280,45 @@ def build_ffmpeg_flags(height: int) -> List[str]:
 
 
 def compare_and_cleanup_files(original_path: Path, output_path: Path) -> None:
-    """Compare file sizes and remove the larger file."""
+    """Validate converted file, compare sizes, and remove the larger/invalid file."""
     original_size = get_file_size(original_path)
     output_size = get_file_size(output_path)
 
     if original_size is None or output_size is None:
         return
 
+    # First, validate that the converted file looks like a sane video.
+    codec_name, height, pix_fmt, _, error = get_video_info(output_path)
+    if error or not codec_name or height is None or not pix_fmt:
+        print(
+            f"Converted file appears invalid, keeping original and removing output: {output_path}\n"
+            f"  Validation error: {error or 'missing codec/height/pixel format'}",
+            file=sys.stderr,
+        )
+        try:
+            os.remove(output_path)
+        except FileNotFoundError:
+            pass
+        return
+
+    # Second, guard against suspiciously small outputs (likely corruption).
+    if output_size < int(original_size * MIN_OUTPUT_SIZE_RATIO):
+        original_size_hr = format_file_size(original_size)
+        output_size_hr = format_file_size(output_size)
+        print(
+            "Converted file is suspiciously small compared to original, "
+            "keeping original and removing output:\n"
+            f"  Original size: {original_size_hr}\n"
+            f"  Output size:   {output_size_hr}",
+            file=sys.stderr,
+        )
+        try:
+            os.remove(output_path)
+        except FileNotFoundError:
+            pass
+        return
+
+    # At this point, the converted file passed basic validation; keep the smaller one.
     original_size_hr = format_file_size(original_size)
     output_size_hr = format_file_size(output_size)
 
@@ -283,10 +327,16 @@ def compare_and_cleanup_files(original_path: Path, output_path: Path) -> None:
 
     if original_size < output_size:
         print(f"Output file is smaller than original file, removing original file: {original_path}")
-        os.remove(original_path)
+        try:
+            os.remove(original_path)
+        except FileNotFoundError:
+            pass
     else:
         print(f"Original file is smaller than output file, removing output file: {output_path}")
-        os.remove(output_path)
+        try:
+            os.remove(output_path)
+        except FileNotFoundError:
+            pass
 
 
 def convert_video(file_path: Path, output_path: Path, ffmpeg_flags: List[str],
