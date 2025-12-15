@@ -1,6 +1,6 @@
 # It should only be necessary to adjust the talos_version.
 
-talos_version = "v1.11.2"
+talos_version = "v1.11.5"
 arch          = "amd64" # must match server_type
 # Plain talos image from https://factory.talos.dev/
 # image_id      = "376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba"
