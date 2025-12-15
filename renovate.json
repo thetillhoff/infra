@@ -5,7 +5,90 @@
   "flux": {
     "managerFilePatterns": ["^/kubernetes/.*\\.yaml$"]
   },
+  "pre-commit": {
+    "enabled": true
+  },
+  "regexManagers": [
+    {
+      "description": "Update Packer hcloud plugin version",
+      "fileMatch": ["^packer/.*\\.pkr\\.hcl$"],
+      "matchStrings": [
+        "hcloud\\s*=\\s*\\{[^}]*?version\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "hetznercloud/packer-plugin-hcloud",
+      "versioningTemplate": "loose"
+    },
+    {
+      "description": "Update Talos version in .pkrvars.hcl files",
+      "fileMatch": ["^packer/.*\\.pkrvars\\.hcl$"],
+      "matchStrings": ["talos_version\\s*=\\s*\"(?<currentValue>v[^\"]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "siderolabs/talos",
+      "versioningTemplate": "loose"
+    },
+    {
+      "description": "Update Cilium version in pulumi/index.ts",
+      "fileMatch": ["^pulumi/index\\.ts$"],
+      "matchStrings": ["cilium:\\s*\"(?<currentValue>[^\"]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "cilium/cilium",
+      "versioningTemplate": "loose"
+    },
+    {
+      "description": "Update Flux version in pulumi/index.ts",
+      "fileMatch": ["^pulumi/index\\.ts$"],
+      "matchStrings": ["flux:\\s*\"(?<currentValue>v[^\"]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "fluxcd/flux2",
+      "versioningTemplate": "loose"
+    },
+    {
+      "description": "Update Flux operator version in pulumi/index.ts",
+      "fileMatch": ["^pulumi/index\\.ts$"],
+      "matchStrings": ["fluxOperator:\\s*\"(?<currentValue>[^\"]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "controlplaneio-fluxcd/flux-operator",
+      "versioningTemplate": "loose"
+    },
+    {
+      "description": "Update Gateway API CRDs version in pulumi/index.ts",
+      "fileMatch": ["^pulumi/index\\.ts$"],
+      "matchStrings": ["gatewayApiCrds:\\s*\"(?<currentValue>v[^\"]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes-sigs/gateway-api",
+      "versioningTemplate": "loose"
+    },
+    {
+      "description": "Update Kubernetes version in pulumi/index.ts",
+      "fileMatch": ["^pulumi/index\\.ts$"],
+      "matchStrings": ["kubernetes:\\s*\"(?<currentValue>v[^\"]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes/kubernetes",
+      "versioningTemplate": "loose"
+    },
+    {
+      "description": "Update Talos version in pulumi/index.ts",
+      "fileMatch": ["^pulumi/index\\.ts$"],
+      "matchStrings": ["talos:\\s*\"(?<currentValue>v[^\"]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "siderolabs/talos",
+      "versioningTemplate": "loose"
+    },
+    {
+      "description": "Update Flux distribution version in fluxInstance.yaml",
+      "fileMatch": ["^pulumi/.*/fluxInstance\\.yaml$"],
+      "matchStrings": ["version:\\s*\"(?<currentValue>[^\"]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "fluxcd/flux2",
+      "versioningTemplate": "loose"
+    }
+  ],
   "packageRules": [
+    {
+      "matchDepNames": ["kubernetes/kubernetes", "siderolabs/talos"],
+      "automerge": false
+    },
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "matchCurrentVersion": "!/^0/",
