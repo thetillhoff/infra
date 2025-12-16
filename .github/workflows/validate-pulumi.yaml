@@ -1,0 +1,39 @@
+name: Validate Pulumi changes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/**"
+      - "pulumi/**"
+  workflow_dispatch:
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: pulumi/package.json
+          cache: 'npm'
+      - run: npm ci
+
+      - run: pulumi preview
+        working-directory: ./pulumi
+
+  plan:
+    needs: preview
+    runs-on: ubuntu-24.04
+    concurrency: pulumi-state
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: pulumi/package.json
+          cache: 'npm'
+      - run: npm ci
+
+      - run: pulumi preview
+        working-directory: ./pulumi
