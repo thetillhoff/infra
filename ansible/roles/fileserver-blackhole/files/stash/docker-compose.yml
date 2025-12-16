@@ -1,0 +1,65 @@
+services:
+  stash:
+    image: stashapp/stash:v0.29.3
+    restart: always
+#    ports:
+#      - "80:80"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "2m"
+    environment:
+      - STASH_STASH=/data/
+      - STASH_GENERATED=/generated/
+      - STASH_METADATA=/metadata/
+      - STASH_CACHE=/cache/
+      ## Adjust below to change default port (9999)
+      - STASH_PORT=80
+    # user: ${UID}:${GID}
+    volumes:
+      # Enable UID/GID lookups from host
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+
+      # - /etc/localtime:/etc/localtime:ro
+
+      ## Keep configs, scrapers, and plugins here.
+
+      - /mnt/hot/stash/config:/root/.stash
+      ## Point this at your collection.
+      # - ./data:/data
+      - /mnt/cold/public/videos:/data
+      ## This is where your stash's metadata lives
+      - /mnt/hot/stash/metadata:/metadata
+      ## Any other cache content.
+      - /mnt/hot/stash/cache:/cache
+      ## Where to store binary blob data (scene covers, images)
+      - /mnt/hot/stash/blobs:/blobs
+      ## Where to store generated content (screenshots,previews,transcodes,sprites)
+      - /mnt/hot/stash/generated:/generated
+
+  caddy:
+    image: caddy:2.10.2
+    restart: always
+    ports:
+    - 80:80
+    - 443:443
+#    configs:
+#    - source: Caddyfile
+#      target: /etc/caddy/Caddyfile
+    #command: caddy reverse-proxy --internal-certs --from blackhole.deer-alphard.ts.net --to stash
+    command: caddy reverse-proxy --internal-certs --from blackhole.local --to stash
+
+configs:
+  Caddyfile:
+    content: |
+      blackhole.local {
+        reverse_proxy stash
+        tls internal
+      }
+
+      blackhole.deer-alphard.ts.net {
+        reverse_proxy stash
+        tls internal
+      }
