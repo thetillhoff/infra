@@ -5,6 +5,7 @@ resources:
 - namespace.yaml
 - helmRepository.yaml
 - helmRelease.yaml
+- setting.yaml
 
 configMapGenerator:
 - name: longhorn-helm-values
