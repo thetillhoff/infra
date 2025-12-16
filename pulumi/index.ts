@@ -17,7 +17,7 @@ const versions = {
   talos: "v1.10.3",
   cilium: "1.18.4", // From https://github.com/cilium/cilium/releases
   gatewayApiCrds: "v1.3.0", // From https://github.com/kubernetes-sigs/gateway-api/releases
-  fluxOperator: "0.22.0", // From https://github.com/controlplaneio-fluxcd/flux-operator/releases
+  fluxOperator: "0.36.0", // From https://github.com/controlplaneio-fluxcd/flux-operator/releases
   flux: "v2.5.1", // From https://github.com/fluxcd/flux2/releases
 };
 const clusterDnsNames = [
