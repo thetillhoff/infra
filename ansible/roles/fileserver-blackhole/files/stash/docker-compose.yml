@@ -1,6 +1,6 @@
 services:
   stash:
-    image: stashapp/stash:v0.29.3
+    image: stashapp/stash:v0.29.3@sha256:a62f2d8afadbe029403777d18f54b2455b209a223aa28c6d3985c3cf9df2e08a
     restart: always
 #    ports:
 #      - "80:80"
@@ -40,7 +40,7 @@ services:
       - /mnt/hot/stash/generated:/generated
 
   caddy:
-    image: caddy:2.10.2
+    image: caddy:2.10.2@sha256:dedfbbeb703b2ce9ff4a98fc06aa9c7c7d9a42f0b7d778738c1dd3ef11dcc767
     restart: always
     ports:
     - 80:80
