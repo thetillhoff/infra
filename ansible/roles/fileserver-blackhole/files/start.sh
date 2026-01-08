@@ -6,7 +6,7 @@ set -e
 echo "Starting Samba with host system authentication..."
 
 # Check if users file exists
-users_file="/mnt/cold/users.txt"
+users_file="/mnt/users.txt"
 if [ ! -f "$users_file" ]; then
     echo "Error: Users file not found: $users_file"
     exit 1
@@ -24,9 +24,9 @@ while IFS=':' read -r username password; do
     # Create Samba user with custom password (unattended)
     echo -e "$password\n$password" | smbpasswd -a "$username"
 
-    echo "Setting user directory permissions: /mnt/cold/$username"
-    chown "$username:$username" "/mnt/cold/$username"
-    chmod 755 "/mnt/cold/$username"
+    echo "Setting user directory permissions: /mnt/$username"
+    chown "$username:$username" "/mnt/$username"
+    chmod 755 "/mnt/$username"
 
     # Add share definition to smb.conf
     echo "Adding share definition for: $username"
@@ -34,7 +34,7 @@ while IFS=':' read -r username password; do
 
 [$username]
    # Private share for $username
-   path = /mnt/cold/$username
+   path = /mnt/$username
 
    # Do not allow guest access to this share
    public = no

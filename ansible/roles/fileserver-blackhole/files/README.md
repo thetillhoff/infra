@@ -15,6 +15,8 @@ ssh-keygen -t ed25519 -C "<username>"
 cp ~/.ssh/id_ed25519.pub ~/.ssh/authorized_keys
 ```
 
+Don't forget to add the user mount in the `docker-compose.yml` file!
+
 Requires the `users.txt` to be unencrypted on the host system and mounted into the container at `/mnt/config/users.txt`.
 It can be decrypted from the `users.secret.txt` in this folder via sops (`sops decrypt users.secret.txt --output /mnt/cold/users.txt`).
 This is not done automatically.

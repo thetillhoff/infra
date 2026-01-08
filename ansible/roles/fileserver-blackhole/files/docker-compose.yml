@@ -16,5 +16,11 @@ services:
       # Format: username:password (one per line, comments start with #)
       - /mnt/cold/users.txt:/mnt/config/users.txt:ro
       # Mount data volumes into /mnt/<username>
-      - /mnt/cold/public:/mnt/public:rw # Configured statically in the smb.conf file
-      - /mnt/cold/backup:/mnt/backup:rw # Configured dynamically in the start.sh script
+      # Configured statically in the smb.conf file
+      # - /mnt/cold/public:/mnt/public:rw
+
+      # Configured dynamically in the start.sh script
+      - /mnt/cold/public:/mnt/public:rw
+      - /mnt/cold/backup:/mnt/backup:rw
+      - /mnt/cold/backup-blackstone:/mnt/backup-blackstone:rw
+      - /mnt/cold/backup-macbook-superluminar:/mnt/backup-macbook-superluminar:rw
