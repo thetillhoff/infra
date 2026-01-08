@@ -19,39 +19,39 @@ while IFS=':' read -r username password; do
     # Skip empty lines and comments
     [ -z "$username" ] && continue
     [[ "$username" =~ ^#.*$ ]] && continue
-    
+
     echo "Creating Samba user: $username"
     # Create Samba user with custom password (unattended)
     echo -e "$password\n$password" | smbpasswd -a "$username"
-    
+
     echo "Setting user directory permissions: /mnt/$username"
     chown "$username:$username" "/mnt/$username"
     chmod 755 "/mnt/$username"
-    
+
     # Add share definition to smb.conf
     echo "Adding share definition for: $username"
     cat >> /etc/samba/smb.conf << EOF
 
 [$username]
    # Private share for $username
-   path = /mnt/$username
-   
+   path = /mnt/cold/$username
+
    # Do not allow guest access to this share
    public = no
-   
+
    # Only allow the '$username' account to access this share
    valid users = $username
-   
+
    # Allow write access to the share
    writeable = yes
-   
+
    # Make this share visible when browsing the server
    browsable = yes
-   
+
    # File creation mask: permissions for new files (0664 = rw-rw-r--)
    # Owner and group can read/write, others can only read
    create mask = 0664
-   
+
    # Directory creation mask: permissions for new directories (0775 = rwxrwxr-x)
    # Owner and group can read/write/execute, others can read/execute
    directory mask = 0775
