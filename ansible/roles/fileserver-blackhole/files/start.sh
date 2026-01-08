@@ -6,7 +6,7 @@ set -e
 echo "Starting Samba with host system authentication..."
 
 # Check if users file exists
-users_file="/mnt/users.txt"
+users_file="/mnt/config/users.txt"
 if [ ! -f "$users_file" ]; then
     echo "Error: Users file not found: $users_file"
     exit 1
