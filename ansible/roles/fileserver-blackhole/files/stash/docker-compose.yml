@@ -2,8 +2,8 @@ services:
   stash:
     image: stashapp/stash:v0.29.3@sha256:a62f2d8afadbe029403777d18f54b2455b209a223aa28c6d3985c3cf9df2e08a
     restart: always
-#    ports:
-#      - "80:80"
+    #    ports:
+    #      - "80:80"
     logging:
       driver: "json-file"
       options:
@@ -42,12 +42,17 @@ services:
   caddy:
     image: caddy:2.10.2@sha256:dedfbbeb703b2ce9ff4a98fc06aa9c7c7d9a42f0b7d778738c1dd3ef11dcc767
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "2m"
     ports:
-    - 80:80
-    - 443:443
-#    configs:
-#    - source: Caddyfile
-#      target: /etc/caddy/Caddyfile
+      - 80:80
+      - 443:443
+    #    configs:
+    #    - source: Caddyfile
+    #      target: /etc/caddy/Caddyfile
     #command: caddy reverse-proxy --internal-certs --from blackhole.deer-alphard.ts.net --to stash
     command: caddy reverse-proxy --internal-certs --from blackhole.local --to stash
 
