@@ -15,6 +15,9 @@
   "pre-commit": {
     "enabled": true
   },
+  "dockerfile": {
+    "enabled": true
+  },
   "customManagers": [
     {
       "customType": "regex",
