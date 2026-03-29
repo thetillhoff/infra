@@ -38,7 +38,7 @@ services:
       - /mnt/hot/stash/generated:/generated
 
   caddy:
-    image: caddy:2.10.2@sha256:c3d7ee5d2b11f9dc54f947f68a734c84e9c9666c92c88a7f30b9cba5da182adb
+    image: caddy:2.11.2@sha256:1e40b251ca9639ead7b5cd2cedcc8765adfbabb99450fe23f130eefabf50f4bc
     restart: always
     logging:
       driver: "json-file"
