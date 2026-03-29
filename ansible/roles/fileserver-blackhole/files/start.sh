@@ -41,6 +41,8 @@ while IFS=':' read -r username password; do
 
    # Only allow the '$username' account to access this share
    valid users = $username
+   force group = $username
+   force user = $username
 
    # Allow write access to the share
    writeable = yes
@@ -55,6 +57,11 @@ while IFS=':' read -r username password; do
    # Directory creation mask: permissions for new directories (0775 = rwxrwxr-x)
    # Owner and group can read/write/execute, others can read/execute
    directory mask = 0775
+
+   # Apple config
+   fruit:time machine = yes
+   fruit:time machine max size = 300G
+   available = yes
 EOF
 done < "$users_file"
 

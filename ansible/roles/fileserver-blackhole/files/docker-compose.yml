@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    hostname: blackhole.local
     restart: always
     logging:
       driver: "json-file"

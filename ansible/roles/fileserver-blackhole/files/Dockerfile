@@ -4,7 +4,7 @@ FROM ubuntu:24.04@sha256:186072bba1b2f436cbb91ef2567abca677337cfc786c86e107d25b7
 RUN \
   apt-get update && \
   apt-get upgrade -y && \
-  apt-get install -y samba samba-common-bin && \
+  apt-get install -y samba samba-common-bin samba-vfs-modules && \
   rm -rf /var/lib/apt/lists/*
 
 # Copy configuration and startup script
