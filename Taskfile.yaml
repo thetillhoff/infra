@@ -11,9 +11,9 @@ tasks:
       - |
         docker run --rm -it \
         --entrypoint=/bin/sh \
-        -v $(pwd):/packer \
+        -v $(pwd):/packer:z \
         -w /packer \
-        hashicorp/packer:light-1.12.0 \
+        docker.io/hashicorp/packer:light-1.15.1 \
         -c \
         "export PKR_VAR_HCLOUD_TOKEN={{ .HCLOUD_TOKEN }} && packer init . && packer build -var-file={{ .ARCH }}.pkrvars.hcl talos-on-hcloud.pkr.hcl"
     requires:

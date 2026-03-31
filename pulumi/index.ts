@@ -1,6 +1,6 @@
-import * as talos from "@pulumiverse/talos";
-import * as fs from "fs";
-import * as path from "path";
+import { machine } from "@pulumiverse/talos";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 import { HcloudTalosNodegroups } from "./hcloud-talos-nodegroup-component/nodegroups";
 import { HcloudTalosCluster } from "./hcloud-talos-cluster-component";
@@ -10,11 +10,11 @@ const domain = "thetillhoff.de";
 const k8sClusterName = "hydra";
 const cloudflareZoneId = "94d9f474ce48a61513a68744b663f5e5";
 const enableM365Dns = true;
-const enableGoogleSiteVerification = "2HI_U5cyyFCcB2OlrH1Ir1BahesDBofU35pVikOQQvg";
+const enableGoogleSiteVerification =
+  "2HI_U5cyyFCcB2OlrH1Ir1BahesDBofU35pVikOQQvg";
 const enableBlueskyVerification = "did:plc:yfywvq4oa4bx5gtd2fk3uenw";
 const versions = {
   kubernetes: "v1.34.2",
-  talos: "v1.11.5",
   cilium: "1.19.2", // From https://github.com/cilium/cilium/releases
   gatewayApiCrds: "v1.4.1", // From https://github.com/kubernetes-sigs/gateway-api/releases
   fluxOperator: "0.36.0", // From https://github.com/controlplaneio-fluxcd/flux-operator/releases
@@ -42,12 +42,12 @@ new Dns(
   {},
 );
 
-const talosSecrets = new talos.machine.Secrets("talosSecrets", {});
+const talosSecrets = new machine.Secrets("talosSecrets", {});
 
 const nodegroups = new HcloudTalosNodegroups(
   "hcloudTalosNodegroups",
   {
-    "hcloud-talos-v1-11-5-controlplane": {
+    "hcloud-talos-v1-12-6-controlplane": {
       nodeCount: 2,
       clusterName: k8sClusterName,
       clusterEndpointDomain: k8sClusterEndpointDomain,
@@ -56,12 +56,12 @@ const nodegroups = new HcloudTalosNodegroups(
       machineType: "controlplane",
       kubernetesVersion: versions.kubernetes,
       configPatches: [
-        fs.readFileSync(
-          path.join(
+        readFileSync(
+          join(
             __dirname,
             "hcloud-talos-nodegroup-component",
             "configPatches",
-            "talos-v1-11-5-controlplane-patch.yaml",
+            "talos-v1-12-6-controlplane-patch.yaml",
           ),
           "utf8",
         ),
@@ -69,16 +69,16 @@ const nodegroups = new HcloudTalosNodegroups(
 
       hcloudLocation: "nbg1",
 
-      hcloudImageId: "341306099",
-      hcloudServerType: "cax21", // arm64
-      // hcloudServerType: "cpx31", // amd64
+      hcloudImageId: "372067998",
+      // hcloudServerType: "cax21", // arm64
+      hcloudServerType: "cx33", // amd64
       cloudflareZoneId: cloudflareZoneId,
     },
   },
   {},
 );
 
-const primaryControlplaneNodegroupName = "hcloud-talos-v1-11-5-controlplane";
+const primaryControlplaneNodegroupName = "hcloud-talos-v1-12-6-controlplane";
 
 const hcloudTalosCluster = new HcloudTalosCluster(
   "hcloud-talos-cluster",
@@ -91,12 +91,8 @@ const hcloudTalosCluster = new HcloudTalosCluster(
     gatewayApiCrdsVersion: versions.gatewayApiCrds,
     fluxOperatorVersion: versions.fluxOperator,
     fluxVersion: versions.flux,
-    fluxInstanceYaml: fs.readFileSync(
-      path.join(
-        __dirname,
-        "hcloud-talos-cluster-component",
-        "fluxInstance.yaml",
-      ),
+    fluxInstanceYaml: readFileSync(
+      join(__dirname, "hcloud-talos-cluster-component", "fluxInstance.yaml"),
       "utf8",
     ),
     gitUsername: "git",

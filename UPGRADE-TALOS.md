@@ -25,7 +25,7 @@
 ## 3. Make the new nodegroup the primary one
 
 - In the `pulumi/index.ts`, change the primary nodegroup to the new one.
-- Run `task deploy` is necessary, even if no resources are changed. Otherwise `task configure-files` will not find use the new nodegroup.
+- Run `task deploy`, even if no resources are changed. Otherwise `task configure-files` will not find use the new nodegroup.
 - Run `task configure-files`.
 - Run `task configure-env | source /dev/stdin` to set the talosconfig and kubeconfig paths.
 
@@ -33,7 +33,7 @@
 
 - Run `kubectl get nodes -owide` to double check which nodes to remove.
 - Run `task delete-nodes -- <nodename>` to remove the old ones.
-  Or (tested last time)
+  Or (tested last times)
 
   ```sh
   kubectl get nodes -owide
