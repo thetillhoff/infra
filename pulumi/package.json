@@ -17,7 +17,7 @@
     "@pulumi/hcloud": "^1.23.0",
     "@pulumi/kubernetes": "^4.23.0",
     "@pulumi/pulumi": "^3.181.0",
-    "@pulumiverse/talos": "^0.6.0",
+    "@pulumiverse/talos": "^0.7.0",
     "@pulumiverse/time": "^0.1.1"
   }
 }
