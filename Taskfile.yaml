@@ -51,7 +51,10 @@ tasks:
     dir: '{{.USER_WORKING_DIR}}'
     cmds:
       - flux reconcile source git flux-system
-      - flux get kustomization --no-header | cut -f 1 -d$'\t' | xargs -n1 flux reconcile kustomization
+      - flux reconcile kustomization flux-system
+      - flux reconcile kustomization infrastructure-controllers
+      - flux reconcile kustomization infrastructure-resources
+      - flux reconcile kustomization apps
 
   flux-status:
     desc: Show flux status
