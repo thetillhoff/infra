@@ -51,6 +51,7 @@ tasks:
     dir: '{{.USER_WORKING_DIR}}'
     cmds:
       - flux reconcile source git flux-system
+      - flux reconcile kustomization flux-system
 
   flux-status:
     desc: Show flux status
