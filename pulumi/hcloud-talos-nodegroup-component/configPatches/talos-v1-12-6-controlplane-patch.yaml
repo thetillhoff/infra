@@ -7,7 +7,8 @@ machine:
     modules:
       - name: nvme_tcp
       - name: vfio_pci
-#     - name: uio_pci_generic
+  # For encrypted volumes
+      - name: dm_crypt
 
   # Enable the Talos KubeSpan feature
   # More info at https://www.talos.dev/v1.10/talos-guides/network/kubespan/#enabling

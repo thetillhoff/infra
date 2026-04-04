@@ -1,8 +1,18 @@
-persistence:
+persistence: # default storage class
   defaultClassReplicaCount: 2
   reclaimPolicy: Retain
-  # dataEngine: v2
+  dataEngine: v1
   defaultDataLocality: strict-local
+  encrypted: "true"
+  # global secret that contains the encryption key that will be used for all volumes
+  csi.storage.k8s.io/provisioner-secret-name: "crypt-secret"
+  csi.storage.k8s.io/provisioner-secret-namespace: "longhorn"
+  csi.storage.k8s.io/node-publish-secret-name: "crypt-secret"
+  csi.storage.k8s.io/node-publish-secret-namespace: "longhorn"
+  csi.storage.k8s.io/node-stage-secret-name: "crypt-secret"
+  csi.storage.k8s.io/node-stage-secret-namespace: "longhorn"
+  csi.storage.k8s.io/node-expand-secret-name: "crypt-secret"
+  csi.storage.k8s.io/node-expand-secret-namespace: "longhorn"
 csi:
   attacherReplicaCount: 1
   provisionerReplicaCount: 1
@@ -13,3 +23,12 @@ longhornUI:
 defaultSettings:
   defaultReplicaCount: 2
   replicaAutoBalance: best-effort
+  nodeDrainPolicy: block-for-eviction
+# -- Setting that allows you to update the default backupstore.
+defaultBackupStore:
+  # -- Endpoint used to access the default backupstore.
+  backupTarget: hydra-k8s-backup.s3.eu-central-003.backblazeb2.com
+  # -- Name of the Kubernetes secret associated with the default backup target.
+  backupTargetCredentialSecret: backup-secret
+  # -- Number of seconds that Longhorn waits before checking the default backupstore for new backups.
+  pollInterval: 300
