@@ -11,5 +11,15 @@ configMapGenerator:
   files:
   - values.yaml
 
+secretGenerator:
+- name: backup-secret
+  namespace: longhorn
+  files:
+  - backup-secret.yaml
+- name: crypt-secret
+  namespace: longhorn
+  files:
+  - crypt-secret.yaml
+
 configurations:
 - kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease
