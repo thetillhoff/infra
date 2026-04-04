@@ -5,21 +5,13 @@ resources:
 - namespace.yaml
 - helmRepository.yaml
 - helmRelease.yaml
+- backup-secret.yaml
+- crypt-secret.yaml
 
 configMapGenerator:
 - name: longhorn-helm-values
   files:
   - values.yaml
-
-secretGenerator:
-- name: backup-secret
-  namespace: longhorn
-  files:
-  - backup-secret.yaml
-- name: crypt-secret
-  namespace: longhorn
-  files:
-  - crypt-secret.yaml
 
 configurations:
 - kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease
