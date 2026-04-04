@@ -1,6 +1,6 @@
 services:
   stash:
-    image: stashapp/stash:v0.29.3@sha256:a62f2d8afadbe029403777d18f54b2455b209a223aa28c6d3985c3cf9df2e08a
+    image: stashapp/stash:v0.31.0@sha256:422b4d2a580e9f52c361264c3003f46a6ae9b7de76e6d08df091f104e90d8fa4
     restart: always
     logging:
       driver: "json-file"
