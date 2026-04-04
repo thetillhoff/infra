@@ -48,7 +48,7 @@ const nodegroups = new HcloudTalosNodegroups(
   "hcloudTalosNodegroups",
   {
     "hcloud-talos-v1-12-6-controlplane": {
-      nodeCount: 2,
+      nodeCount: 3,
       clusterName: k8sClusterName,
       clusterEndpointDomain: k8sClusterEndpointDomain,
       clusterDnsNames: clusterDnsNames,

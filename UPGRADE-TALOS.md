@@ -21,6 +21,7 @@
   Make sure all the other parameters match. For example location and instance type.
 - Create a new patchfile for the new nodegroup in `pulumi/hcloud-talos-nodegroup-component/configPatches/<name>.yaml`.
 - Run `task deploy`, verify only additions happen, then approve the changes.
+- Connect to one of the nodes and read the logs. Check for any errors.
 
 ## 3. Make the new nodegroup the primary one
 
@@ -38,9 +39,8 @@
   ```sh
   kubectl get nodes -owide
   kubectl drain --ignore-daemonsets --delete-emptydir-data <nodename>
-  # Optional disk wipe (state & data only, not os):
-  # talosctl -n <nodeip> reset --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL
-  kubectl delete node <nodename>
+  # Verify that there is nothing important running on the node any more, especially pvcs and pvs!
+  kubectl delete node nodename
   ```
 
 Please note, that at this point, the nodes are shutdown, but still listed in DNS. Continue with the next step to fix this.

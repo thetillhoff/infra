@@ -5,10 +5,9 @@ machine:
     vm.nr_hugepages: "1024"
   kernel:
     modules:
-      - name: nbd
-      - name: iscsi_tcp
-      - name: iscsi_generic
-      - name: configfs
+      - name: nvme_tcp
+      - name: vfio_pci
+#     - name: uio_pci_generic
 
   # Enable the Talos KubeSpan feature
   # More info at https://www.talos.dev/v1.10/talos-guides/network/kubespan/#enabling

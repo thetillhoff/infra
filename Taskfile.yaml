@@ -109,7 +109,8 @@ tasks:
         -n '{{ .NODE_IP }}' \
         --to '{{ .K8S_VERSION }}' \
         --with-docs=false \
-        --with-examples=false
+        --with-examples=false \
+        --preserve
     vars:
       K8S_VERSION: '{{ .CLI_ARGS }}'
       NODE_IP: # Need a random controlplane node to trigger the upgrade from
