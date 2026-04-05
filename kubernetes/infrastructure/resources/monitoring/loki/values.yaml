@@ -3,13 +3,16 @@ loki:
     replication_factor: 1
   schemaConfig:
     configs:
-      - from: "2024-04-01"
+      - from: 2024-04-01
+        object_store: filesystem
         store: tsdb
-        object_store: s3
         schema: v13
         index:
-          prefix: loki_index_
+          prefix: index_
           period: 24h
+  storage_config:
+      filesystem:
+        directory: /tmp/loki
   pattern_ingester:
       enabled: true
   limits_config:
@@ -17,9 +20,6 @@ loki:
     volume_enabled: true
   ruler:
     enable_api: true
-
-minio:
-  enabled: true
       
 deploymentMode: SingleBinary
 
