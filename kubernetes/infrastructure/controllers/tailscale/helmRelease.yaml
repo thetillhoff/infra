@@ -9,7 +9,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: tailscale
-      version: v1.88.4
+      version: v1.94.2 # From https://pkgs.tailscale.com/helmcharts/
   interval: 10m
 
   valuesFrom:

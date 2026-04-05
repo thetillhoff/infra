@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: metrics-server
-      version: 3.12.2
+      version: 3.13.0 # From https://artifacthub.io/packages/helm/metrics-server/metrics-server
       sourceRef:
         kind: HelmRepository
         name: metrics-server

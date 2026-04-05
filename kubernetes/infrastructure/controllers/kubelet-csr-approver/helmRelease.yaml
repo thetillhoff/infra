@@ -9,7 +9,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kubelet-csr-approver
-      version: v1.2.10
+      version: v1.2.13 # From https://artifacthub.io/packages/helm/kubelet-csr-approver/kubelet-csr-approver
   interval: 10m
 
   valuesFrom:
