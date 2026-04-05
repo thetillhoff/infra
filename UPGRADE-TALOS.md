@@ -2,6 +2,17 @@
 
 ## 0. Log in to Cloud Provider and check that new instances are available
 
+If not, you can upgrade in-place with this command:
+
+```sh
+# update the versin tag. The config hash should stay the same, but can be compared to the current ones in the `packer/` config.
+# foreach node
+talosctl upgrade --n <node-ip> --preserve --image factory.talos.dev/hcloud-installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.12.6
+```
+
+Can the upgrade process be observed?
+Yes, using the `talosctl dmesg -f` command. You can also use `talosctl upgrade --wait`, and optionally `talosctl upgrade --wait --debug` to observe kernel logs.
+
 ## Check available Talos versions
 
 <https://github.com/siderolabs/talos/releases/latest>
