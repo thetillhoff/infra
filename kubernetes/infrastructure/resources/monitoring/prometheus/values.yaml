@@ -1,6 +1,15 @@
-additionalDataSources:
-- name: Loki
-  type: loki
-  url: http://loki-gateway
-  access: proxy
-  isDefault: true
+# additionalDataSources:
+# - name: Loki
+#   type: loki
+#   url: http://loki-gateway
+#   access: proxy
+#   isDefault: true
+
+
+
+# prometheus:
+#   prometheusSpec:
+#     replicas: 2
+#     podAntiAffinity: "hard"
+#     externalLabels:
+#       cluster: prod-eu1
