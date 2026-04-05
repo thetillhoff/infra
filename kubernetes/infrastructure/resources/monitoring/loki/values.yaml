@@ -10,9 +10,8 @@ loki:
         index:
           prefix: index_
           period: 24h
-  storage_config:
-      filesystem:
-        directory: /tmp/loki
+  storage:
+    type: filesystem
   pattern_ingester:
       enabled: true
   limits_config:
