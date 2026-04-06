@@ -1,9 +1,10 @@
-# additionalDataSources:
-# - name: Loki
-#   type: loki
-#   url: http://loki-gateway
-#   access: proxy
-#   isDefault: true
+grafana:
+  additionalDataSources:
+  - name: Loki
+    type: loki
+    url: http://loki-gateway
+    access: proxy
+    isDefault: true
 
 
 
