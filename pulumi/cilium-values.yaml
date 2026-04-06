@@ -85,3 +85,10 @@ operator:
 #         group: "cert-manager.io"
 #         kind: "ClusterIssuer"
 #         name: "selfsigned-ca"
+hubble:
+  tls:
+    auto:
+      enabled: true               # enable automatic TLS certificate generation
+      method: cronJob             # auto generate certificates using cronJob method
+      certValidityDuration: 60    # certificates validity duration in days
+      schedule: "0 0 1 * *"       # schedule for certificates re-generation (crontab syntax)
