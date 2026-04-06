@@ -2,7 +2,7 @@ persistence: # default storage class
   defaultClassReplicaCount: 2
   reclaimPolicy: Retain
   dataEngine: v1
-  defaultDataLocality: strict-local
+  defaultDataLocality: best-effort
   encrypted: "true"
   # global secret that contains the encryption key that will be used for all volumes
   csi.storage.k8s.io/provisioner-secret-name: "crypt-secret"
@@ -21,7 +21,7 @@ csi:
 longhornUI:
   replicas: 1
 defaultSettings:
-  defaultReplicaCount: 2
+  defaultReplicaCount: 2 # needs to be 1 if data-locality is strict-local
   replicaAutoBalance: best-effort
   nodeDrainPolicy: block-for-eviction
 # -- Setting that allows you to update the default backupstore.
