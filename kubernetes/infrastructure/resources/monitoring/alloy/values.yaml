@@ -1,5 +1,6 @@
-alloy:
-  configMap:
-    create: false
-    name: alloy-config
-    key: config.alloy
+# https://github.com/grafana/alloy/blob/main/operations/helm/charts/alloy/values.yaml
+
+# alloy:
+#   configMap:
+#     create: false
+#     name: alloy-config
