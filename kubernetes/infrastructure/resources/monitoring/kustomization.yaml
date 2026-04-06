@@ -10,4 +10,3 @@ resources:
 - prometheus
 - loki
 # - alloy
-# - grafana

@@ -5,12 +5,4 @@ grafana:
     url: http://loki-gateway
     access: proxy
     isDefault: true
-
-
-
-# prometheus:
-#   prometheusSpec:
-#     replicas: 2
-#     podAntiAffinity: "hard"
-#     externalLabels:
-#       cluster: prod-eu1
+  prune: true
