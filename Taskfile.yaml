@@ -51,6 +51,7 @@ tasks:
     dir: '{{.USER_WORKING_DIR}}'
     cmds:
       - flux reconcile source git flux-system
+      #- flux get source helm -A | xargs -n1 flux reconcile source helm -A # <- This does not work yet.
       - flux reconcile kustomization flux-system
       - flux reconcile kustomization infrastructure-controllers
       - flux reconcile kustomization infrastructure-resources
