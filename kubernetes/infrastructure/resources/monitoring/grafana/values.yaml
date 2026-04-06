@@ -14,11 +14,17 @@ datasources:
   datasources.yaml:
     apiVersion: 1
     datasources:
+
     - name: Prometheus
       type: prometheus
       url: http://prometheus-server
       access: proxy
       isDefault: true
+
+    - name: Loki
+      type: loki
+      url: http://loki-gateway
+      access: proxy
 
 # ## Configure grafana alerting (can be templated)
 # ## ref: https://docs.grafana.com/alerting/set-up/provision-alerting-resources/file-provisioning/
