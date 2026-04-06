@@ -1,3 +1,5 @@
+# https://github.com/grafana-community/helm-charts/blob/main/charts/loki/values.yaml
+
 loki:
   auth_enabled: false
   commonConfig:
