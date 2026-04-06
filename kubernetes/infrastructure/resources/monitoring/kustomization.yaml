@@ -9,6 +9,6 @@ resources:
 - helmRepository-prometheus-community.yaml
 - helmRepository-grafana-labs.yaml
 - helmRepository-grafana.yaml
-# - prometheus
+- prometheus
 # - loki
 # - alloy
