@@ -10,5 +10,6 @@ resources:
 - helmRepository-grafana-labs.yaml
 - helmRepository-grafana.yaml
 - prometheus
+- grafana
 # - loki
 # - alloy
