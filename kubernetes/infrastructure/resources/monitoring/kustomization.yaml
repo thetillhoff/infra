@@ -7,7 +7,7 @@ resources:
 
 # All of the following are disabled until https://github.com/grafana/loki/issues/17371 was fixed & a new version contains the fix
 - helmRepository-prometheus-community.yaml
-- helmRepository-grafana-labs.yaml
+- helmRepository-grafana-community.yaml
 - helmRepository-grafana.yaml
 - prometheus
 - grafana
