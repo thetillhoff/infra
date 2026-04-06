@@ -25,6 +25,10 @@ deploymentMode: SingleBinary
 singleBinary:
   replicas: 1
 
+# disable resouce hogging chunks cache - we're on local disk anyways
+chunksCache:
+  enabled: false
+
 # Zero out replica counts of other deployment modes
 backend:
   replicas: 0
@@ -32,7 +36,6 @@ read:
   replicas: 0
 write:
   replicas: 0
-
 ingester:
   replicas: 0
 querier:
