@@ -7,6 +7,10 @@
     "config:best-practices",
     ":disableDependencyDashboard"
   ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
   "flux": {
     "managerFilePatterns": [
       "^/kubernetes/.*\\.yaml$"
