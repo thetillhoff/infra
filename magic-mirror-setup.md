@@ -35,6 +35,8 @@ sudo systemctl restart sshd
 
 sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get autoremove -y && sudo apt-get clean
 
+sudo timedatectl set-timezone Europe/Berlin
+
 sudo raspi-config nonint do_hostname <hostname>
 sudo raspi-config nonint do_wifi_country DE
 sudo raspi-config nonint do_wifi_ssid_passphrase "<ssid>" "<passphrase>"
