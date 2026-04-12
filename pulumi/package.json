@@ -7,6 +7,10 @@
     "format": "prettier --write .",
     "configure": "pulumi stack output --show-secrets kubeconfig > kubeconfig && echo export KUBECONFIG=\"$(pwd)/kubeconfig\" && pulumi stack output --show-secrets talosconfig > talosconfig && echo export TALOSCONFIG=\"$(pwd)/talosconfig\""
   },
+  "engines": {
+    "node": ">=24.12.2",
+    "npm": ">=11.11.0"
+  },
   "devDependencies": {
     "@types/node": "24.12.2",
     "prettier": "3.8.1",
