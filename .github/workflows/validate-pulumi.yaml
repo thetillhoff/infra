@@ -25,6 +25,8 @@ jobs:
       - run: npm ci
 
       - run: pulumi preview
+        with:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
   plan:
     needs: preview
@@ -43,3 +45,5 @@ jobs:
       - run: npm ci
 
       - run: pulumi preview
+        with:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
