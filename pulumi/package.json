@@ -14,7 +14,7 @@
   "devDependencies": {
     "@types/node": "24.12.2",
     "prettier": "3.8.1",
-    "typescript": "5.9.3"
+    "typescript": "6.0.2"
   },
   "dependencies": {
     "@pulumi/cloudflare": "^6.3.1",
