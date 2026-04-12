@@ -1,4 +1,4 @@
-FROM jrottenberg/ffmpeg:8.1-ubuntu-edge@sha256:56db6ff853a23da41af2c0f3205135085280311506de4b756858da1f2e2d5c95
+FROM jrottenberg/ffmpeg:8.1-ubuntu-edge@sha256:393230de4cce95408f710add22237251228302090de3fc30418209d118422496
 
 # Install Python 3 and pip
 # Clean up in the same layer to reduce image size
