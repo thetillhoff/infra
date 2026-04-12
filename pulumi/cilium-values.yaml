@@ -92,3 +92,13 @@ hubble:
       method: cronJob             # auto generate certificates using cronJob method
       certValidityDuration: 60    # certificates validity duration in days
       schedule: "0 0 1 * *"       # schedule for certificates re-generation (crontab syntax)
+
+# Enable mutual authentication with SPIRE/SPIFFE
+# More info at https://docs.cilium.io/en/latest/network/servicemesh/mutual-authentication/mutual-authentication/#installation
+authentication:
+  enabled: true
+  mutual:
+    spire:
+      enabled: true
+      install:
+        enabled: true
