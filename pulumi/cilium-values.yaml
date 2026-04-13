@@ -1,4 +1,4 @@
-# Values documented at https://artifacthub.io/packages/helm/cilium/cilium/1.17.4
+# Values documented at https://artifacthub.io/packages/helm/cilium/cilium/1.19.2
 
 # namespaceOverride: cilium-system # default is kube-system
 
