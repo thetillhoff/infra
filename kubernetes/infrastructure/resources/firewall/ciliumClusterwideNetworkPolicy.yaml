@@ -1,0 +1,24 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "allow-node-to-node-and-http-https-talos"
+spec:
+  description: "Allow node-to-node, HTTP, HTTPS and talos traffic from the cluster"
+  nodeSelector: {}
+  ingress:
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "80"
+            - port: "443"
+            - port: "50000"
+    - fromEntities:
+      - cluster
+      - host
+  egress:
+    - toEntities:
+      - cluster
+      - world
+      - remote-node
+      - host
