@@ -6,6 +6,7 @@ import os
 import shutil
 import subprocess
 import sys
+from datetime import datetime
 from enum import IntEnum
 from pathlib import Path
 from time import time
@@ -14,6 +15,7 @@ from typing import List, Optional, Tuple
 # Constants
 DEFAULT_WORKDIR = Path("/data")
 MAX_HEIGHT = 1080
+MAX_FPS = 30
 CRF_VALUE = 23
 FFMPEG_PRESET = "slow"
 MAX_FILENAME_LEN = 255
@@ -21,7 +23,8 @@ MAX_FILENAME_LEN = 255
 MIN_OUTPUT_SIZE_RATIO = 0.20
 
 # Supported file extensions
-# mp4 is a special case, as it will only be downscaled to 1080p if necessary.
+# mp4 is a special case, as it will only be converted if it needs downscaling, codec change,
+# or frame-rate reduction.
 # Feel free to add more extensions, but verify whether they work first.
 SUPPORTED_EXTENSIONS = {"mp4", "avi", "flv", "mkv", "mov", "mpg", "rmvb", "webm", "wmv"}
 
@@ -59,20 +62,37 @@ def check_tools_available() -> bool:
     return True
 
 
-def get_video_info(file_path: Path) -> Tuple[Optional[str], Optional[int], Optional[str], Optional[int], Optional[str]]:
+def parse_fps(fps_str: Optional[str]) -> Optional[float]:
+    """Parse a frame rate string like '60/1' or '30000/1001' to a float."""
+    if not fps_str:
+        return None
+    try:
+        if "/" in fps_str:
+            num, den = fps_str.split("/", 1)
+            den_int = int(den)
+            if den_int == 0:
+                return None
+            return int(num) / den_int
+        return float(fps_str)
+    except (ValueError, ZeroDivisionError):
+        return None
+
+
+def get_video_info(file_path: Path) -> Tuple[Optional[str], Optional[int], Optional[str], Optional[int], Optional[float], Optional[str]]:
     """Get video information using ffprobe.
 
     Returns:
-        Tuple of (codec_name, height, pix_fmt, bitrate, error_message)
+        Tuple of (codec_name, height, pix_fmt, bitrate, fps, error_message)
         If successful, error_message is None. Otherwise, other values are None.
         Bitrate is in bits per second, or None if not available.
+        fps is frames per second, or None if not available.
     """
     try:
         cmd = [
             "ffprobe",
             "-v", "quiet",
             "-select_streams", "v:0",
-            "-show_entries", "stream=codec_name,height,pix_fmt,bit_rate",
+            "-show_entries", "stream=codec_name,height,pix_fmt,bit_rate,r_frame_rate",
             "-of", "json",
             str(file_path)
         ]
@@ -95,13 +115,14 @@ def get_video_info(file_path: Path) -> Tuple[Optional[str], Optional[int], Optio
         height = stream.get("height")
         pix_fmt = stream.get("pix_fmt", "")
         bitrate = stream.get("bit_rate")
+        fps = parse_fps(stream.get("r_frame_rate"))
 
         # Validate height is numeric
         if height is not None and not isinstance(height, int):
             try:
                 height = int(height)
             except (ValueError, TypeError):
-                return None, None, None, None, f"Invalid height value: {height}"
+                return None, None, None, None, None, f"Invalid height value: {height}"
 
         # Validate bitrate is numeric
         if bitrate is not None:
@@ -110,13 +131,13 @@ def get_video_info(file_path: Path) -> Tuple[Optional[str], Optional[int], Optio
             except (ValueError, TypeError):
                 bitrate = None
 
-        return codec_name, height, pix_fmt, bitrate, None
+        return codec_name, height, pix_fmt, bitrate, fps, None
     except subprocess.CalledProcessError as e:
-        return None, None, None, None, f"FFprobe failed to analyze file: {file_path} (exit code: {e.returncode})\nError: {e.stderr}"
-    except json.JSONDecodeError as e:
-        return None, None, None, None, f"Could not parse video information for: {file_path}"
+        return None, None, None, None, None, f"FFprobe failed to analyze file: {file_path} (exit code: {e.returncode})\nError: {e.stderr}"
+    except json.JSONDecodeError:
+        return None, None, None, None, None, f"Could not parse video information for: {file_path}"
     except Exception as e:
-        return None, None, None, None, f"Unexpected error analyzing file: {file_path}\nError: {str(e)}"
+        return None, None, None, None, None, f"Unexpected error analyzing file: {file_path}\nError: {str(e)}"
 
 
 def get_file_size(file_path: Path) -> Optional[int]:
@@ -241,8 +262,15 @@ def estimate_output_size_increase(codec_name: str, height: int, bitrate: Optiona
     return bitrate < estimated_target_bitrate
 
 
-def validate_video_info(file_path: Path, codec_name: Optional[str], height: Optional[int],
-                        pix_fmt: Optional[str], bitrate: Optional[int], error: Optional[str]) -> Tuple[Optional[Tuple[str, int, str, Optional[int]]], ProcessResult]:
+def validate_video_info(
+    file_path: Path,
+    codec_name: Optional[str],
+    height: Optional[int],
+    pix_fmt: Optional[str],
+    bitrate: Optional[int],
+    fps: Optional[float],
+    error: Optional[str],
+) -> Tuple[Optional[Tuple[str, int, str, Optional[int], Optional[float]]], ProcessResult]:
     """Validate video information from ffprobe."""
     if error:
         print(f"  {error}", file=sys.stderr)
@@ -252,18 +280,21 @@ def validate_video_info(file_path: Path, codec_name: Optional[str], height: Opti
         print(f"  Could not parse video information for: {file_path}", file=sys.stderr)
         return None, ProcessResult.FAILED
 
-    return (codec_name, height, pix_fmt, bitrate), ProcessResult.SUCCESS
+    return (codec_name, height, pix_fmt, bitrate, fps), ProcessResult.SUCCESS
 
 
-def should_skip_mp4(extension: str, height: int, codec_name: str, pix_fmt: str) -> bool:
+def should_skip_mp4(extension: str, height: int, codec_name: str, pix_fmt: str, fps: Optional[float]) -> bool:
     """Check if MP4 file is already in desired format."""
-    return (extension == "mp4" and
-            height <= MAX_HEIGHT and
-            codec_name == "h264")
+    if not (extension == "mp4" and height <= MAX_HEIGHT and codec_name == "h264"):
+        return False
+    # Also convert when FPS exceeds the target
+    if fps is not None and fps > MAX_FPS:
+        return False
+    return True
 
 
-def build_ffmpeg_flags(height: int) -> List[str]:
-    """Build ffmpeg command flags based on video height."""
+def build_ffmpeg_flags(height: int, fps: Optional[float]) -> List[str]:
+    """Build ffmpeg command flags based on video height and fps."""
     ffmpeg_flags = [
         "-c:v", "libx264",
         "-pix_fmt", "yuv420p",
@@ -273,10 +304,56 @@ def build_ffmpeg_flags(height: int) -> List[str]:
         "-loglevel", "error"
     ]
 
+    vf_filters = []
     if height > MAX_HEIGHT:
-        ffmpeg_flags.extend(["-vf", f"scale=-2:{MAX_HEIGHT}"])
+        vf_filters.append(f"scale=-2:{MAX_HEIGHT}")
+    if fps is not None and fps > MAX_FPS:
+        vf_filters.append(f"fps={MAX_FPS}")
+
+    if vf_filters:
+        ffmpeg_flags.extend(["-vf", ",".join(vf_filters)])
 
     return ffmpeg_flags
+
+
+def check_file_corruption(file_path: Path, extension: str) -> bool:
+    """Check if a video file appears corrupted.
+
+    For MP4/MOV files, verifies the presence of the 'ftyp' ISO base-media atom in
+    the first 64 bytes. Then runs a full ffprobe validation for all formats.
+
+    Returns True if the file appears corrupted, False otherwise.
+    """
+    # MP4/MOV header check: ISO base media files must contain the 'ftyp' atom
+    if extension in ("mp4", "mov"):
+        try:
+            with open(file_path, "rb") as f:
+                header = f.read(64)
+            if b"ftyp" not in header:
+                print(f"  Corrupted (invalid header, 'ftyp' atom not found): {file_path}", file=sys.stderr)
+                return True
+        except OSError as e:
+            print(f"  Could not read file header: {file_path}: {e}", file=sys.stderr)
+            return True
+
+    # Full ffprobe validation (mirrors scan.sh ffprobe check)
+    try:
+        subprocess.run(
+            [
+                "ffprobe",
+                "-v", "error",
+                "-show_format",
+                "-show_streams",
+                str(file_path),
+            ],
+            capture_output=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError:
+        print(f"  Corrupted (ffprobe validation failed): {file_path}", file=sys.stderr)
+        return True
+
+    return False
 
 
 def compare_and_cleanup_files(original_path: Path, output_path: Path) -> None:
@@ -288,7 +365,7 @@ def compare_and_cleanup_files(original_path: Path, output_path: Path) -> None:
         return
 
     # First, validate that the converted file looks like a sane video.
-    codec_name, height, pix_fmt, _, error = get_video_info(output_path)
+    codec_name, height, pix_fmt, _, _fps, error = get_video_info(output_path)
     if error or not codec_name or height is None or not pix_fmt:
         print(
             f"Converted file appears invalid, keeping original and removing output: {output_path}\n"
@@ -366,7 +443,7 @@ def convert_video(file_path: Path, output_path: Path, ffmpeg_flags: List[str],
         print(f"✓ Successfully converted: {file_path} (with audio copy) in {duration}s")
         stats.processed += 1
         return True
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
         # Audio copy failed, will try AAC fallback
         pass
 
@@ -401,7 +478,7 @@ def convert_video(file_path: Path, output_path: Path, ffmpeg_flags: List[str],
         return False
 
 
-def process_file(file_path: Path, workdir: Path, stats: Statistics) -> ProcessResult:
+def process_file(file_path: Path, workdir: Path, stats: Statistics, corrupted_report: Path) -> ProcessResult:
     """Process individual video file."""
     print("----------------------------------------")
 
@@ -417,6 +494,18 @@ def process_file(file_path: Path, workdir: Path, stats: Statistics) -> ProcessRe
         stats.skipped += 1
         return result
 
+    # Check for corruption before attempting any conversion
+    if check_file_corruption(file_path, extension):
+        print(f"  Skipping corrupted file: {file_path}", file=sys.stderr)
+        try:
+            with open(corrupted_report, "a") as f:
+                f.write(str(file_path) + "\n")
+            print(f"  Logged to: {corrupted_report}", file=sys.stderr)
+        except OSError as e:
+            print(f"  Failed to write to corrupted files report: {e}", file=sys.stderr)
+        stats.failed += 1
+        return ProcessResult.FAILED
+
     # Generate output path
     output_path, result = get_output_path(file_path, extension, workdir)
     if output_path is None:
@@ -426,33 +515,35 @@ def process_file(file_path: Path, workdir: Path, stats: Statistics) -> ProcessRe
     print(f"Converting: {file_path} -> {output_path}")
 
     # Get video properties using ffprobe
-    codec_name, height, pix_fmt, bitrate, error = get_video_info(file_path)
-    video_info, result = validate_video_info(file_path, codec_name, height, pix_fmt, bitrate, error)
+    codec_name, height, pix_fmt, bitrate, fps, error = get_video_info(file_path)
+    video_info, result = validate_video_info(file_path, codec_name, height, pix_fmt, bitrate, fps, error)
     if video_info is None:
         stats.failed += 1
         return result
 
-    codec_name, height, pix_fmt, bitrate = video_info
+    codec_name, height, pix_fmt, bitrate, fps = video_info
 
     # Check if already in desired format (for MP4 files)
-    if should_skip_mp4(extension, height, codec_name, pix_fmt):
+    if should_skip_mp4(extension, height, codec_name, pix_fmt, fps):
         print(f"  MP4 file already in desired format, skipping: {file_path}")
         stats.skipped += 1
         return ProcessResult.SKIPPED
 
-    # Pre-check: estimate if output will be larger
-    file_size = get_file_size(file_path)
-    if file_size is not None:
-        will_be_larger = estimate_output_size_increase(codec_name, height, bitrate, file_size)
-        if will_be_larger:
-            bitrate_str = f"{bitrate/1_000_000:.2f} Mbps" if bitrate else "unknown"
-            print(f"  Warning: Estimated output file will be larger than input (codec: {codec_name}, bitrate: {bitrate_str})", file=sys.stderr)
-            print(f"  Skipping to prevent infinite loop. File: {file_path}", file=sys.stderr)
-            stats.skipped += 1
-            return ProcessResult.SKIPPED
+    # FPS reduction always yields a smaller output, so skip the size estimate in that case.
+    needs_fps_reduction = fps is not None and fps > MAX_FPS
+    if not needs_fps_reduction:
+        file_size = get_file_size(file_path)
+        if file_size is not None:
+            will_be_larger = estimate_output_size_increase(codec_name, height, bitrate, file_size)
+            if will_be_larger:
+                bitrate_str = f"{bitrate/1_000_000:.2f} Mbps" if bitrate else "unknown"
+                print(f"  Warning: Estimated output file will be larger than input (codec: {codec_name}, bitrate: {bitrate_str})", file=sys.stderr)
+                print(f"  Skipping to prevent infinite loop. File: {file_path}", file=sys.stderr)
+                stats.skipped += 1
+                return ProcessResult.SKIPPED
 
     # Build ffmpeg flags
-    ffmpeg_flags = build_ffmpeg_flags(height)
+    ffmpeg_flags = build_ffmpeg_flags(height, fps)
 
     # Start timing
     start_time = time()
@@ -460,6 +551,17 @@ def process_file(file_path: Path, workdir: Path, stats: Statistics) -> ProcessRe
     # Convert video
     success = convert_video(file_path, output_path, ffmpeg_flags, start_time, stats)
     if not success:
+        return ProcessResult.FAILED
+
+    # Validate the converted output before keeping it
+    if check_file_corruption(output_path, "mp4"):
+        print(f"  Converted output failed corruption check, source file: {file_path}", file=sys.stderr)
+        try:
+            os.remove(output_path)
+        except FileNotFoundError:
+            pass
+        stats.processed -= 1
+        stats.failed += 1
         return ProcessResult.FAILED
 
     # Compare file sizes and cleanup
@@ -499,15 +601,19 @@ def main() -> None:
     print(f"Processing files in: {workdir}")
 
     stats = Statistics()
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    corrupted_report = workdir / f"corrupted-video-files-{timestamp}.txt"
 
     # Find all files in the work directory (more efficient than rglob then filter)
     files = [f for f in workdir.rglob("*") if f.is_file()]
 
     try:
         for file_path in files:
-            process_file(file_path, workdir, stats)
+            process_file(file_path, workdir, stats, corrupted_report)
     except KeyboardInterrupt:
         print("\n\nInterrupted by user", file=sys.stderr)
+        if corrupted_report.exists():
+            print(f"Corrupted files report: {corrupted_report}", file=sys.stderr)
         print("\nStatistics so far:")
         print(stats)
         sys.exit(130)
@@ -516,6 +622,8 @@ def main() -> None:
     print("----------------------------------------")
     print("Conversion complete!")
     print(stats)
+    if corrupted_report.exists():
+        print(f"Corrupted files report: {corrupted_report}")
 
 
 if __name__ == "__main__":
