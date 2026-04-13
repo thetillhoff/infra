@@ -1,5 +1,5 @@
 services:
-  video-converter:
+  video-management:
     build: .
     entrypoint: ["python3"]
     command:
