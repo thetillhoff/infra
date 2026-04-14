@@ -13,12 +13,14 @@ datasources:
     datasources:
 
     - name: Prometheus
+      uid: prometheus
       type: prometheus
       url: http://prometheus-server
       access: proxy
       isDefault: true
 
     - name: Loki
+      uid: loki
       type: loki
       url: http://loki-gateway
       access: proxy
@@ -49,7 +51,9 @@ dashboards:
     loki-logs:
       gnetId: 13639
       revision: 2
-      datasource: Loki
+      datasource:
+        - name: DS_LOKI
+          value: Loki
 
 alerting:
   contactpoints.yaml:

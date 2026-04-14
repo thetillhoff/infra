@@ -3,7 +3,7 @@
 server:
   persistentVolume:
     enabled: true
-    size: 10Gi
+    size: 5Gi
   retention: "15d"
   extraFlags:
     - web.enable-remote-write-receiver

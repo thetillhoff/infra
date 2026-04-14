@@ -22,11 +22,13 @@ loki:
     volume_enabled: true
   ruler:
     enable_api: true
-      
+
 deploymentMode: SingleBinary
 
 singleBinary:
   replicas: 1
+  persistence:
+    size: 5Gi
 
 # disable resouce hogging chunks cache - we're on local disk anyways
 chunksCache:
