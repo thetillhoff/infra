@@ -104,3 +104,8 @@ authentication:
       enabled: true
       install:
         enabled: true
+
+# Enable bandwidth manager to enable rate limiting
+# More info at https://docs.cilium.io/en/stable/network/kubernetes/bandwidth-manager/
+bandwidthManager:
+  enabled: true
