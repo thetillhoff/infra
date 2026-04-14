@@ -1,30 +1,15 @@
 # https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus/values.yaml
 
-# grafana:
-#   additionalDataSources:
-#   - name: loki
-#     type: loki
-#     url: http://loki-gateway
-#     access: proxy
-#     isDefault: true
-#   prune: true
+server:
+  persistentVolume:
+    enabled: true
+    size: 10Gi
+  retention: "15d"
+  extraFlags:
+    - web.enable-remote-write-receiver
 
-# server:
-#   persistentVolume:
-#     enabled: false
-#   extraFlags:
-#     - web.enable-remote-write-receiver
-#     - enable-feature=native-histograms
-#     - enable-feature=exemplar-storage
+alertmanager:
+  enabled: false
 
-# alertmanager:
-#   enabled: false
-
-# kube-state-metrics:
-#   enabled: false
-
-# prometheus-node-exporter:
-#   enabled: false
-
-# prometheus-pushgateway:
-#   enabled: false
+prometheus-pushgateway:
+  enabled: false

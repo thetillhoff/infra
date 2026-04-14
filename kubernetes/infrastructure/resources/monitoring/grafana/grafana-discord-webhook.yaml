@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: grafana-discord-webhook
+stringData:
+    DISCORD_WEBHOOK_URL: ENC[AES256_GCM,data:xpfJTNjtYQ7bc0Kn3/hgbV53IDtHPNVANnlX7GVQWwU9BSllOJB2ae5SGe4j19Hm6YbRxbo5wFs5RYnsJYP2iLiJTsFj21QhM4kiDEz7QOAr0E3z0Ch1C6cmbveDI/et0IE7nyTPEeomv6AIxmGI/tKVlndiLzVPbA==,iv:MexWFrPxNzODOm9josrjgFNEoKkqUoHiezN91RcXY9E=,tag:a7mvvmuLFQLswbXivDpQeA==,type:str]
+sops:
+    age:
+        - recipient: age1068jmwnqrpg6g2m9aswfwz37fjg7vpwtz5vnxlkcwvf3ed8hjaxsycmf85
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBhcUZ3S2NiYnNFQ1FlQ1NX
+            dlRIN1ZEN2NFRUxFLzBwOS80MGdjdENsZUdBCmo5RGFmSk1LYW1CVllkd2J5bzd5
+            N3JINmFhakZpM3VON3c5MEszWHljeDgKLS0tIC9JeEo4UWd3c0t1aUI3VzdFNkFD
+            azhva2tKK0hheGNGQVhaUE5xQmNBekkKf2/S5gy+DZjjxFc2WP6aGsrZk41zhLvo
+            9gFIZBJNbSq3LFBRiVuCATi5DX7can1oFGKB2BSc+cFZaXVvKTMvrw==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jmznk7lwandq9d7mm6fq69uwpa7hf79p6h6qztz0e20wj2yw2a8qylelvw
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBLNHc4eGV5S1NoeU9DK3Jo
+            VXFQVzJFOWJUMTlTdWVKRjAvaERxME50NlVRCjJNSjFFWklHYWV6bW5oMGZYVGoz
+            dUJXblV0VzkvbjhZSUZJdXJncVA0Nm8KLS0tIFNEK1cwV3lzQU1QY0NYVWpLRnhC
+            cVJOaGtoY0JVejdRZDRLMUw1UGpjRHcKB3+IVSxjGtjMlPLYoBiD8MvjWw24qGpc
+            /lrrGYwVqlFP5gGem2/pcMBPoU8gWQj2UL5A0/6vNi7hOyAs0xdfXg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-04-14T21:34:12Z"
+    mac: ENC[AES256_GCM,data:gapIHbjPVVnBSq0s8Ej+fVeEVVnJoUIpcknpEL3+Jp/cT3tBzYrXizALp7/8WcfD0gntdu5Uw4i1mAew7bjebLbexUu7kW5+6S2siyQZNofFL0FVSNUlD4a9Bh4wDZ2qyBpXPPMotTgbZBzzJbpRXnArlf5IpaLXle/oOia0wds=,iv:JZ0ph1OdRD2XsLrK46IukGzsGJhUP4ensmrPCJtdDwk=,tag:54HDPquafPg0bN1tQcLbeA==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0

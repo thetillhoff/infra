@@ -9,6 +9,12 @@ loki.write "default" {
   }
 }
 
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://prometheus-server/api/v1/write"
+  }
+}
+
 // POD LOGS
 
 // discovery.kubernetes allows you to find scrape targets from Kubernetes resources.
@@ -18,7 +24,7 @@ discovery.kubernetes "pod" {
   // Restrict to pods on the node to reduce cpu & memory usage
   selectors {
     role = "pod"
-    field = "spec.nodeName=" + coalesce(sys.env("HOSTNAME"), constants.hostname)
+    field = "spec.nodeName=" + sys.env("NODE_NAME")
   }
 }
 
@@ -113,10 +119,4 @@ loki.source.kubernetes_events "cluster_events" {
 // and forwards the results to the list of receivers in the component's arguments.
 loki.process "cluster_events" {
   forward_to = [loki.write.default.receiver]
-
-  stage.labels {
-    values = {
-      kubernetes_cluster_events = "job",
-    }
-  }
 }

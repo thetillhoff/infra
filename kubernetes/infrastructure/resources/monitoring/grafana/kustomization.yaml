@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - helmRelease.yaml
 - grafana-admin.yaml
+- grafana-discord-webhook.yaml
 
 configMapGenerator:
 - name: grafana-helm-values
