@@ -53,3 +53,26 @@ cilium-hubble?
 ---
 
 hardening
+
+---
+
+Monitoring - alert if above/below a threshold or yes/no (smart):
+
+https://beszel.dev/
+
+- usage of all disks
+- usage of all partitions
+- SMART disk health of all disks
+- cpu load
+- memory load
+- disk io load (percent?)
+- network io load
+- temperature sensors
+- number of pods
+- pods restarts
+- pods pending
+- volumes pending
+- backup from last 48 hours
+- gpu usage, temp, memory, power draw
+- mount changes
+- no data for either of the others
