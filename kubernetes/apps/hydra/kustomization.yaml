@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
 - thetillhoff-de
 - link-shortener
-# - umami
-# - vaultwarden
+- umami
+- vaultwarden
 # - tailscale # tailscale requires a new token every 90 days...
