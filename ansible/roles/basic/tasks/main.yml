@@ -46,7 +46,7 @@
 
 # Add current user to sudoers
 - user:
-    name: "{{ ansible_user_id }}"
+    name: "{{ ansible_facts['user_id'] }}"
     groups: sudo
     append: yes
 
@@ -55,6 +55,7 @@
     name:
       - git
       - curl
+      - python3-apt # Required for ansible check module
     state: present
 
 # Download infra repository

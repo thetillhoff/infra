@@ -30,3 +30,4 @@ services:
       - /mnt/cold/backup:/mnt/backup:rw
       - /mnt/cold/backup-blackstone:/mnt/backup-blackstone:rw
       - /mnt/cold/backup-macbook-superluminar:/mnt/backup-macbook-superluminar:rw
+      - /mnt/cold/backup-homeassistant:/mnt/backup-homeassistant:rw

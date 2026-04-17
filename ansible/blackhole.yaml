@@ -1,15 +1,15 @@
 - name: Blackhole configuration
-  # hosts: blackhole # use this for remote execution
-  hosts: localhost # use this for local execution
-  connection: local # use this for local execution
+  hosts: blackhole
 
   #####
 
   # Requirements:
   # - python installed -> `sudo apt-get install -y python3`
-  # - passwordless sudo
+  # - passwordless sudo (or pass -K)
 
   roles:
     - basic
+    - docker-debian
     - fileserver-blackhole
-    - disk-spindown
+    - stash
+    # - disk-spindown

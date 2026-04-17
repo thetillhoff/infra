@@ -64,8 +64,3 @@ configs:
         reverse_proxy stash
         tls internal
       }
-
-      blackhole.deer-alphard.ts.net {
-        reverse_proxy stash
-        tls internal
-      }

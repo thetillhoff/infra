@@ -44,41 +44,12 @@
       # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
       #-o casesensitivity=mixed -o nbmand=on
 
-
-# Install docker
-- package_facts:
-    manager: apt
-- when: '"docker-ce" not in ansible_facts.packages'
-  block:
-    - apt:
-        pkg:
-          - ca-certificates
-          - curl
-          - gnupg
-    - apt_key:
-        url:  https://download.docker.com/linux/ubuntu/gpg
-    - apt_repository:
-        repo: deb [arch="amd64"] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
-        state: present
-    - apt:
-        update_cache: yes
-        pkg:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-buildx-plugin
-          - docker-compose-plugin
-- ansible.builtin.user:
-    name: user
-    groups: docker
-    append: yes
-
 # Allow SMB port/s
 - ufw: # allow connections to port
     rule: allow
     port: 445
     proto: tcp
 
-# Start samba container
+# Start container
 - community.docker.docker_compose_v2:
-    project_src: "{{ role_path }}/files/"
+    project_src: "./infra/ansible/roles/{{ role_path | basename }}/files/"
