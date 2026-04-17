@@ -18,6 +18,8 @@ datasources:
       url: http://prometheus-server
       access: proxy
       isDefault: true
+      jsonData:
+        timeInterval: 15s
 
     - name: Loki
       uid: loki
