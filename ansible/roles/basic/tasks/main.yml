@@ -65,3 +65,4 @@
     force: yes # discard local changes
     single_branch: yes
     version: main
+  become: false
