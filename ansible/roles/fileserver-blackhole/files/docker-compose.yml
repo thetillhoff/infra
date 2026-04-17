@@ -1,3 +1,4 @@
+name: fileserver-blackhole
 services:
   fileserver:
     build:
