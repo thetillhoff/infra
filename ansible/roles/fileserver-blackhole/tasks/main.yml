@@ -53,3 +53,4 @@
 # Start container
 - community.docker.docker_compose_v2:
     project_src: "./infra/ansible/roles/{{ role_path | basename }}/files/"
+    remove_orphans: true
