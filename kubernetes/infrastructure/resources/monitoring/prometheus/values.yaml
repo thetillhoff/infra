@@ -8,6 +8,10 @@ server:
   extraFlags:
     - web.enable-remote-write-receiver
 
+prometheus-node-exporter:
+  extraArgs:
+    - --no-collector.kernel_hung
+
 alertmanager:
   enabled: false
 
