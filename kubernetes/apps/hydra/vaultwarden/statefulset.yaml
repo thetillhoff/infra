@@ -12,6 +12,9 @@ spec:
     metadata:
       labels:
         app: vaultwarden
+      annotations:
+        kubernetes.io/egress-bandwidth: "5M"
+        kubernetes.io/ingress-bandwidth: "1M"
     spec:
       containers:
         - name: vaultwarden

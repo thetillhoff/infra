@@ -11,6 +11,9 @@ spec:
     metadata:
       labels:
         app: link-shortener
+      annotations:
+        kubernetes.io/egress-bandwidth: "5M"
+        kubernetes.io/ingress-bandwidth: "1M"
     spec:
       containers:
       - name: link-shortener

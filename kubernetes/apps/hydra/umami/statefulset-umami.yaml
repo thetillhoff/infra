@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         app: umami
+      annotations:
+        kubernetes.io/egress-bandwidth: "5M"
+        kubernetes.io/ingress-bandwidth: "10M"
     spec:
       containers:
       - name: umami
