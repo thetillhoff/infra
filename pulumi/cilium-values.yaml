@@ -72,32 +72,23 @@ envoy:
 operator:
   extraArgs:
   - '--pod-restart-selector=""'
-# ---
-# Set hubble tls method to certmanager to prevent continuous drift of the hubble certificate
-# More info at https://docs.cilium.io/en/latest/observability/hubble/configuration/tls/#enable-tls-on-the-hubble-api
-# hubble:
-#   tls:
-#     auto:
-#       enabled: true
-#       method: certmanager
-#       certValidityDuration: 365
-#       certManagerIssuerRef:
-#         group: "cert-manager.io"
-#         kind: "ClusterIssuer"
-#         name: "selfsigned-ca"
-
 # Enable hubble
-# It might be that hubble doesn't create the server certificate (`hubble-server-certs`) automatically, due to the cronjob.
-# To create it manually, run: `kubectl -n kube-system create job --from=cronjob/hubble-generate-certs hubble-generate-certs-manual`
+# TLS for the Hubble API is issued by cert-manager via the `selfsigned-ca` ClusterIssuer
+# (defined in kubernetes/infrastructure/resources/cert-manager/). This avoids the drift
+# that the cronJob method causes when the generated secrets go missing between runs.
+# More info at https://docs.cilium.io/en/latest/observability/hubble/configuration/tls/#enable-tls-on-the-hubble-api
 hubble:
   relay:
     enabled: true
   tls:
     auto:
-      enabled: true               # enable automatic TLS certificate generation
-      method: cronJob             # auto generate certificates using cronJob method
-      certValidityDuration: 60    # certificates validity duration in days
-      schedule: "0 0 1 * *"       # schedule for certificates re-generation (crontab syntax)
+      enabled: true
+      method: certmanager
+      certValidityDuration: 365
+      certManagerIssuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: selfsigned-ca
   ui:
     enabled: true
 
