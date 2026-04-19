@@ -87,6 +87,7 @@ operator:
 #         name: "selfsigned-ca"
 hubble:
   enabled: true
+  listenAddress: ":4244"
   relay:
     enabled: true
   tls:
