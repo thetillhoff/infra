@@ -32,13 +32,6 @@
 
 ---
 
-cilium-hubble?
-
-- Set up cert-manager as tls provider for hubble, so its certificates are auto-renewed as necessary instead of helm rotating them on every update
-  https://docs.cilium.io/en/v1.15/gettingstarted/hubble-configuration/#auto-generated-certificates-via-cert-manager
-
----
-
 - set up observability
 
 - deploy apps
