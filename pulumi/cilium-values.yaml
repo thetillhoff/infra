@@ -85,9 +85,11 @@ operator:
 #         group: "cert-manager.io"
 #         kind: "ClusterIssuer"
 #         name: "selfsigned-ca"
+
+# Enable hubble
+# It might be that hubble doesn't create the server certificate (`hubble-server-certs`) automatically, due to the cronjob.
+# To create it manually, run: `kubectl -n kube-system create job --from=cronjob/hubble-generate-certs hubble-generate-certs-manual`
 hubble:
-  enabled: true
-  listenAddress: ":4244"
   relay:
     enabled: true
   tls:
