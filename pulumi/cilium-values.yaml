@@ -86,6 +86,7 @@ operator:
 #         kind: "ClusterIssuer"
 #         name: "selfsigned-ca"
 hubble:
+  enabled: true
   relay:
     enabled: true
   tls:
