@@ -101,3 +101,10 @@ The hostpath provider could be used to integrate zfs with k8s if needed.
 - Pulumi
   - Provider
 - Secret rotation TBD
+
+---
+
+next time:
+
+- retry mtls, and use cilium status afterwards.
+- Check kubernetes/TODO.md.
