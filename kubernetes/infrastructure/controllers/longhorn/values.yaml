@@ -1,3 +1,10 @@
+longhornManager:
+  # Longhorn exposes metrics on the longhorn-backend Service on port 9500 (named `manager`).
+  # That port name isn't matched by the auto-discovery regex, so opt in via annotation.
+  serviceAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9500"
+
 persistence: # default storage class
   defaultClassReplicaCount: 2
   reclaimPolicy: Retain

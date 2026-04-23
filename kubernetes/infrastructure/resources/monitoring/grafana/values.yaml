@@ -7,6 +7,14 @@ admin:
 
 envFromSecret: grafana-discord-webhook
 
+# Grafana's service port is named `service` (not something our port-name auto-discovery
+# matches), so annotate the Service explicitly. Grafana exposes /metrics on the same
+# port as the UI by default.
+service:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "80"
+
 datasources:
   datasources.yaml:
     apiVersion: 1

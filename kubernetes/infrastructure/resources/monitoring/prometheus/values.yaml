@@ -19,3 +19,35 @@ alertmanager:
 
 prometheus-pushgateway:
   enabled: false
+
+# Convention-based auto-discovery: any Service with a port named `metrics`,
+# `<something>-metrics`, or `prometheus` is scraped automatically without needing
+# any annotations. This matches the port-naming convention used by virtually all
+# modern Helm charts (Grafana, Loki, Alloy, Cilium, cert-manager, ...).
+#
+# Opt-out for a specific service: `prometheus.io/scrape: "false"` annotation.
+# Opt-in for services that don't follow the convention: `prometheus.io/scrape: "true"`
+# annotation (handled by the chart's default scrape jobs).
+extraScrapeConfigs: |
+  - job_name: kubernetes-service-endpoints-by-port-name
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: (metrics|.+-metrics|prometheus)
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        action: drop
+        regex: "false"
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_service_name]
+        target_label: service
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        target_label: node
