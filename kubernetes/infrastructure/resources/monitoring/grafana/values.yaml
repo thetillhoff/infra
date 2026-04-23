@@ -88,10 +88,10 @@ alerting:
       rules:
       - uid: high-cpu
         title: High CPU usage
-        condition: A
+        condition: B
         for: 5m
         annotations:
-          summary: "CPU usage above 80% for 5 minutes"
+          summary: "CPU usage on {{ $labels.instance }} is above 80% (value: {{ $values.A }}%)"
         data:
         - refId: A
           relativeTimeRange:
@@ -99,14 +99,25 @@ alerting:
             to: 0
           datasourceUid: prometheus
           model:
-            expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+            expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+            instant: true
             refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            type: threshold
+            refId: B
+            expression: A
+            conditions:
+            - evaluator:
+                type: gt
+                params: [80]
       - uid: high-memory
         title: High memory usage
-        condition: A
+        condition: B
         for: 5m
         annotations:
-          summary: "Memory usage above 85% for 5 minutes"
+          summary: "Memory usage on {{ $labels.instance }} is above 85% (value: {{ $values.A }}%)"
         data:
         - refId: A
           relativeTimeRange:
@@ -114,14 +125,25 @@ alerting:
             to: 0
           datasourceUid: prometheus
           model:
-            expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+            expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100
+            instant: true
             refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            type: threshold
+            refId: B
+            expression: A
+            conditions:
+            - evaluator:
+                type: gt
+                params: [85]
       - uid: high-disk
         title: High disk usage
-        condition: A
+        condition: B
         for: 5m
         annotations:
-          summary: "Disk usage above 85% for 5 minutes"
+          summary: "Disk {{ $labels.mountpoint }} on {{ $labels.instance }} is above 85% full (value: {{ $values.A }}%)"
         data:
         - refId: A
           relativeTimeRange:
@@ -129,14 +151,25 @@ alerting:
             to: 0
           datasourceUid: prometheus
           model:
-            expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}) * 100 > 85
+            expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}) * 100
+            instant: true
             refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            type: threshold
+            refId: B
+            expression: A
+            conditions:
+            - evaluator:
+                type: gt
+                params: [85]
       - uid: pod-restarts
         title: Pod restart loop
-        condition: A
+        condition: B
         for: 10m
         annotations:
-          summary: "Pod has restarted more than 3 times in 10 minutes"
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} restarted {{ $values.A }} times in the last 10 minutes"
         data:
         - refId: A
           relativeTimeRange:
@@ -144,14 +177,25 @@ alerting:
             to: 0
           datasourceUid: prometheus
           model:
-            expr: increase(kube_pod_container_status_restarts_total[10m]) > 3
+            expr: increase(kube_pod_container_status_restarts_total[10m])
+            instant: true
             refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            type: threshold
+            refId: B
+            expression: A
+            conditions:
+            - evaluator:
+                type: gt
+                params: [3]
       - uid: pods-pending
         title: Pods stuck pending
-        condition: A
+        condition: B
         for: 5m
         annotations:
-          summary: "Pod has been in Pending state for more than 5 minutes"
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been Pending for more than 5 minutes"
         data:
         - refId: A
           relativeTimeRange:
@@ -159,14 +203,25 @@ alerting:
             to: 0
           datasourceUid: prometheus
           model:
-            expr: kube_pod_status_phase{phase="Pending"} > 0
+            expr: kube_pod_status_phase{phase="Pending"}
+            instant: true
             refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            type: threshold
+            refId: B
+            expression: A
+            conditions:
+            - evaluator:
+                type: gt
+                params: [0]
       - uid: pvc-pending
         title: PVC stuck pending
-        condition: A
+        condition: B
         for: 5m
         annotations:
-          summary: "PersistentVolumeClaim has been Pending for more than 5 minutes"
+          summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has been Pending for more than 5 minutes"
         data:
         - refId: A
           relativeTimeRange:
@@ -174,5 +229,16 @@ alerting:
             to: 0
           datasourceUid: prometheus
           model:
-            expr: kube_persistentvolumeclaim_status_phase{phase="Pending"} > 0
+            expr: kube_persistentvolumeclaim_status_phase{phase="Pending"}
+            instant: true
             refId: A
+        - refId: B
+          datasourceUid: __expr__
+          model:
+            type: threshold
+            refId: B
+            expression: A
+            conditions:
+            - evaluator:
+                type: gt
+                params: [0]
