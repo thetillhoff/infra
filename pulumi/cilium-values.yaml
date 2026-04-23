@@ -68,8 +68,12 @@ envoy:
         - NET_ADMIN
         - SYS_ADMIN
         - NET_BIND_SERVICE
-# Removing the built-in pod restart selector to make cilium restart all unmanaged pods, not just kube-dns
 operator:
+  # Enable cilium metrics
+  prometheus:
+    enabled: true
+
+  # Removing the built-in pod restart selector to make cilium restart all unmanaged pods, not just kube-dns
   extraArgs:
   - '--pod-restart-selector=""'
 # Enable hubble
@@ -105,4 +109,8 @@ hubble:
 # Enable bandwidth manager to enable rate limiting
 # More info at https://docs.cilium.io/en/stable/network/kubernetes/bandwidth-manager/
 bandwidthManager:
+  enabled: true
+
+# Enable cilium metrics
+prometheus:
   enabled: true
