@@ -82,6 +82,17 @@ operator:
 # that the cronJob method causes when the generated secrets go missing between runs.
 # More info at https://docs.cilium.io/en/latest/observability/hubble/configuration/tls/#enable-tls-on-the-hubble-api
 hubble:
+  enabled: true
+  metrics:
+    enableOpenMetrics: true
+    enabled:
+      - "dns:query;ignoreAAAA"
+      - drop
+      - tcp
+      - flow
+      - icmp
+      - port-distribution
+      - "httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction"
   relay:
     enabled: true
   tls:
