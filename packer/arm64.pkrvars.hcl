@@ -1,6 +1,6 @@
 # It should only be necessary to adjust the talos_version.
 
-talos_version = "v1.12.6"
+talos_version = "v1.12.7"
 arch          = "arm64" # must match server_type
 server_type   = "cax21" # must match arch
 
