@@ -99,7 +99,7 @@ alerting:
         condition: B
         for: 5m
         annotations:
-          summary: "CPU usage on {{ $labels.instance }} is above 80% (value: {{ $values.A }}%)"
+          summary: "CPU usage on {{ `{{ $labels.instance }}` }} is above 80% (value: {{ `{{ $values.A }}` }}%)"
         data:
         - refId: A
           queryType: ''
@@ -136,7 +136,7 @@ alerting:
         condition: B
         for: 5m
         annotations:
-          summary: "Memory usage on {{ $labels.instance }} is above 85% (value: {{ $values.A }}%)"
+          summary: "Memory usage on {{ `{{ $labels.instance }}` }} is above 85% (value: {{ `{{ $values.A }}` }}%)"
         data:
         - refId: A
           queryType: ''
@@ -173,7 +173,7 @@ alerting:
         condition: B
         for: 5m
         annotations:
-          summary: "Disk {{ $labels.mountpoint }} on {{ $labels.instance }} is above 85% full (value: {{ $values.A }}%)"
+          summary: "Disk {{ `{{ $labels.mountpoint }}` }} on {{ `{{ $labels.instance }}` }} is above 85% full (value: {{ `{{ $values.A }}` }}%)"
         data:
         - refId: A
           queryType: ''
@@ -214,7 +214,7 @@ alerting:
         for: 10m
         noDataState: OK
         annotations:
-          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} restarted {{ $values.A }} times in the last 10 minutes"
+          summary: "Pod {{ `{{ $labels.namespace }}` }}/{{ `{{ $labels.pod }}` }} restarted {{ `{{ $values.A }}` }} times in the last 10 minutes"
         data:
         - refId: A
           queryType: ''
@@ -252,7 +252,7 @@ alerting:
         for: 5m
         noDataState: OK
         annotations:
-          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been Pending for more than 5 minutes"
+          summary: "Pod {{ `{{ $labels.namespace }}` }}/{{ `{{ $labels.pod }}` }} has been Pending for more than 5 minutes"
         data:
         - refId: A
           queryType: ''
@@ -290,7 +290,7 @@ alerting:
         for: 5m
         noDataState: OK
         annotations:
-          summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has been Pending for more than 5 minutes"
+          summary: "PVC {{ `{{ $labels.namespace }}` }}/{{ `{{ $labels.persistentvolumeclaim }}` }} has been Pending for more than 5 minutes"
         data:
         - refId: A
           queryType: ''
