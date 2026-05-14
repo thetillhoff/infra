@@ -61,7 +61,7 @@
 # Download infra repository
 - git:
     repo: https://github.com/thetillhoff/infra
-    dest: ./infra
+    dest: /home/{{ ansible_user }}/infra
     force: yes # discard local changes
     single_branch: yes
     version: main

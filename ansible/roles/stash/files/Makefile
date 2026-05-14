@@ -1,5 +1,5 @@
-.PHONY: list
-list:
+.PHONY: help
+help:
 	@grep -E '^[[:alpha:]].*:' Makefile | cat # Get all targets in this file, without color-coding the matching letters
 
 start:
