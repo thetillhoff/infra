@@ -3,7 +3,7 @@ description: Re-encodes videos to h264 with bitrate-aware rate control. Downscal
 version: 0.1.0
 exec:
   - python3
-  - stash_plugin.py
+  - /root/.stash/plugins/video-reencoder/stash_plugin.py
 interface: raw
 tasks:
   - name: Re-encode all videos
