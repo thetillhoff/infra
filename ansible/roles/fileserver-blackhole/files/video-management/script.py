@@ -84,7 +84,8 @@ def get_video_info(file_path: Path) -> Tuple[Optional[str], Optional[int], Optio
     Returns:
         Tuple of (codec_name, height, pix_fmt, bitrate, fps, error_message)
         If successful, error_message is None. Otherwise, other values are None.
-        Bitrate is in bits per second, or None if not available.
+        Bitrate is in bits per second. Derived from stream metadata when available,
+        otherwise computed from file size / duration as a fallback.
         fps is frames per second, or None if not available.
     """
     try:
@@ -92,7 +93,7 @@ def get_video_info(file_path: Path) -> Tuple[Optional[str], Optional[int], Optio
             "ffprobe",
             "-v", "quiet",
             "-select_streams", "v:0",
-            "-show_entries", "stream=codec_name,height,pix_fmt,bit_rate,r_frame_rate",
+            "-show_entries", "stream=codec_name,height,pix_fmt,bit_rate,r_frame_rate:format=duration",
             "-of", "json",
             str(file_path)
         ]
@@ -104,12 +105,13 @@ def get_video_info(file_path: Path) -> Tuple[Optional[str], Optional[int], Optio
             text=True,
             check=True
         )
-        duration = int(time() - start_time)
-        if duration > 1:
-            print(f"FFPROBE DURATION: {duration}s")
+        elapsed = int(time() - start_time)
+        if elapsed > 1:
+            print(f"FFPROBE DURATION: {elapsed}s")
 
         data = json.loads(result.stdout)
         stream = data.get("streams", [{}])[0]
+        fmt = data.get("format", {})
 
         codec_name = stream.get("codec_name", "")
         height = stream.get("height")
@@ -130,6 +132,19 @@ def get_video_info(file_path: Path) -> Tuple[Optional[str], Optional[int], Optio
                 bitrate = int(bitrate)
             except (ValueError, TypeError):
                 bitrate = None
+
+        # Fallback: derive bitrate from file size and duration (works for any container).
+        # Some formats (MKV, WebM) don't embed per-stream bitrate in metadata.
+        if bitrate is None:
+            try:
+                file_duration = float(fmt.get("duration", 0))
+                if file_duration > 0:
+                    bitrate = int(file_path.stat().st_size * 8 / file_duration)
+            except (ValueError, TypeError, OSError) as e:
+                return None, None, None, None, None, f"Could not compute fallback bitrate for: {file_path}\nError: {e}"
+
+        if bitrate is None:
+            return None, None, None, None, None, f"Could not determine bitrate for: {file_path}"
 
         return codec_name, height, pix_fmt, bitrate, fps, None
     except subprocess.CalledProcessError as e:
@@ -293,19 +308,48 @@ def should_skip_mp4(extension: str, height: int, codec_name: str, pix_fmt: str, 
     return True
 
 
-def build_ffmpeg_flags(height: int, fps: Optional[float]) -> List[str]:
-    """Build ffmpeg command flags based on video height and fps."""
+def build_ffmpeg_flags(height: int, fps: Optional[float], bitrate: Optional[int]) -> List[str]:
+    """Build ffmpeg command flags based on video height, fps, and source bitrate.
+
+    Rate control strategy:
+    - Downscaling + known bitrate: CRF for quality-based encoding, maxrate capped at
+      ~65% of source (lower resolution needs fewer bits for equivalent quality).
+    - Same resolution + known bitrate: target source bitrate directly (1-pass CBR),
+      so the output stays comparable in size to the original.
+    - No bitrate info: fall back to CRF only.
+    """
+    needs_downscale = height > MAX_HEIGHT
+
+    if needs_downscale and bitrate is not None:
+        # Downscaling with known bitrate: CRF for quality, maxrate capped by pixel area ratio
+        # (height² proxy) plus 20% headroom so the smaller-resolution output can't balloon.
+        pixel_ratio = (MAX_HEIGHT / height) ** 2
+        maxrate = int(bitrate * pixel_ratio * 1.2)
+        rate_flags = ["-crf", str(CRF_VALUE), "-maxrate", str(maxrate), "-bufsize", str(maxrate * 2)]
+    elif needs_downscale and bitrate is None:
+        # Downscaling without known bitrate: fall back to CRF only; no cap can be derived.
+        rate_flags = ["-crf", str(CRF_VALUE)]
+    elif not needs_downscale and bitrate is not None:
+        # Same resolution with known bitrate: target source bitrate directly (1-pass CBR)
+        # so the output stays comparable in size to the original.
+        rate_flags = ["-b:v", str(bitrate)]
+    elif not needs_downscale and bitrate is None:
+        # Same resolution without known bitrate: fall back to CRF only; no target can be derived.
+        rate_flags = ["-crf", str(CRF_VALUE)]
+    else:
+        raise RuntimeError(f"Unhandled rate control case: needs_downscale={needs_downscale}, bitrate={bitrate}")
+
     ffmpeg_flags = [
         "-c:v", "libx264",
         "-pix_fmt", "yuv420p",
         "-preset", FFMPEG_PRESET,
-        "-crf", str(CRF_VALUE),
+        *rate_flags,
         "-hide_banner",
         "-loglevel", "error"
     ]
 
     vf_filters = []
-    if height > MAX_HEIGHT:
+    if needs_downscale:
         vf_filters.append(f"scale=-2:{MAX_HEIGHT}")
     if fps is not None and fps > MAX_FPS:
         vf_filters.append(f"fps={MAX_FPS}")
