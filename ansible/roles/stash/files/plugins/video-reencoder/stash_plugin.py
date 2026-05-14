@@ -2,6 +2,7 @@
 
 import json
 import sys
+import traceback
 import urllib.request
 from datetime import datetime
 from pathlib import Path
@@ -92,8 +93,14 @@ def main() -> None:
         print(f"Corrupted files report: {corrupted_report}", flush=True)
 
     # Must be the last line — Stash parses this as PluginOutput
-    print(json.dumps({"output": summary, "error": None}))
+    print(json.dumps({"output": summary, "error": None}), flush=True)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        tb = traceback.format_exc()
+        print(tb, file=sys.stderr, flush=True)
+        print(json.dumps({"output": None, "error": tb}), flush=True)
+        sys.exit(1)
