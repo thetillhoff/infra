@@ -1,4 +1,17 @@
-# Start container
+- name: Create stash plugin directory for video re-encoder
+  file:
+    path: /mnt/hot/stash/config/plugins/video-reencoder
+    state: directory
+    mode: '0755'
+
+- name: Deploy video re-encoder plugin files
+  copy:
+    src: "plugins/video-reencoder/"
+    dest: /mnt/hot/stash/config/plugins/video-reencoder/
+    mode: '0755'
+
+# Start container — build: always ensures the Python3 layer is present
 - community.docker.docker_compose_v2:
     project_src: "./infra/ansible/roles/{{ role_path | basename }}/files/"
     remove_orphans: true
+    build: always
