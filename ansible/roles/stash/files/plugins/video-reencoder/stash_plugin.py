@@ -11,6 +11,30 @@ from typing import List
 sys.path.insert(0, str(Path(__file__).parent))
 
 WORKDIR = Path("/data")
+DEBUG_LOG = WORKDIR / "plugin-debug.log"
+
+
+class _Tee:
+    """Mirrors writes to real stdout and a log file so every line is captured."""
+    def __init__(self, stream, log_file):
+        self._stream = stream
+        self._log = log_file
+
+    def write(self, data):
+        self._stream.write(data)
+        self._stream.flush()
+        try:
+            self._log.write(data)
+            self._log.flush()
+        except OSError:
+            pass
+
+    def flush(self):
+        self._stream.flush()
+
+    # Delegate attribute access (e.g. .encoding, .fileno) to the real stream.
+    def __getattr__(self, name):
+        return getattr(self._stream, name)
 
 
 def read_plugin_input() -> dict:
@@ -64,17 +88,13 @@ def main() -> None:
     api_key = server.get("ApiKey", "")
 
     print(f"Connecting to Stash at {server_url}", flush=True)
+    print(f"ApiKey present: {bool(api_key)}", flush=True)
 
     if not check_tools_available():
-        print(json.dumps({"output": None, "error": "ffmpeg or ffprobe not found in PATH"}))
-        sys.exit(1)
+        raise RuntimeError("ffmpeg or ffprobe not found in PATH")
 
     print("Fetching scene list from Stash...", flush=True)
-    try:
-        paths = get_all_scene_paths(server_url, api_key)
-    except Exception as e:
-        print(json.dumps({"output": None, "error": f"Failed to fetch scenes: {e}"}))
-        sys.exit(1)
+    paths = get_all_scene_paths(server_url, api_key)
 
     print(f"Found {len(paths)} scene files", flush=True)
 
@@ -96,11 +116,17 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    log_f = open(DEBUG_LOG, "w")
+    sys.stdout = _Tee(sys.__stdout__, log_f)
+    sys.stderr = _Tee(sys.__stderr__, log_f)
     try:
         from script import process_file, Statistics, check_tools_available
         main()
     except Exception:
         tb = traceback.format_exc()
-        print(tb, file=sys.stderr, flush=True)
+        print(tb, flush=True)
         print(json.dumps({"output": None, "error": tb}), flush=True)
-        sys.exit(1)
+    finally:
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        log_f.close()
