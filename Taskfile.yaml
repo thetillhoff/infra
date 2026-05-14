@@ -40,11 +40,11 @@ tasks:
 
   configure-env:
     desc: "Configure talosconfig and kubeconfig env vars. Usage: task configure-env | source /dev/stdin"
-    dir: 'pulumi'
     cmds:
       - |
-        echo export TALOSCONFIG="$(pwd)/talosconfig"
-        echo export KUBECONFIG="$(pwd)/kubeconfig"
+        echo export TALOSCONFIG="$(pwd)/pulumi/talosconfig"
+        echo export KUBECONFIG="$(pwd)/pulumi/kubeconfig"
+        echo export SOPS_AGE_KEY_FILE="$(pwd)/age.key"
 
   reconcile:
     desc: Reconcile flux sources
