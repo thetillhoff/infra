@@ -62,6 +62,13 @@ while IFS=':' read -r username password; do
    fruit:time machine = yes
    fruit:time machine max size = 300G
    available = yes
+
+   # Symlink Support
+   # Follow symlinks within and outside the share root.
+   # Access is still governed by the user's Unix permissions on the target.
+   # Requires 'unix extensions = no' in [global].
+   follow symlinks = yes
+   wide links = yes
 EOF
 done < "$users_file"
 
