@@ -114,8 +114,12 @@ def main() -> None:
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     corrupted_report = WORKDIR / f"corrupted-video-files-{timestamp}.txt"
 
-    for path in paths:
+    total = len(paths)
+    for i, path in enumerate(paths, 1):
         process_file(Path(path), WORKDIR, stats, corrupted_report)
+        if i % 1000 == 0 or i == total:
+            pct = i * 100 // total
+            print(f"[{i}/{total}] {pct}% — converted: {stats.processed}, skipped: {stats.skipped}, failed: {stats.failed}", flush=True)
 
     summary = str(stats)
     print(f"\n{summary}", flush=True)
