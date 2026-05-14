@@ -48,19 +48,27 @@ def build_server_url(server: dict) -> str:
     return f"{scheme}://{host}:{port}"
 
 
-def graphql_query(server_url: str, api_key: str, query: str, variables: dict = None) -> dict:
+def graphql_query(server_url: str, headers: dict, query: str, variables: dict = None) -> dict:
     url = f"{server_url}/graphql"
     payload = json.dumps({"query": query, "variables": variables or {}}).encode()
-    req = urllib.request.Request(
-        url,
-        data=payload,
-        headers={"Content-Type": "application/json", "ApiKey": api_key},
-    )
+    req = urllib.request.Request(url, data=payload, headers=headers)
     with urllib.request.urlopen(req) as resp:
         return json.loads(resp.read())
 
 
-def get_all_scene_paths(server_url: str, api_key: str) -> List[str]:
+def build_auth_headers(server: dict) -> dict:
+    headers = {"Content-Type": "application/json"}
+    api_key = server.get("ApiKey", "")
+    if api_key:
+        headers["ApiKey"] = api_key
+        return headers
+    cookie = server.get("SessionCookie")
+    if cookie and cookie.get("Value"):
+        headers["Cookie"] = f"{cookie.get('Name', 'session')}={cookie['Value']}"
+    return headers
+
+
+def get_all_scene_paths(server_url: str, headers: dict) -> List[str]:
     query = """
     query {
         findScenes(filter: { per_page: -1 }) {
@@ -73,7 +81,7 @@ def get_all_scene_paths(server_url: str, api_key: str) -> List[str]:
         }
     }
     """
-    result = graphql_query(server_url, api_key, query)
+    result = graphql_query(server_url, headers, query)
     paths = []
     for scene in result["data"]["findScenes"]["scenes"]:
         for f in scene.get("files", []):
@@ -85,16 +93,20 @@ def main() -> None:
     plugin_input = read_plugin_input()
     server = plugin_input["server_connection"]
     server_url = build_server_url(server)
-    api_key = server.get("ApiKey", "")
 
+    print(f"server_connection keys: {sorted(server.keys())}", flush=True)
     print(f"Connecting to Stash at {server_url}", flush=True)
-    print(f"ApiKey present: {bool(api_key)}", flush=True)
+
+    auth_headers = build_auth_headers(server)
+    api_key = server.get("ApiKey", "")
+    cookie = server.get("SessionCookie")
+    print(f"ApiKey present: {bool(api_key)}, SessionCookie present: {bool(cookie and cookie.get('Value'))}", flush=True)
 
     if not check_tools_available():
         raise RuntimeError("ffmpeg or ffprobe not found in PATH")
 
     print("Fetching scene list from Stash...", flush=True)
-    paths = get_all_scene_paths(server_url, api_key)
+    paths = get_all_scene_paths(server_url, auth_headers)
 
     print(f"Found {len(paths)} scene files", flush=True)
 
