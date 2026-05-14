@@ -587,7 +587,7 @@ def process_file(file_path: Path, workdir: Path, stats: Statistics, corrupted_re
                 return ProcessResult.SKIPPED
 
     # Build ffmpeg flags
-    ffmpeg_flags = build_ffmpeg_flags(height, fps)
+    ffmpeg_flags = build_ffmpeg_flags(height, fps, bitrate)
 
     # Start timing
     start_time = time()

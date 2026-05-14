@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import List
 
 sys.path.insert(0, str(Path(__file__).parent))
-from script import process_file, Statistics, check_tools_available
 
 WORKDIR = Path("/data")
 
@@ -98,6 +97,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     try:
+        from script import process_file, Statistics, check_tools_available
         main()
     except Exception:
         tb = traceback.format_exc()
