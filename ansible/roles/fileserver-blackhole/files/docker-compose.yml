@@ -27,8 +27,9 @@ services:
       # - /mnt/cold/public:/mnt/public:rw
 
       # Configured dynamically in the start.sh script
-      - /mnt/cold/public:/mnt/public:rw
-      - /mnt/cold/backup:/mnt/backup:rw
-      - /mnt/cold/backup-blackstone:/mnt/backup-blackstone:rw
-      - /mnt/cold/backup-macbook-superluminar:/mnt/backup-macbook-superluminar:rw
-      - /mnt/cold/backup-homeassistant:/mnt/backup-homeassistant:rw
+      - /mnt/cold/public:/mnt/cold/public:rw
+      - /mnt/cold/backup:/mnt/cold/backup:rw
+      - /mnt/cold/backup-blackstone:/mnt/cold/backup-blackstone:rw
+      - /mnt/cold/backup-macbook-superluminar:/mnt/cold/backup-macbook-superluminar:rw
+      - /mnt/cold/backup-homeassistant:/mnt/cold/backup-homeassistant:rw
+      - /mnt/hot/public:/mnt/hot/public:rw

@@ -24,9 +24,9 @@ while IFS=':' read -r username password; do
     # Create Samba user with custom password (unattended)
     echo -e "$password\n$password" | smbpasswd -a "$username"
 
-    echo "Setting user directory permissions: /mnt/$username"
-    chown "$username:$username" "/mnt/$username"
-    chmod 755 "/mnt/$username"
+    echo "Setting user directory permissions: /mnt/cold/$username"
+    chown "$username:$username" "/mnt/cold/$username"
+    chmod 755 "/mnt/cold/$username"
 
     # Add share definition to smb.conf
     echo "Adding share definition for: $username"
@@ -34,7 +34,7 @@ while IFS=':' read -r username password; do
 
 [$username]
    # Private share for $username
-   path = /mnt/$username
+   path = /mnt/cold/$username
 
    # Do not allow guest access to this share
    public = no
