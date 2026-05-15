@@ -176,8 +176,20 @@ def validate_file(file_path: Path) -> Tuple[Optional[Path], ProcessResult]:
     """Validate that file exists and is a regular file."""
     file_path = Path(file_path)
     if not file_path.is_file():
-        print(f"Not a file: {file_path}", file=sys.stderr)
-        return None, ProcessResult.FAILED
+        if not file_path.parent.exists():
+            reason = "parent directory does not exist"
+        elif file_path.is_symlink():
+            try:
+                target = os.readlink(file_path)
+            except OSError:
+                target = "<unreadable>"
+            reason = f"broken symlink -> {target}"
+        elif file_path.exists():
+            reason = "exists but is not a regular file"
+        else:
+            reason = "does not exist on disk"
+        print(f"Skipping ({reason}): {file_path!r}", file=sys.stderr)
+        return None, ProcessResult.SKIPPED
     return file_path, ProcessResult.SUCCESS
 
 
@@ -484,7 +496,9 @@ def convert_video(file_path: Path, output_path: Path, ffmpeg_flags: List[str],
             check=True
         )
         duration = int(time() - start_time)
-        print(f"✓ Successfully converted: {file_path} (with audio copy) in {duration}s")
+        msg = f"✓ Successfully converted: {file_path} (with audio copy) in {duration}s"
+        print(msg)
+        print(msg, file=sys.stderr)
         stats.processed += 1
         return True
     except subprocess.CalledProcessError:
@@ -510,7 +524,9 @@ def convert_video(file_path: Path, output_path: Path, ffmpeg_flags: List[str],
             check=True
         )
         duration = int(time() - start_time)
-        print(f"✓ Successfully converted: {file_path} (with AAC re-encoding) in {duration}s")
+        msg = f"✓ Successfully converted: {file_path} (with AAC re-encoding) in {duration}s"
+        print(msg)
+        print(msg, file=sys.stderr)
         stats.processed += 1
         return True
     except subprocess.CalledProcessError as e:
@@ -529,7 +545,7 @@ def process_file(file_path: Path, workdir: Path, stats: Statistics, corrupted_re
     # Validate file exists and is a regular file
     file_path, result = validate_file(file_path)
     if file_path is None:
-        stats.failed += 1
+        stats.skipped += 1
         return result
 
     # Validate extension is supported
