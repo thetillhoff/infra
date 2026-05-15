@@ -1,0 +1,20 @@
+name: stash-dev
+services:
+  stash:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: "no"
+    ports:
+      - "9999:9999"
+    environment:
+      - STASH_STASH=/data/
+      - STASH_GENERATED=/data/generated/
+      - STASH_METADATA=/data/metadata/
+      - STASH_CACHE=/data/cache/
+      - STASH_PORT=9999
+    volumes:
+      - ./dev-data/videos:/data
+      - ./dev-data/config:/root/.stash
+      # Mount plugins directly so edits take effect after a container restart
+      - ./plugins:/root/.stash/plugins

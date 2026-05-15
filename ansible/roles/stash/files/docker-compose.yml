@@ -28,6 +28,8 @@ services:
       ## Keep configs, scrapers, and plugins here.
 
       - /mnt/hot/stash/config:/root/.stash
+      - ./plugins/video-reencoder:/root/.stash/plugins/video-reencoder:ro
+      - ./plugins/duplicate-merger:/root/.stash/plugins/duplicate-merger:ro
       ## Point this at your collection.
       # - ./data:/data
       - /mnt/cold/public/videos:/data

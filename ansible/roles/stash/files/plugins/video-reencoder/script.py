@@ -310,11 +310,17 @@ def validate_video_info(
     return (codec_name, height, pix_fmt, bitrate, fps), ProcessResult.SUCCESS
 
 
-def should_skip_mp4(extension: str, height: int, codec_name: str, pix_fmt: str, fps: Optional[float]) -> bool:
-    """Check if MP4 file is already in desired format."""
-    if not (extension == "mp4" and height <= MAX_HEIGHT and codec_name == "h264"):
+ACCEPTABLE_CODECS = {"h264", "h265", "hevc"}
+
+
+def is_acceptable_format(extension: str, height: int, codec_name: str, fps: Optional[float]) -> bool:
+    """Check if file is already in acceptable format (h264 or h265/hevc, ≤1080p, ≤30fps in mp4)."""
+    if extension != "mp4":
         return False
-    # Also convert when FPS exceeds the target
+    if codec_name not in ACCEPTABLE_CODECS:
+        return False
+    if height > MAX_HEIGHT:
+        return False
     if fps is not None and fps > MAX_FPS:
         return False
     return True
@@ -583,9 +589,9 @@ def process_file(file_path: Path, workdir: Path, stats: Statistics, corrupted_re
 
     codec_name, height, pix_fmt, bitrate, fps = video_info
 
-    # Check if already in desired format (for MP4 files)
-    if should_skip_mp4(extension, height, codec_name, pix_fmt, fps):
-        print(f"  MP4 file already in desired format, skipping: {file_path}")
+    # Check if already in acceptable format (h264 or h265/hevc, ≤1080p, ≤30fps, mp4)
+    if is_acceptable_format(extension, height, codec_name, fps):
+        print(f"  File already in acceptable format, skipping: {file_path}")
         stats.skipped += 1
         return ProcessResult.SKIPPED
 

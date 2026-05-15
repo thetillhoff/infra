@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 
+ansible/roles/stash/files/dev-data/
+
 .terraform
 .terraform.lock.hcl
 *.gpg

@@ -1,0 +1,7 @@
+name: Duplicate Merger
+description: Rule-based duplicate scene merger. Picks the best-quality file as destination, previews merge direction, and executes in bulk.
+version: 0.1.0
+
+ui:
+  javascript:
+    - duplicate-merger.js
