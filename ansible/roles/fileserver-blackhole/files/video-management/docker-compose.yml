@@ -10,3 +10,7 @@ services:
     working_dir: /data
     environment:
       - PYTHONUNBUFFERED=1 # Ensure Python output is not buffered
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - video

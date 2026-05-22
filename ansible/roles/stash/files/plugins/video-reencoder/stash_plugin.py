@@ -116,6 +116,9 @@ def main() -> None:
 
     total = len(paths)
     for i, path in enumerate(paths, 1):
+        if _shutdown_requested:
+            print("Shutdown requested, stopping after current file.", flush=True)
+            break
         process_file(Path(path), WORKDIR, stats, corrupted_report)
         pct = i * 100 // total
         print(f"[{i}/{total}] {pct}% — converted: {stats.processed}, skipped: {stats.skipped}, failed: {stats.failed}", flush=True)
@@ -135,7 +138,7 @@ if __name__ == "__main__":
     sys.stdout = _Tee(sys.__stdout__, log_f)
     sys.stderr = _Tee(sys.__stderr__, log_f)
     try:
-        from script import process_file, Statistics, check_tools_available
+        from script import process_file, Statistics, check_tools_available, _shutdown_requested
         main()
     except Exception:
         tb = traceback.format_exc()
