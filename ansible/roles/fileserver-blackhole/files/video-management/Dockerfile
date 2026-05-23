@@ -42,10 +42,14 @@ RUN apt-get update && \
     LIBX265=$(apt-cache search '^libx265-[0-9]+$' | awk '{print $1}' | head -1) && \
     apt-get install -y --no-install-recommends \
         mesa-va-drivers \
+        libva2 \
+        libva-drm2 \
+        libdrm2 \
         "$LIBX264" \
         "$LIBX265" \
         libnuma1 \
         libvorbis0a \
+        libvorbisenc2 \
         libopus0 \
         python3 \
         python3-pip \
