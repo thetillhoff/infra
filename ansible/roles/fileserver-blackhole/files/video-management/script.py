@@ -269,8 +269,8 @@ def _strip_mp4_suffixes(stem: str) -> str:
 
 
 def get_temp_path(file_path: Path) -> Path:
-    """Return the in-progress transcode path. Dot-prefixed so it is hidden."""
-    return file_path.parent / f".{file_path.stem}.transcode.tmp.mp4"
+    """Return the in-progress transcode path."""
+    return file_path.parent / f"{file_path.stem}.tmp.mp4"
 
 
 def get_final_path(file_path: Path, extension: str) -> Path:
@@ -502,12 +502,17 @@ def finalize_output(original_path: Path, temp_path: Path, final_path: Path,
     print(f"  Original: {format_file_size(original_size)}  Output: {format_file_size(temp_size)}")
 
     if temp_size < original_size:
-        print(f"  {temp_path} -> {final_path}")
+        saved = format_file_size(original_size - temp_size)
+        if final_path == original_path:
+            print(f"  Replacing original with converted output (saved {saved})")
+        else:
+            print(f"  Saving as {final_path} (saved {saved})")
         _critical_replace(temp_path, final_path)
         # For non-mp4 sources the original has a different path; remove it now that
         # the HEVC mp4 is in place. This deletion is not critical — if interrupted,
         # the next run will skip (final_path exists) and leave original cleanup to the user.
         if final_path != original_path:
+            print(f"  Removing original {original_path}")
             original_path.unlink(missing_ok=True)
     else:
         print("  Output is not smaller — discarding converted file")
@@ -544,7 +549,7 @@ def convert_video(file_path: Path, temp_path: Path,
             success, err = _run_ffmpeg(cmd_base + enc_flags + audio_opt + ["-y", str(temp_path)])
             if success:
                 duration = int(time() - start_time)
-                print(f"✓ Converted: {file_path} ({label}) in {duration}s")
+                print(f"✓ Converted in {duration}s ({label})")
                 stats.processed += 1
                 return True
             if _shutdown_requested:
@@ -571,7 +576,7 @@ def process_file(file_path: Path, stats: Statistics, corrupted_report: Path,
         return ProcessResult.SKIPPED
 
     # Skip hidden temp files silently before printing a separator
-    if file_path.name.endswith(".transcode.tmp.mp4"):
+    if file_path.name.endswith(".tmp.mp4"):
         return ProcessResult.SKIPPED
 
     print(f"--- ({index}/{total}) ---")
@@ -645,7 +650,18 @@ def process_file(file_path: Path, stats: Statistics, corrupted_report: Path,
                 stats.skipped += 1
                 return ProcessResult.SKIPPED
 
-    print(f"Converting: {file_path} -> {temp_path}")
+    reasons = []
+    if extension != "mp4":
+        reasons.append(f"format ({extension}→mp4)")
+    if codec_name != TARGET_CODEC:
+        reasons.append(f"codec ({codec_name}→{TARGET_CODEC})")
+    if height > MAX_HEIGHT:
+        reasons.append(f"resolution ({height}p→{MAX_HEIGHT}p)")
+    if needs_fps_reduction and fps is not None:
+        reasons.append(f"fps ({fps:.2f}→{MAX_FPS})")
+    print(f"Converting {file_path}")
+    print(f"  to:     {temp_path}")
+    print(f"  reason: {', '.join(reasons) or 'unknown'}")
     hwdec_flags = build_ffmpeg_flags(height, fps, hwdec=True)
     swdec_flags = build_ffmpeg_flags(height, fps, hwdec=False)
 
@@ -707,7 +723,7 @@ def main() -> None:
         f for f in workdir.rglob("*")
         if f.is_file()
         and f.suffix.lstrip(".").lower() in SUPPORTED_EXTENSIONS
-        and not f.name.endswith(".transcode.tmp.mp4")
+        and not f.name.endswith(".tmp.mp4")
     ]
     total = len(files)
     print(f"Found {total} video files")
