@@ -25,6 +25,7 @@ const clusterDnsNames = [
   `link.${domain}`,
   `analytics.${domain}`,
   `pw.${domain}`,
+  `webscan.${domain}`,
   // "logs.thetillhoff.de",
 ];
 
