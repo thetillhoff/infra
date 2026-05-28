@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: redis:7.4.3 # {"$imagepolicy": "webscan:redis"}
+        image: redis:8.8.0 # {"$imagepolicy": "webscan:redis"}
         ports:
         - containerPort: 6379
         livenessProbe:
