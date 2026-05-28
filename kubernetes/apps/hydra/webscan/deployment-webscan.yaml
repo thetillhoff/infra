@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webscan
+spec:
+  selector:
+    matchLabels:
+      app: webscan
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: webscan
+      annotations:
+        kubernetes.io/egress-bandwidth: "10M"
+        kubernetes.io/ingress-bandwidth: "5M"
+    spec:
+      containers:
+      - name: webscan
+        image: ghcr.io/thetillhoff/webscan:5.0.0 # {"$imagepolicy": "webscan:webscan"}
+        ports:
+        - containerPort: 8080
+        args:
+        - --port=8080
+        - --redis-addr=redis:6379
+        - --max-concurrent-scans=2
+        - --max-queue-size=50
+        - --scan-timeout=30s
+        - --timeout=5s
+        livenessProbe:
+          httpGet:
+            port: 8080
+          initialDelaySeconds: 5

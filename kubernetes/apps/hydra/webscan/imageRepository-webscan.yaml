@@ -1,0 +1,7 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: webscan
+spec:
+  image: ghcr.io/thetillhoff/webscan
+  interval: 5m0s
