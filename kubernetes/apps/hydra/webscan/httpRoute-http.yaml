@@ -13,12 +13,8 @@ spec:
     - path:
         type: PathPrefix
         value: /
-    backendRefs:
-    - name: webscan
-      port: 80
-  # # Redirect to https:
-  # - filters:
-  #   - type: RequestRedirect
-  #     requestRedirect:
-  #       scheme: https
-  #       statusCode: 301
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: https
+        statusCode: 301
