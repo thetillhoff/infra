@@ -137,7 +137,10 @@ def get_video_info(file_path: Path) -> tuple[str | None, int | None, str | None,
             print(f"FFPROBE DURATION: {elapsed}s")
 
         data = json.loads(result.stdout)
-        stream = data.get("streams", [{}])[0]
+        streams = data.get("streams", [])
+        if not streams:
+            return None, None, None, None, None, None, f"No video stream found in: {file_path}"
+        stream = streams[0]
         fmt = data.get("format", {})
 
         codec_name = stream.get("codec_name", "")
