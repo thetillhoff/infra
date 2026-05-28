@@ -303,39 +303,34 @@ def rename_if_double_mp4(file_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 def estimate_output_size_increase(codec_name: str, height: int, bitrate: int | None,
-                                   file_size: int) -> bool:
+                                   file_size: int) -> tuple[bool, int | None]:
     """Estimate if output file will be larger than input.
 
-    Returns True if output is estimated to be larger, False if smaller.
+    Returns (will_be_larger, estimated_target_bitrate).
+    estimated_target_bitrate is None when the decision is not bitrate-based.
     """
     if bitrate is None:
-        if codec_name in ("hevc", "h265"):
-            return True  # Already HEVC; re-encoding adds generation loss without savings
-        if codec_name == "av1":
-            return True  # AV1 is more efficient than HEVC; converting would increase size
-        if codec_name == "h264" and height <= MAX_HEIGHT:
-            return False  # H.264 → HEVC saves ~40% at equivalent quality
-        return False
+        if codec_name in ("hevc", "h265", "av1"):
+            return True, None
+        return False, None
 
-    # Estimate target bitrate for HEVC at CQP 28 (~60% of H.264 CRF 23 at equivalent quality)
-    if height > MAX_HEIGHT:
-        estimated_target_bitrate = 2_500_000  # ~2.5 Mbps for output scaled to MAX_HEIGHT
-    elif height > 720:
-        estimated_target_bitrate = 2_200_000
-    elif height > 480:
-        estimated_target_bitrate = 1_500_000
-    else:
-        estimated_target_bitrate = 900_000
+    # Output height is capped at MAX_HEIGHT because we scale down before encoding.
+    output_height = min(height, MAX_HEIGHT)
 
     if codec_name in ("hevc", "h265"):
-        # Already HEVC; re-encoding at same settings adds overhead
+        # Re-encoding HEVC at the same CQP adds ~10% generation loss with no efficiency gain.
         estimated_target_bitrate = int(bitrate * 1.1)
-    elif codec_name == "av1":
-        # AV1 is more efficient than HEVC; HEVC output will need more bits
-        estimated_target_bitrate = int(estimated_target_bitrate * 1.15)
-    # h264 and other less-efficient codecs: no adjustment needed
+    else:
+        # Power-law model for HEVC CQP 28 typical content, calibrated at two points:
+        #   480p → ~600 kbps, 1080p → ~2.0 Mbps (exponent 1.5 sits between linear-height
+        #   and pixel-area scaling, reflecting HEVC's improved efficiency at higher resolutions).
+        # Continuous examples: 240p→212kbps, 360p→390kbps, 720p→1.1Mbps, 1080p→2.0Mbps
+        estimated_target_bitrate = int(600_000 * (output_height / 480) ** 1.5)
+        if codec_name == "av1":
+            # AV1 is ~15% more efficient than HEVC; the HEVC output needs proportionally more bits.
+            estimated_target_bitrate = int(estimated_target_bitrate * 1.15)
 
-    return bitrate < estimated_target_bitrate
+    return bitrate < estimated_target_bitrate, estimated_target_bitrate
 
 
 def should_skip_mp4(extension: str, height: int, codec_name: str, fps: float | None) -> bool:
@@ -515,7 +510,15 @@ def finalize_output(original_path: Path, temp_path: Path, final_path: Path,
             print(f"  Removing original {original_path}")
             original_path.unlink(missing_ok=True)
     else:
-        print("  Output is not smaller — discarding converted file")
+        if source_duration:
+            src_mbps = original_size * 8 / source_duration / 1_000_000
+            out_mbps = temp_size * 8 / source_duration / 1_000_000
+            print(
+                f"  Output is not smaller — discarding "
+                f"(source: {source_height}p, {src_mbps:.2f} Mbps → output: {out_mbps:.2f} Mbps)"
+            )
+        else:
+            print(f"  Output is not smaller — discarding (source: {source_height}p, duration unknown)")
         temp_path.unlink(missing_ok=True)
 
 
@@ -639,12 +642,13 @@ def process_file(file_path: Path, stats: Statistics, corrupted_report: Path,
     if not needs_fps_reduction:
         file_size = get_file_size(file_path)
         if file_size is not None:
-            will_be_larger = estimate_output_size_increase(codec_name, height, bitrate, file_size)
+            will_be_larger, est_target = estimate_output_size_increase(codec_name, height, bitrate, file_size)
             if will_be_larger:
                 bitrate_str = f"{bitrate/1_000_000:.2f} Mbps" if bitrate else "unknown"
+                est_str = f", est. output: {est_target/1_000_000:.2f} Mbps" if est_target else ""
                 print(
                     f"  Skipping: output estimated larger "
-                    f"(codec: {codec_name}, bitrate: {bitrate_str})",
+                    f"(codec: {codec_name}, {height}p, source: {bitrate_str}{est_str})",
                 )
                 rename_if_double_mp4(file_path)
                 stats.skipped += 1
