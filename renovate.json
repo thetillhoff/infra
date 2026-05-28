@@ -143,13 +143,6 @@
   ],
   "packageRules": [
     {
-      "matchDepNames": [
-        "kubernetes/kubernetes",
-        "siderolabs/talos"
-      ],
-      "automerge": false
-    },
-    {
       "matchUpdateTypes": [
         "minor",
         "patch",
@@ -164,6 +157,13 @@
     {
       "matchUpdateTypes": [
         "major"
+      ],
+      "automerge": false
+    },
+    {
+      "matchDepNames": [
+        "kubernetes/kubernetes",
+        "siderolabs/talos"
       ],
       "automerge": false
     }

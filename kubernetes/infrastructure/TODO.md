@@ -69,3 +69,8 @@ https://beszel.dev/
 - gpu usage, temp, memory, power draw
 - mount changes
 - no data for either of the others
+
+---
+
+cilium:
+- cluster mesh
