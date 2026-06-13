@@ -4,7 +4,7 @@ all:
       hosts:
         blackhole:
           # Use mDNS/FQDN for SSH, while keeping inventory name for local match.
-          ansible_host: blackhole.local
+          ansible_host: blackhole.lan
           # If controller short hostname matches this inventory host, run locally.
           # Otherwise connect remotely over SSH.
           ansible_connection: "{{ 'local' if lookup('pipe', 'hostname -s') == inventory_hostname else 'ssh' }}"

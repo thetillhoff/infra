@@ -57,15 +57,15 @@ services:
       - source: Caddyfile
         target: /etc/caddy/Caddyfile
     #command: caddy reverse-proxy --internal-certs --from blackhole.deer-alphard.ts.net --to stash
-    #command: caddy reverse-proxy --internal-certs --from blackhole.local --to stash
-    #command: caddy reverse-proxy --internal-certs --from blackhole.local --from blackhole.deer-alphard.ts.net --to stash
+    #command: caddy reverse-proxy --internal-certs --from blackhole.lan --to stash
+    #command: caddy reverse-proxy --internal-certs --from blackhole.lan --from blackhole.deer-alphard.ts.net --to stash
     volumes:
       - /etc/localtime:/etc/localtime:ro
 
 configs:
   Caddyfile:
     content: |
-      blackhole.local {
+      blackhole.lan {
         reverse_proxy stash
         tls internal
       }
