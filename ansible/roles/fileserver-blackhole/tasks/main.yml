@@ -50,6 +50,12 @@
     port: 445
     proto: tcp
 
+# Stop container before rebuilding to ensure port 445 is released
+- community.docker.docker_compose_v2:
+    project_src: "{{ role_path }}/files/"
+    state: stopped
+  ignore_errors: true
+
 # Start container
 - community.docker.docker_compose_v2:
     project_src: "{{ role_path }}/files/"
