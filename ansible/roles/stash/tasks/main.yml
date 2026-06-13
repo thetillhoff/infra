@@ -1,6 +1,6 @@
 
 # Start container — build: always ensures the Python3 layer is present
 - community.docker.docker_compose_v2:
-    project_src: "./infra/ansible/roles/{{ role_path | basename }}/files/"
+    project_src: "{{ role_path }}/files/"
     remove_orphans: true
     build: always
