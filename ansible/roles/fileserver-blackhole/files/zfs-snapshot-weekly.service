@@ -1,0 +1,6 @@
+[Unit]
+Description=Weekly ZFS snapshot
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/zfs-weekly-snapshot.sh

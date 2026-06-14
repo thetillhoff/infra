@@ -44,6 +44,23 @@
       # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
       #-o casesensitivity=mixed -o nbmand=on
 
+# Weekly ZFS snapshots (keep last 8)
+- copy:
+    src: zfs-weekly-snapshot.sh
+    dest: /usr/local/bin/zfs-weekly-snapshot.sh
+    mode: '0755'
+- copy:
+    src: zfs-snapshot-weekly.service
+    dest: /etc/systemd/system/zfs-snapshot-weekly.service
+- copy:
+    src: zfs-snapshot-weekly.timer
+    dest: /etc/systemd/system/zfs-snapshot-weekly.timer
+- systemd:
+    name: zfs-snapshot-weekly.timer
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
 # Allow SMB port/s
 - ufw: # allow connections to port
     rule: allow
