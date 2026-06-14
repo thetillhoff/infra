@@ -15,7 +15,7 @@ services:
       - STASH_GENERATED=/generated/
       - STASH_METADATA=/metadata/
       - STASH_CACHE=/cache/
-      - STASH_BACKUP_DIRECTORY_PATH=/backups/
+      - STASH_BLOBS=/blobs/
       ## Adjust below to change default port (9999)
       - STASH_PORT=80
     # user: ${UID}:${GID}
