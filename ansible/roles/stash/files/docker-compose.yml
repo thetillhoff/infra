@@ -15,6 +15,7 @@ services:
       - STASH_GENERATED=/generated/
       - STASH_METADATA=/metadata/
       - STASH_CACHE=/cache/
+      - STASH_BACKUP_DIRECTORY_PATH=/backups/
       ## Adjust below to change default port (9999)
       - STASH_PORT=80
     # user: ${UID}:${GID}
@@ -41,6 +42,8 @@ services:
       - /mnt/hot/stash/blobs:/blobs
       ## Where to store generated content (screenshots,previews,transcodes,sprites)
       - /mnt/hot/stash/generated:/generated
+      ## Where to store automatic database backups
+      - /mnt/hot/stash/backups:/backups
 
   caddy:
     image: caddy:2.11.4@sha256:cfeb0b281bc44a5a51fecde39e9e577c60d863c0b6196e6bbdf58fd00960887f
