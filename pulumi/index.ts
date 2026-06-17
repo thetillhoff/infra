@@ -75,6 +75,33 @@ const nodegroups = new HcloudTalosNodegroups(
       hcloudServerType: "cx33", // amd64
       cloudflareZoneId: cloudflareZoneId,
     },
+    "hcloud-talos-v1-13-4-controlplane": {
+      nodeCount: 3,
+      clusterName: k8sClusterName,
+      clusterEndpointDomain: k8sClusterEndpointDomain,
+      clusterDnsNames: clusterDnsNames,
+      talosSecrets: talosSecrets,
+      machineType: "controlplane",
+      kubernetesVersion: versions.kubernetes,
+      configPatches: [
+        readFileSync(
+          join(
+            __dirname,
+            "hcloud-talos-nodegroup-component",
+            "configPatches",
+            "talos-v1-13-4-controlplane-patch.yaml",
+          ),
+          "utf8",
+        ),
+      ],
+
+      hcloudLocation: "nbg1",
+
+      hcloudImageId: "398555717",
+      // hcloudServerType: "cax21", // arm64
+      hcloudServerType: "cx33", // amd64
+      cloudflareZoneId: cloudflareZoneId,
+    },
   },
   {},
 );
