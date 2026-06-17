@@ -1,10 +1,16 @@
-# How to upgrade the kubernetes version and installed apps
+# How to upgrade the Kubernetes version and installed apps
 
-- Go into `pulumi/index.ts`, and check out the versions there. Each one has a link in a comment next to it, where you can find the latest versions. Replace them as desired and make sure to read the changelogs.
+## Kubernetes
 
-- Run `task upgrade-k8s -- <version>`. Although this uses a specific node, it upgrades the whole cluster.
+- Run `task upgrade-k8s -- <version>` (targets a random controlplane node but upgrades the whole cluster).
+- Update `versions.kubernetes` in `pulumi/index.ts` to match.
+- Run `task deploy` to ensure no drift.
 
-- Run `task deploy`. This will
+## Other versions (Cilium, FluxOperator, Flux, Gateway API CRDs)
 
+- Check latest versions via the links in comments next to each version in `pulumi/index.ts`.
+- Read changelogs before bumping.
+- Update the values in `pulumi/index.ts`.
+- Run `task deploy`.
 
-Copy the new kubernetes version into `pulumi/index.ts` and run `task deploy` to ensure there's no drift.
+  > **Helm repo error:** If deploy fails with `unable to locate chart: no cached repo found`, run `helm repo add cilium https://helm.cilium.io/ && helm repo update`, then retry.

@@ -1,68 +1,71 @@
 # How to upgrade talos nodegroups
 
-## 0. Log in to Cloud Provider and check that new instances are available
+## 0. Prerequisites
 
-If not, you can upgrade in-place with this command:
+- Log in to Hetzner Cloud and verify new instances of the desired type are available.
+- Ensure Longhorn volumes are healthy before proceeding (check again in step 4):
+
+  ```sh
+  kubectl get volumes.longhorn.io -n longhorn -o custom-columns='NAME:.metadata.name,REPLICAS:.spec.numberOfReplicas,ROBUSTNESS:.status.robustness'
+  ```
+
+  All volumes must show `healthy` before draining any node.
+
+If in-place upgrade is preferred over blue/green:
 
 ```sh
-# update the versin tag. The config hash should stay the same, but can be compared to the current ones in the `packer/` config.
-# foreach node
-talosctl upgrade --n <node-ip> --preserve --image factory.talos.dev/hcloud-installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.12.6
+# Update the version tag. Config hash should stay the same.
+# Run for each node:
+talosctl upgrade -n <node-ip> --preserve --image factory.talos.dev/hcloud-installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.12.6
 ```
 
-Can the upgrade process be observed?
-Yes, using the `talosctl dmesg -f` command. You can also use `talosctl upgrade --wait`, and optionally `talosctl upgrade --wait --debug` to observe kernel logs.
+Monitor with `talosctl dmesg -f` or `talosctl upgrade --wait --debug`.
 
-## Check available Talos versions
+Check available Talos versions: <https://github.com/siderolabs/talos/releases/latest>
 
-<https://github.com/siderolabs/talos/releases/latest>
+Check compatibility with Kubernetes versions: <https://docs.siderolabs.com/talos/v1.11/getting-started/support-matrix>
 
-## Check compatibility with kubernetes versions
+## 1. Build new Talos image via packer
 
-<https://docs.siderolabs.com/talos/v1.11/getting-started/support-matrix>
-
-## 1. Build new talos image via packer
-
-- Update the `talos_version` in the `*pkrvars.hcl` files in the `packer/` folder.
-- Build new images for the desired architecture with `task build ARCH=arm64 HCLOUD_TOKEN=...`.
+- Update `talos_version` and `image_id` in `packer/common.pkrvars.hcl` (shared by all arch-specific files).
+- Build new images: `task build ARCH=amd64` (HCLOUD_TOKEN is auto-sourced from pulumi config).
+- Note the HCloud snapshot ID from the build output.
 
 ## 2. Create a new nodegroup
 
-- Add a new nodegroup in the `pulumi/index.ts`. It should reference the new image ID that was build with packer.
-  Make sure all the other parameters match. For example location and instance type.
-- Create a new patchfile for the new nodegroup in `pulumi/hcloud-talos-nodegroup-component/configPatches/<name>.yaml`.
-- Run `task deploy`, verify only additions happen, then approve the changes.
-- Connect to one of the nodes and read the logs. Check for any errors.
+- Add a new nodegroup in `pulumi/index.ts` referencing the new snapshot ID.
+- Create a patchfile in `pulumi/hcloud-talos-nodegroup-component/configPatches/<name>.yaml` (copy from previous nodegroup).
+- Run `npm install` in `pulumi/` first if `@pulumiverse/talos` was also bumped (stale node_modules cause wrong plugin version).
+- Run `task deploy`. The preview should show only additions for the new nodegroup.
+
+  > **Note:** If `@pulumiverse/talos` was bumped, the deploy will show a cascade: `talosSecrets update → kubernetesProvider replace → 71 k8s resource deletes` (Cilium, FluxCD, Gateway CRDs). These deletes are real — there will be a ~2-5 min networking gap while Cilium restarts. FluxCD reconciles everything back within minutes. Talos nodes and etcd are unaffected. The `clusterIdentifier` in the provider config mitigates this for future bumps, but not the first one after adding it.
+  >
+  > **Helm repo error:** If `task deploy` fails with `unable to locate chart: no cached repo found`, run `helm repo add cilium https://helm.cilium.io/ && helm repo update`, then re-run `task deploy`.
 
 ## 3. Make the new nodegroup the primary one
 
-- In the `pulumi/index.ts`, change the primary nodegroup to the new one.
-- Run `task deploy`, even if no resources are changed. Otherwise `task configure-files` will not find use the new nodegroup.
-- Run `task configure-files`.
-- Run `task configure-env | source /dev/stdin` to set the talosconfig and kubeconfig paths.
+- In `pulumi/index.ts`, update `primaryControlplaneNodegroupName` to the new nodegroup name.
+- Run `task deploy` (even with no resource changes — needed so pulumi outputs reflect the new primary).
+- Run `task configure-files` to write updated talosconfig/kubeconfig.
+- Run `task configure-env | source /dev/stdin` to set env vars.
 
-## 4. Remove nodes from kubernetes
+## 4. Remove old nodes from Kubernetes
 
-- Run `kubectl get nodes -owide` to double check which nodes to remove.
-- Run `task delete-nodes -- <nodename>` to remove the old ones.
-  Or (tested last times)
+- Verify Longhorn volumes are all `healthy` (see step 0).
+- Verify which nodes to remove: `kubectl get nodes -owide`
+- Run `task delete-nodes -- <nodename1> <nodename2> <nodename3>`
 
-  ```sh
-  kubectl get nodes -owide
-  kubectl drain --ignore-daemonsets --delete-emptydir-data <nodename>
-  # Verify that there is nothing important running on the node any more, especially pvcs and pvs!
-  kubectl delete node nodename
-  ```
+  The task cordons all nodes first (no new scheduling), then for each: drains pods gracefully, resets Talos, and removes the node from Kubernetes.
 
-Please note, that at this point, the nodes are shutdown, but still listed in DNS. Continue with the next step to fix this.
+  > The servers are now shut down but still listed in DNS. Step 5 removes the DNS records.
 
-## 5. Remove nodes
+## 5. Remove the old nodegroup
 
-- Remove the old nodegroup from the `pulumi/index.ts`.
-- Run `task deploy`, verify only the old nodes are removed, then approve and deploy.
+- Remove the old nodegroup from `pulumi/index.ts`.
+- Run `task deploy` — verify only the old nodes and their DNS records are removed, then approve.
 
 ## 6. Cleanup
 
-- Remove the `pulumi/hcloud-talos-nodegroup-component/configPatches/<name>.yaml` patchfile of the old nodegroup.
-- Commit the changes to the codebase and push.
+- Remove the old patchfile from `pulumi/hcloud-talos-nodegroup-component/configPatches/`.
+- Commit and push all changes.
 - Check the pipeline for errors.
