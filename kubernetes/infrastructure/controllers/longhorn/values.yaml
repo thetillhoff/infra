@@ -21,10 +21,10 @@ persistence: # default storage class
   csi.storage.k8s.io/node-expand-secret-name: "crypt-secret"
   csi.storage.k8s.io/node-expand-secret-namespace: "longhorn"
 csi:
-  attacherReplicaCount: 1
-  provisionerReplicaCount: 1
-  resizerReplicaCount: 1
-  snapshotterReplicaCount: 1
+  attacherReplicaCount: 2
+  provisionerReplicaCount: 2
+  resizerReplicaCount: 2
+  snapshotterReplicaCount: 2
 longhornUI:
   replicas: 1
 defaultSettings:
