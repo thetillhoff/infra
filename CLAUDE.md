@@ -103,3 +103,22 @@ Longhorn for persistent volumes in Kubernetes. Bare-metal ZFS on `blackhole` (ma
 ### Versions
 
 Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator, flux) are centralized in `pulumi/index.ts`.
+
+## Known Pulumi Pitfalls
+
+### @pulumiverse/talos provider bump triggers kubernetes cascade
+
+When `@pulumiverse/talos` is upgraded (e.g. via Renovate), run `npm install` in `pulumi/` **before** `pulumi up`. Without it, node_modules is stale and pulumi uses the wrong plugin version.
+
+Even after `npm install`, any `@pulumiverse/talos` version bump causes this cascade in `pulumi preview`:
+
+```text
+talosSecrets update [diff: ]          ← provider re-registers resource (values unchanged)
+  → talosKubeconfig update            ← kubeconfig re-evaluated with new provider
+    → kubernetesProvider replace      ← kubeconfig serialization differs between versions
+      → all kubernetes resources delete + recreate
+```
+
+The deletes are real — Cilium, FluxOperator, Gateway CRDs get removed from the cluster. FluxCD reconciles them back within minutes, but there is a networking gap while Cilium restarts.
+
+**Before deploying after a talos provider bump:** confirm you understand the cascade and have a window for brief cluster disruption. The cluster itself (Talos nodes, etcd) is unaffected.
