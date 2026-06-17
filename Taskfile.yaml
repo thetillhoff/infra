@@ -75,6 +75,9 @@ tasks:
     cmds:
       - for:
           var: CLI_ARGS
+        cmd: kubectl cordon '{{ .ITEM }}'
+      - for:
+          var: CLI_ARGS
         task: delete-node
         vars:
           CLI_ARGS: '{{ .ITEM }}'
@@ -93,6 +96,7 @@ tasks:
         sh: talosctl version -n '{{ .NODE_IP }}'
     cmds:
       - |
+        kubectl drain '{{ .NODE_NAME }}' --ignore-daemonsets --delete-emptydir-data
         talosctl -n '{{ .NODE_IP }}' reset --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL
         kubectl delete node '{{ .NODE_NAME }}'
         echo 'You can shutdown the server now.'
