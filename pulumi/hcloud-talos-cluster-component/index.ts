@@ -77,6 +77,9 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
       "kubernetesProvider",
       {
         kubeconfig: talosKubeconfig.kubeconfigRaw,
+        // Stable identifier prevents provider replacement (and cascade k8s resource deletes)
+        // when @pulumiverse/talos bumps cause kubeconfigRaw to appear "computed" during preview.
+        clusterIdentifier: "hydra",
       },
       {
         parent: this,
