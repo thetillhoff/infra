@@ -5,8 +5,9 @@ server:
     scrape_interval: 15s
   persistentVolume:
     enabled: true
-    size: 5Gi
+    size: 10Gi
   retention: "15d"
+  retentionSize: "9GB"
   extraFlags:
     - web.enable-remote-write-receiver
 
