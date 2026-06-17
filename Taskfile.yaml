@@ -5,22 +5,24 @@ silent: true
 
 tasks:
   build:
-    desc: "Build hcloud image for talos. Example usage: task build ARCH=amd64 HCLOUD_TOKEN=..."
+    desc: "Build hcloud image for talos. Example usage: task build ARCH=amd64"
     dir: 'packer'
+    vars:
+      HCLOUD_TOKEN:
+        sh: 'cd {{.TASKFILE_DIR}}/pulumi && pulumi config get hcloud:token 2>/dev/null'
     cmds:
       - |
-        docker run --rm -it \
+        docker run --rm \
         --entrypoint=/bin/sh \
         -v $(pwd):/packer:z \
         -w /packer \
         docker.io/hashicorp/packer:light-1.15.1 \
         -c \
-        "export PKR_VAR_HCLOUD_TOKEN={{ .HCLOUD_TOKEN }} && packer init . && packer build -var-file={{ .ARCH }}.pkrvars.hcl talos-on-hcloud.pkr.hcl"
+        "export PKR_VAR_HCLOUD_TOKEN={{ .HCLOUD_TOKEN }} && packer init . && packer build -var-file=common.pkrvars.hcl -var-file={{ .ARCH }}.pkrvars.hcl talos-on-hcloud.pkr.hcl"
     requires:
       vars:
         - name: ARCH
           enum: [amd64, arm64]
-        - HCLOUD_TOKEN
 
   deploy:
     desc: "Deploy pulumi stack. Example usage: task deploy"
