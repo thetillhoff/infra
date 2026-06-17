@@ -21,6 +21,7 @@ persistence: # default storage class
   csi.storage.k8s.io/node-expand-secret-name: "crypt-secret"
   csi.storage.k8s.io/node-expand-secret-namespace: "longhorn"
 csi:
+  # 2 replicas required: single-replica + minAvailable PDB causes deadlock during node drain
   attacherReplicaCount: 2
   provisionerReplicaCount: 2
   resizerReplicaCount: 2
