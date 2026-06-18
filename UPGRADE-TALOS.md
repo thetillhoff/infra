@@ -55,14 +55,16 @@ Check compatibility with Kubernetes versions: <https://docs.siderolabs.com/talos
 - Verify which nodes to remove: `kubectl get nodes -owide`
 - Run `task delete-nodes -- <nodename1> <nodename2> <nodename3>`
 
-  The task cordons all nodes first (no new scheduling), then for each: drains pods gracefully, resets Talos, and removes the node from Kubernetes.
+  The task cordons all nodes first (no new scheduling), then for each: drains pods gracefully, resets Talos (`--wait=false` avoids a false-positive exit code when the node goes unreachable), and removes the node from Kubernetes.
 
-  > The servers are now shut down but still listed in DNS. Step 5 removes the DNS records.
+  > **If the task exits early:** `talosctl reset` may still have succeeded even if the task failed. Check `kubectl get nodes` — if the node is `NotReady`, the reset worked. Manually run `kubectl delete node <name>` and re-run `task delete-nodes` for the remaining nodes.
+  >
+  > **Longhorn CSI PDB deadlock:** If drain is stuck on `csi-attacher` or `csi-provisioner` with PDB violations, the Longhorn values.yaml sets `attacherReplicaCount: 2` etc. to prevent this. If it still happens (e.g. first deploy after changing from 1 to 2), temporarily scale up: `kubectl scale deployment -n longhorn csi-attacher csi-provisioner --replicas=2`.
 
 ## 5. Remove the old nodegroup
 
 - Remove the old nodegroup from `pulumi/index.ts`.
-- Run `task deploy` — verify only the old nodes and their DNS records are removed, then approve.
+- Run `task deploy` — Pulumi deletes the HCloud servers and DNS records. No manual deletion in Hetzner console needed.
 
 ## 6. Cleanup
 
