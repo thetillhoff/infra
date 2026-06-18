@@ -2,7 +2,12 @@
 
 ## Kubernetes
 
+- Check the changelog for breaking changes for each minor version between current and target:
+  `https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-<major>.<minor>.md`
+- Check the Talos support matrix to confirm the target version is supported:
+  `https://www.talos.dev/v<talos-version>/introduction/support-matrix/`
 - Run `task upgrade-k8s -- <version>` (targets a random controlplane node but upgrades the whole cluster).
+- Verify all nodes are on the new version: `kubectl get nodes`
 - Update `versions.kubernetes` in `pulumi/index.ts` to match.
 - Run `task deploy` to ensure no drift.
 
