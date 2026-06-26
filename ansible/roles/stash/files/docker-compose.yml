@@ -68,7 +68,7 @@ services:
 configs:
   Caddyfile:
     content: |
-      blackhole.lan {
+      blackhole.lan, blackhole.deer-alphard.ts.net {
         reverse_proxy stash
         tls internal
       }
