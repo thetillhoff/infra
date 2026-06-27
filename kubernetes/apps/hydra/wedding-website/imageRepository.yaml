@@ -1,0 +1,9 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: wedding-website
+spec:
+  image: ghcr.io/thetillhoff/wedding-website
+  interval: 5m0s
+  secretRef:
+    name: ghcr-pull

@@ -1,0 +1,13 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: wedding-website
+spec:
+  imageRepositoryRef:
+    name: wedding-website
+  filterTags:
+    pattern: '^(?P<run>[0-9]+)$'
+    extract: '$run'
+  policy:
+    numerical:
+      order: asc

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wedding-website
+spec:
+  selector:
+    matchLabels:
+      app: wedding-website
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wedding-website
+    spec:
+      imagePullSecrets:
+      - name: ghcr-pull
+      containers:
+      - name: wedding-website
+        image: ghcr.io/thetillhoff/wedding-website:1-placeholder # {"$imagepolicy": "wedding-website:wedding-website"}
+        ports:
+        - containerPort: 80
+        env:
+        - name: WEDDING_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wedding-password
+              key: password
+        - name: DB_PATH
+          value: /data/wedding.db
+        livenessProbe:
+          httpGet:
+            port: 80
+            path: /healthz
+          initialDelaySeconds: 5
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: wedding-website-data
