@@ -23,6 +23,13 @@ spec:
         image: ghcr.io/thetillhoff/wedding-website:4 # {"$imagepolicy": "wedding-website:wedding-website"}
         ports:
         - containerPort: 80
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
         env:
         - name: WEDDING_PASSWORD
           valueFrom:
