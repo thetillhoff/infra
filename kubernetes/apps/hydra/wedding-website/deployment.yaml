@@ -16,7 +16,7 @@ spec:
       - name: ghcr-pull
       containers:
       - name: wedding-website
-        image: ghcr.io/thetillhoff/wedding-website:1-placeholder # {"$imagepolicy": "wedding-website:wedding-website"}
+        image: ghcr.io/thetillhoff/wedding-website:3 # {"$imagepolicy": "wedding-website:wedding-website"}
         ports:
         - containerPort: 80
         env:
