@@ -4,7 +4,9 @@ namespace: wedding-website
 resources:
 - namespace.yaml
 - ghcr-pull.secret.yaml
+- wedding-password.secret.yaml
 
+- pvc.yaml
 - deployment.yaml
 - service.yaml
 - httpRoute-http.yaml
