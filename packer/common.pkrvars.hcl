@@ -1,4 +1,4 @@
-talos_version = "v1.13.4"
+talos_version = "v1.13.5"
 
 # Talos image for longhorn from https://factory.talos.dev/?arch=amd64&cmdline-set=true&extensions=-&extensions=siderolabs%2Fiscsi-tools&extensions=siderolabs%2Futil-linux-tools&platform=hcloud&target=cloud&version=1.10.3
 # extensions: siderolabs/iscsi-tools, siderolabs/util-linux-tools
