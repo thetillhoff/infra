@@ -12,6 +12,8 @@ spec:
       labels:
         app: wedding-website
     spec:
+      securityContext:
+        fsGroup: 65532
       imagePullSecrets:
       - name: ghcr-pull
       containers:
