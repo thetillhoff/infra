@@ -1,0 +1,178 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: autotrades.trading.thetillhoff.de
+spec:
+  group: trading.thetillhoff.de
+  names:
+    kind: AutoTrade
+    plural: autotrades
+    singular: autotrade
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required: ["strategyConfig"]
+              properties:
+                enabled: {type: boolean, default: false}
+                strategyConfig: {type: string}
+                preloadOnDeploy: {type: boolean, default: false}
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dataupdates.trading.thetillhoff.de
+spec:
+  group: trading.thetillhoff.de
+  names:
+    kind: DataUpdate
+    listKind: DataUpdateList
+    plural: dataupdates
+    singular: dataupdate
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                requestedAt: {type: string}
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: gridsearches.trading.thetillhoff.de
+spec:
+  group: trading.thetillhoff.de
+  names:
+    kind: GridSearch
+    listKind: GridSearchList
+    plural: gridsearches
+    singular: gridsearch
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required: ["configs"]
+              properties:
+                configs:
+                  type: array
+                  items:
+                    type: string
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: strategyconfigs.trading.thetillhoff.de
+spec:
+  group: trading.thetillhoff.de
+  names:
+    kind: StrategyConfig
+    listKind: StrategyConfigList
+    plural: strategyconfigs
+    singular: strategyconfig
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: strategyconfigresults.trading.thetillhoff.de
+spec:
+  group: trading.thetillhoff.de
+  names:
+    kind: StrategyConfigResult
+    listKind: StrategyConfigResultList
+    plural: strategyconfigresults
+    singular: strategyconfigresult
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                gridSearch: {type: string}
+                period: {type: string}
+                alpha: {type: number}
+                winRate: {type: number}
+                totalTrades: {type: integer}
+                avgExposurePct: {type: number}
+                stressedAlphaBase: {type: number}
+                stressedAlphaMedium: {type: number}
+                stressedAlphaSevere: {type: number}
+                stressGatePassed: {type: boolean}
+                completedAt: {type: string}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: taskplans.trading.thetillhoff.de
+spec:
+  group: trading.thetillhoff.de
+  names:
+    kind: TaskPlan
+    listKind: TaskPlanList
+    plural: taskplans
+    singular: taskplan
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true

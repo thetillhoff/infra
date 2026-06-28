@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trading-operator
+  namespace: trading
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trading-operator
+  template:
+    metadata:
+      labels:
+        app: trading-operator
+    spec:
+      serviceAccountName: trading-operator
+      imagePullSecrets:
+        - name: ghcr-creds
+      containers:
+        - name: operator
+          image: ghcr.io/thetillhoff/trading-operator:latest
+          command: ["python", "-m", "trading_operator"]
+          env:
+            - name: WORKER_IMAGE
+              value: ghcr.io/thetillhoff/trading-worker:latest
+            - name: PVC_NAME
+              value: trading-data
+            - name: NAMESPACE
+              value: trading
+            - name: POSTGRES_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: trading-postgres
+                  key: dsn
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
