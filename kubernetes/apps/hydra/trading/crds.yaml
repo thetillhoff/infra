@@ -56,6 +56,10 @@ spec:
               type: object
               properties:
                 requestedAt: {type: string}
+                instruments:
+                  type: array
+                  items:
+                    type: string
             status:
               type: object
               x-kubernetes-preserve-unknown-fields: true
