@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: trading-operator
+  namespace: trading
+spec:
+  image: ghcr.io/thetillhoff/trading-operator
+  interval: 5m0s
+  secretRef:
+    name: ghcr-creds

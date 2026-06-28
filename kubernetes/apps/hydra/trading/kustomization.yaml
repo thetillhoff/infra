@@ -18,6 +18,12 @@ resources:
 - httpRoute-http.yaml
 - httpRoute-https.yaml
 
-- imageRepository.yaml
-- imagePolicy.yaml
+- imageRepository-backend.yaml
+- imageRepository-frontend.yaml
+- imageRepository-operator.yaml
+- imageRepository-worker.yaml
+- imagePolicy-backend.yaml
+- imagePolicy-frontend.yaml
+- imagePolicy-operator.yaml
+- imagePolicy-worker.yaml
 - imageUpdateAutomation.yaml

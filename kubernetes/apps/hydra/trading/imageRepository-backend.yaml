@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: trading-backend
+  namespace: trading
+spec:
+  image: ghcr.io/thetillhoff/trading-backend
+  interval: 5m0s
+  secretRef:
+    name: ghcr-creds
