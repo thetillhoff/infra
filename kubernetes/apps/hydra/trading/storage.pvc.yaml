@@ -7,6 +7,9 @@ spec:
   accessModes:
     - ReadWriteMany
   storageClassName: longhorn
+  # 30Gi (not 50): holds only configs + compute cache (market prices live in the
+  # postgres PVC). 50Gi couldn't schedule 2 RWX replicas under hard anti-affinity —
+  # only 1 of 3 ready Longhorn nodes had >=50Gi free. 30Gi fits all three.
   resources:
     requests:
-      storage: 50Gi
+      storage: 30Gi
