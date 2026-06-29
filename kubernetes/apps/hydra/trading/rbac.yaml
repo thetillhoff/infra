@@ -18,6 +18,8 @@ rules:
       - strategyconfigresults
       - dataupdates
       - dataupdates/status
+      - autotrades
+      - autotrades/status
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   - apiGroups: ["batch"]
     resources: ["jobs", "jobs/status"]
