@@ -8,6 +8,9 @@ resources:
 
 - crds.yaml
 - rbac.yaml
+- serviceAccount-trading-worker.yaml
+- role-trading-worker.yaml
+- roleBinding-trading-worker.yaml
 - storage.pvc.yaml
 
 - postgres.yaml

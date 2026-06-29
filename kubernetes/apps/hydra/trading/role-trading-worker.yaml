@@ -1,0 +1,26 @@
+# Planning/eval/data Jobs run under this SA. Mirrors k8s/worker/serviceaccount.yaml
+# in the trading repo (was never ported to infra; Jobs fail FailedCreate without it).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: trading-worker
+  namespace: trading
+rules:
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["strategyconfigs"]
+    verbs: ["get", "list", "create"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["gridsearches"]
+    verbs: ["get"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["gridsearches/status"]
+    verbs: ["patch"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["dataupdates"]
+    verbs: ["get", "create"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["dataupdates/status"]
+    verbs: ["patch"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["taskplans"]
+    verbs: ["create"]
