@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: scraper-cache
+  namespace: federated-cloud-platform
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scraper
+  namespace: federated-cloud-platform
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+            - name: ghcr-creds
+          restartPolicy: OnFailure
+          initContainers:
+            - name: wait-for-backend
+              image: busybox:1.37
+              command: ["sh", "-c", "until wget -qO- http://backend.federated-cloud-platform.svc.cluster.local:8080/health; do echo waiting; sleep 2; done"]
+          containers:
+            - name: scraper
+              image: ghcr.io/thetillhoff/federated-cloud-platform/scrapers:1 # {"$imagepolicy": "federated-cloud-platform:fcp-scrapers"}
+              env:
+                - name: API_URL
+                  value: http://backend.federated-cloud-platform.svc.cluster.local:8080
+                - name: HETZNER_SCRAPER_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-scrapers
+                      key: hetznerKey
+                - name: AWS_SCRAPER_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-scrapers
+                      key: awsKey
+                - name: GCP_SCRAPER_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-scrapers
+                      key: gcpKey
+                - name: GCP_BILLING_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-scrapers
+                      key: gcpBillingApiKey
+                - name: AZURE_SCRAPER_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-scrapers
+                      key: azureKey
+                - name: SCRAPER_CACHE_DIR
+                  value: /cache
+                - name: SCRAPER_CACHE_REFRESH
+                  value: "0"
+              volumeMounts:
+                - name: cache
+                  mountPath: /cache
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 512Mi
+                limits:
+                  cpu: 2000m
+                  memory: 2Gi
+          volumes:
+            - name: cache
+              persistentVolumeClaim:
+                claimName: scraper-cache

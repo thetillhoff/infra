@@ -1,0 +1,14 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: fcp-scrapers
+  namespace: federated-cloud-platform
+spec:
+  imageRepositoryRef:
+    name: fcp-scrapers
+  filterTags:
+    pattern: '^(?P<run>[0-9]+)$'
+    extract: '$run'
+  policy:
+    numerical:
+      order: asc

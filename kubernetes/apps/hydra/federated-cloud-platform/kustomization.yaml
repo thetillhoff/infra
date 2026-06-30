@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: federated-cloud-platform
+resources:
+- namespace.yaml
+- ghcr-creds.secret.yaml
+- fcp-postgres.secret.yaml
+- fcp-clerk.secret.yaml
+- fcp-scrapers.secret.yaml
+
+- postgres.yaml
+- backend.yaml
+- scraper.yaml
+- frontend.yaml
+
+- httpRoute-http.yaml
+- httpRoute-https.yaml
+
+- imageRepository-backend.yaml
+- imageRepository-frontend.yaml
+- imageRepository-scrapers.yaml
+- imageRepository-migrations.yaml
+- imagePolicy-backend.yaml
+- imagePolicy-frontend.yaml
+- imagePolicy-scrapers.yaml
+- imagePolicy-migrations.yaml
+- imageUpdateAutomation.yaml

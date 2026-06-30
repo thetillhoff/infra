@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: federated-cloud-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      imagePullSecrets:
+        - name: ghcr-creds
+      initContainers:
+        - name: atlas-schema
+          image: ghcr.io/thetillhoff/federated-cloud-platform/migrations:1 # {"$imagepolicy": "federated-cloud-platform:fcp-migrations"}
+          command: ["sh", "-c"]
+          args:
+            - atlas migrate apply --dir file:///migrations --url $(DB_DSN)
+          env:
+            - name: DB_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: fcp-postgres
+                  key: dsn
+      containers:
+        - name: backend
+          image: ghcr.io/thetillhoff/federated-cloud-platform/backend:1 # {"$imagepolicy": "federated-cloud-platform:fcp-backend"}
+          env:
+            - name: HOST
+              value: "0.0.0.0"
+            - name: PORT
+              value: "8080"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fcp-postgres
+                  key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fcp-postgres
+                  key: password
+            - name: POSTGRES_HOST
+              value: postgres.federated-cloud-platform.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_SCHEMA
+              value: fcp
+            - name: CLERK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fcp-clerk
+                  key: secretKey
+            - name: ADMIN_CLERK_SUBJECTS
+              valueFrom:
+                secretKeyRef:
+                  name: fcp-clerk
+                  key: adminSubjects
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: federated-cloud-platform
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 8080
+      targetPort: 8080

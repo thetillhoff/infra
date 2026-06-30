@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: fcp-backend
+  namespace: federated-cloud-platform
+spec:
+  image: ghcr.io/thetillhoff/federated-cloud-platform/backend
+  interval: 5m0s
+  secretRef:
+    name: ghcr-creds
