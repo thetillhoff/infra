@@ -19,8 +19,15 @@ spec:
         - name: frontend
           image: ghcr.io/thetillhoff/federated-cloud-platform/frontend:1 # {"$imagepolicy": "federated-cloud-platform:fcp-frontend"}
           ports:
-            - containerPort: 80
-          # ponytail: nginx binds port 80 as root; switch to nginx-unprivileged + port 8080 to add runAsNonRoot
+            - containerPort: 8080
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
           resources:
             requests:
               cpu: 50m
@@ -38,5 +45,5 @@ spec:
   selector:
     app: frontend
   ports:
-    - port: 80
-      targetPort: 80
+    - port: 8080
+      targetPort: 8080
