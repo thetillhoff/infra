@@ -1,11 +1,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: infrastructure-controllers
+  name: app-trading
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./kubernetes/infrastructure/controllers
+  path: ./kubernetes/apps/hydra/trading
   prune: true
   wait: true
   sourceRef:

@@ -1,14 +1,12 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: apps
+  name: app-wedding-website
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./kubernetes/apps/hydra
-  # MIGRATION Phase 1: prune disabled so removing this monolith in Phase 2 does NOT
-  # garbage-collect all apps. The per-app Kustomizations then adopt the existing resources.
-  prune: false
+  path: ./kubernetes/apps/hydra/wedding-website
+  prune: true
   wait: true
   sourceRef:
     kind: GitRepository
