@@ -11,6 +11,7 @@ resources:
 - serviceAccount-trading-worker.yaml
 - role-trading-worker.yaml
 - roleBinding-trading-worker.yaml
+- priorityClass-trading-batch-low.yaml
 - storage.pvc.yaml
 
 - postgres.yaml

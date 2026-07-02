@@ -1,0 +1,13 @@
+# Below-default priority for batch worker Jobs (planning/signals/simulation/download).
+# value < 0 puts them beneath everything at default priority (0), so postgres, backend,
+# operator, and any other app on the cluster outrank them — and a higher-priority pod that
+# needs to schedule preempts a running batch Job instead of sitting Pending (which took the
+# prod data layer down for ~31h on 2026-07-02). Must exist before the operator emits Jobs
+# referencing it, else those pods are rejected.
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: trading-batch-low
+value: -10
+globalDefault: false
+description: "Below-default priority for trading batch worker Jobs; yields to all core infra."
