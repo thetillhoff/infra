@@ -6,7 +6,9 @@ metadata:
 spec:
   interval: 10m0s
   path: ./kubernetes/apps/hydra
-  prune: true
+  # MIGRATION Phase 1: prune disabled so removing this monolith in Phase 2 does NOT
+  # garbage-collect all apps. The per-app Kustomizations then adopt the existing resources.
+  prune: false
   wait: true
   sourceRef:
     kind: GitRepository

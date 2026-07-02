@@ -26,7 +26,9 @@ spec:
     - name: infrastructure-controllers
   interval: 10m0s
   path: ./kubernetes/infrastructure/resources
-  prune: true
+  # MIGRATION Phase 1: prune disabled so removing this monolith in Phase 2 does NOT
+  # garbage-collect the resources. The per-resource Kustomizations then adopt them.
+  prune: false
   wait: true
   sourceRef:
     kind: GitRepository
