@@ -61,6 +61,15 @@ machine:
       # requests (CSR).
       # serverTLSBootstrap: true
 
+      # Reserve CPU for node + kube daemons (kubelet, containerd, etcd — etcd runs as a
+      # Talos system service, outside pods) so a CPU-hungry workload can't starve them.
+      # Root cause of the 2026-06-30 control-plane wedge: a batch grid pinned CPU with no
+      # reservation, PLEG/containerd stalled, nodes went NotReady. 256m + 256m = 0.5 core.
+      systemReserved:
+        cpu: 256m
+      kubeReserved:
+        cpu: 256m
+
     # Longhorn data path mounts
     # More info at https://longhorn.io/docs/1.8.1/advanced-resources/os-distro-specific/talos-linux-support/#data-path-mounts
     extraMounts:
