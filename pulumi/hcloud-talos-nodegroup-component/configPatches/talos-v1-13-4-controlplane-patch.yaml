@@ -70,6 +70,12 @@ machine:
       kubeReserved:
         cpu: 256m
 
+      # Age-prune container images unused for 30d (regardless of disk), so the run-number
+      # image tags (a new trading-worker/operator per CI build) don't accumulate on nodes
+      # and fill /var. The default disk-threshold GC (85%/80%) remains the safety net.
+      # Best-effort: kubelet tracks unused-time from its start, so it resets on reboot.
+      imageMaximumGCAge: 720h
+
     # Longhorn data path mounts
     # More info at https://longhorn.io/docs/1.8.1/advanced-resources/os-distro-specific/talos-linux-support/#data-path-mounts
     extraMounts:
