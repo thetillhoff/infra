@@ -1,0 +1,22 @@
+# Daily off-cluster backup of all volumes in the "default" group to the configured
+# backupTarget (see values.yaml: s3://hydra-k8s-backup@backblaze). Previously this job
+# existed only imperatively on the cluster (not in git) — a from-scratch rebuild would have
+# come up with the backup TARGET but no SCHEDULE, silently stopping backups. This manifest
+# makes the schedule reproducible. New volumes join the "default" group automatically.
+# Note: on a fresh cluster this CR may fail its first reconcile until the longhorn HelmRelease
+# installs the RecurringJob CRD; Flux retries and it converges.
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: daily
+  # namespace omitted: the longhorn kustomization sets namespace: longhorn
+spec:
+  name: daily
+  task: backup
+  cron: "0 5 * * *"
+  groups:
+    - default
+  retain: 7
+  concurrency: 1
+  labels: {}
+  parameters: {}

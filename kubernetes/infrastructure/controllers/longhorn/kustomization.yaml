@@ -7,6 +7,7 @@ resources:
 - helmRelease.yaml
 - backup-secret.yaml
 - crypt-secret.yaml
+- recurringJob-daily.yaml
 
 configMapGenerator:
 - name: longhorn-helm-values
