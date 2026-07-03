@@ -18,11 +18,11 @@ spec:
         - name: ghcr-creds
       containers:
         - name: operator
-          image: ghcr.io/thetillhoff/trading-operator:41 # {"$imagepolicy": "trading:trading-operator"}
+          image: ghcr.io/thetillhoff/trading-operator:43 # {"$imagepolicy": "trading:trading-operator"}
           command: ["python", "-m", "trading_operator"]
           env:
             - name: WORKER_IMAGE
-              value: ghcr.io/thetillhoff/trading-worker:41 # {"$imagepolicy": "trading:trading-worker"}
+              value: ghcr.io/thetillhoff/trading-worker:43 # {"$imagepolicy": "trading:trading-worker"}
             - name: PVC_NAME
               value: trading-data
             - name: NAMESPACE
