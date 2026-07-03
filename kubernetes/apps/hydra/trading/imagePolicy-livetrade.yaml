@@ -1,0 +1,14 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: trading-livetrade
+  namespace: trading
+spec:
+  imageRepositoryRef:
+    name: trading-livetrade
+  filterTags:
+    pattern: '^(?P<run>[0-9]+)$'
+    extract: '$run'
+  policy:
+    numerical:
+      order: asc

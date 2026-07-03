@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: livetrade-close, namespace: trading}
+spec:
+  schedule: "30 16 * * 1-5"
+  timeZone: America/New_York
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 600
+  suspend: true   # operator unsuspends when AutoTrade enabled + config column=Close
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: trading-worker
+          restartPolicy: Never
+          containers:
+            - name: livetrade
+              image: ghcr.io/thetillhoff/trading-livetrade:47 # {"$imagepolicy": "trading:trading-livetrade"}
+              imagePullPolicy: IfNotPresent
+              env:
+                - {name: TRIGGER, value: close}
+                - {name: NAMESPACE, value: trading}
+                - {name: IBKR_HOST, value: ibkr-gateway}
+                - {name: IBKR_PORT, value: "4002"}
+                - name: POSTGRES_DSN
+                  valueFrom: {secretKeyRef: {name: trading-postgres, key: dsn}}
+              envFrom:
+                - secretRef: {name: trading-ibkr}
+              resources:
+                requests: {cpu: 500m, memory: 512Mi}
+                limits: {memory: 1Gi}

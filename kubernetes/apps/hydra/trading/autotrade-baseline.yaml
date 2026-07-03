@@ -1,0 +1,7 @@
+apiVersion: trading.thetillhoff.de/v1alpha1
+kind: AutoTrade
+metadata: {name: autotrade, namespace: trading}
+spec:
+  strategyConfig: baseline
+  enabled: true
+  preloadOnDeploy: false   # data already loaded; set true to trigger a fresh full-universe refresh on next deploy

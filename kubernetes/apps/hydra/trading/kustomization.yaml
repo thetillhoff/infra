@@ -30,7 +30,13 @@ resources:
 - imagePolicy-frontend.yaml
 - imagePolicy-operator.yaml
 - imagePolicy-worker.yaml
+- imageRepository-livetrade.yaml
+- imagePolicy-livetrade.yaml
 - imageUpdateAutomation.yaml
 
+- cronjob-livetrade-open.yaml
+- cronjob-livetrade-close.yaml
 - cronjob-data-refresh-open.yaml
 - cronjob-data-refresh-close.yaml
+
+- autotrade-baseline.yaml
