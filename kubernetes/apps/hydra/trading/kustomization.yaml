@@ -31,3 +31,6 @@ resources:
 - imagePolicy-operator.yaml
 - imagePolicy-worker.yaml
 - imageUpdateAutomation.yaml
+
+- cronjob-data-refresh-open.yaml
+- cronjob-data-refresh-close.yaml

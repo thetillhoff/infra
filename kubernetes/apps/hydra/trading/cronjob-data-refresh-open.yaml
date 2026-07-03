@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: data-refresh-open, namespace: trading}
+spec:
+  schedule: "35 10 * * 1-5"
+  timeZone: America/New_York
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 600
+  suspend: false   # always-on; refreshes full universe after market open regardless of AutoTrade state
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          serviceAccountName: trading-worker
+          restartPolicy: Never
+          priorityClassName: trading-batch-low
+          containers:
+            - name: data-refresh
+              image: bitnami/kubectl:latest
+              imagePullPolicy: IfNotPresent
+              command: [sh, -c]
+              args:
+                - |
+                  kubectl create -f - <<'EOF'
+                  apiVersion: trading.thetillhoff.de/v1alpha1
+                  kind: DataUpdate
+                  metadata:
+                    generateName: data-refresh-open-
+                    namespace: trading
+                  spec:
+                    requestedAt: ""
+                  EOF
+              resources:
+                requests: {cpu: 50m, memory: 64Mi}
+                limits: {memory: 128Mi}
