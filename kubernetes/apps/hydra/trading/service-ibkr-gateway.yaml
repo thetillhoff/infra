@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Service
+metadata: {name: ibkr-gateway, namespace: trading}
+spec:
+  selector: {app: ibkr-gateway}
+  ports:
+    - {name: live, port: 4001, targetPort: 4001}
+    - {name: paper, port: 4002, targetPort: 4002}

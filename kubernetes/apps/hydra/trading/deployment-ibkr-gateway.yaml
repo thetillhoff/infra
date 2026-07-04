@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ibkr-gateway
+  namespace: trading
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: ibkr-gateway}}
+  template:
+    metadata: {labels: {app: ibkr-gateway}}
+    spec:
+      containers:
+        - name: gateway
+          image: ghcr.io/gnzsnz/ib-gateway:stable
+          envFrom:
+            - secretRef: {name: trading-ibkr}
+          ports:
+            - {containerPort: 4001, name: live}
+            - {containerPort: 4002, name: paper}
+          resources:
+            requests: {cpu: 250m, memory: 512Mi}
+            limits: {cpu: "1", memory: 1Gi}

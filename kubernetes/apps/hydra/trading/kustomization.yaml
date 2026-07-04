@@ -41,4 +41,7 @@ resources:
 
 - trading-ibkr.secret.yaml
 
+- deployment-ibkr-gateway.yaml
+- service-ibkr-gateway.yaml
+
 - autotrade-baseline.yaml
