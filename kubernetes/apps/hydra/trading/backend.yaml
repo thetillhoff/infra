@@ -17,7 +17,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: backend
-          image: ghcr.io/thetillhoff/trading-backend:47 # {"$imagepolicy": "trading:trading-backend"}
+          image: ghcr.io/thetillhoff/trading-backend:48 # {"$imagepolicy": "trading:trading-backend"}
           command: ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
           env:
             - name: POSTGRES_DSN
