@@ -6,7 +6,6 @@ spec:
   timeZone: America/New_York
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 600
-  suspend: true   # operator unsuspends when AutoTrade enabled + config column=Close
   jobTemplate:
     spec:
       backoffLimit: 1
