@@ -22,7 +22,7 @@ spec:
           command: ["python", "-m", "trading_operator"]
           env:
             - name: WORKER_IMAGE
-              value: ghcr.io/thetillhoff/trading-worker:48 # {"$imagepolicy": "trading:trading-worker"}
+              value: ghcr.io/thetillhoff/trading-worker:49 # {"$imagepolicy": "trading:trading-worker"}
             - name: PVC_NAME
               value: trading-data
             - name: NAMESPACE
