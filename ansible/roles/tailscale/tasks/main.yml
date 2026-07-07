@@ -16,7 +16,15 @@
     # This commands either fails with "Logged out." or succeeds with "Logged in. <...>"
     changed_when: false
   rescue:
-  - command: tailscale up --hostname={{ inventory_hostname }} --authkey {{ lookup('env', 'TAILSCALE_AUTH_TOKEN') }} --advertise-exit-node
+  # authkey from sops host_vars (tailscale.sops.yaml). --reset makes the tags/flags
+  # authoritative, so this also retags a node that was authed without them.
+  - command: >-
+      tailscale up
+      --hostname={{ inventory_hostname }}
+      --authkey {{ tailscale_authkey }}
+      --advertise-tags=tag:service,tag:exit
+      --advertise-exit-node
+      --reset
 
 - command: tailscale ip -4
   register: tailscale_ip

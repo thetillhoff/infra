@@ -1,7 +1,9 @@
 # Variables
 PLAYBOOK ?= blackhole.yaml
 ANSIBLE_PLAYBOOK_CMD = ansible-playbook $(PLAYBOOK) -i inventory.yaml
-DOCKER_RUN = docker run --rm -it -v $(HOME)/.ssh:/root/.ssh:ro -v $(CURDIR):/app -w /app --privileged ansible
+# SOPS_AGE_KEY_FILE comes from `eval "$(task configure-env)"` (repo root) — mounted so
+# community.sops can decrypt host_vars. Set it before running the docker-* targets.
+DOCKER_RUN = docker run --rm -it -v $(HOME)/.ssh:/root/.ssh:ro -v $(CURDIR):/app -w /app -v $(SOPS_AGE_KEY_FILE):/age.key:ro -e SOPS_AGE_KEY_FILE=/age.key --privileged ansible
 
 .PHONY: help run check lint docker-build docker-run docker-check docker-lint
 

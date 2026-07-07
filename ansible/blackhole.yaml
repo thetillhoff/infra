@@ -9,6 +9,7 @@
 
   roles:
     - basic
+    - tailscale
     - docker-debian
     - fileserver-blackhole
     - stash

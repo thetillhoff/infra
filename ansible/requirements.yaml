@@ -6,3 +6,5 @@ collections:
 # helm/kubernetes
 - kubernetes.core
 - community.docker
+# sops-encrypted vars (tailscale auth key)
+- community.sops

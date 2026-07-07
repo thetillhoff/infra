@@ -1,0 +1,24 @@
+# Tailscale credential for blackhole (consumed by roles/tailscale).
+#
+# Use an OAuth CLIENT SECRET, not a plain auth key — client secrets never expire
+# (auth keys cap at 90d). `tailscale up --authkey` accepts an OAuth client secret
+# directly and applies the tags from --advertise-tags. This mirrors how the k8s
+# operator authenticates (operator-oauth.secret.yaml).
+#
+# Setup (once):
+#   1. Tailscale admin console → Settings → OAuth clients → Generate:
+#        scope: auth_keys (write); tags: tag:service, tag:exit
+#      (both tags are owned by autogroup:admin via pulumi/tailscale-acl.hujson,
+#      so the client may carry them).
+#   2. cp tailscale.sops.yaml.example tailscale.sops.yaml
+#   3. put the client secret (tskey-client-...) below, then encrypt in place:
+#        sops encrypt -i host_vars/blackhole/tailscale.sops.yaml
+#   4. commit tailscale.sops.yaml (encrypted); delete this .example if you like.
+#
+# The community.sops vars plugin auto-decrypts *.sops.yaml at runtime
+# (needs SOPS_AGE_KEY_FILE + the sops binary — both provided by task configure-env
+# and the ansible Docker image).
+#
+# Note: a plain reusable auth key also works here (same var) if you prefer — but
+# then you must rotate it before it expires.
+tailscale_authkey: tskey-client-REPLACE-ME
