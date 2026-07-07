@@ -6,3 +6,4 @@ resources:
 - clusterIssuer-selfsigned-ca.yaml
 - clusterIssuer-staging.yaml
 - clusterIssuer-prod.yaml
+- cloudflare-api-token.secret.yaml

@@ -28,7 +28,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: thetillhoff-de-tls-certificate
+          - name: link-thetillhoff-de-tls-certificate
     - name: analytics-thetillhoff-de
       hostname: "analytics.thetillhoff.de"
       port: 443
@@ -39,7 +39,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: thetillhoff-de-tls-certificate
+          - name: analytics-thetillhoff-de-tls-certificate
     - name: pw-thetillhoff-de
       hostname: "pw.thetillhoff.de"
       port: 443
@@ -50,7 +50,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: thetillhoff-de-tls-certificate
+          - name: pw-thetillhoff-de-tls-certificate
     - name: webscan-thetillhoff-de
       hostname: "webscan.thetillhoff.de"
       port: 443
@@ -61,7 +61,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: thetillhoff-de-tls-certificate
+          - name: webscan-thetillhoff-de-tls-certificate
     - name: wedding-thetillhoff-de
       hostname: "wedding.thetillhoff.de"
       port: 443
@@ -72,4 +72,4 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: thetillhoff-de-tls-certificate
+          - name: wedding-thetillhoff-de-tls-certificate

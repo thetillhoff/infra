@@ -11,11 +11,9 @@ spec:
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
       name: letsencrypt-staging
-    # Enable the HTTP-01 challenge provider
     solvers:
-    - http01:
-        gatewayHTTPRoute:
-          parentRefs:
-          - kind: Gateway
-            name: http-gateway
-            namespace: gateways
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            name: cloudflare-api-token
+            key: api-token
