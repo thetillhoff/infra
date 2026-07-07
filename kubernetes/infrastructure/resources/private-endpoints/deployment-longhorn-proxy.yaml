@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: longhorn-proxy
+  namespace: private-endpoints
+spec:
+  # ponytail: single replica — homelab internal tooling. Bump to 2 if uptime matters.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: longhorn-proxy
+  template:
+    metadata:
+      labels:
+        app: longhorn-proxy
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: caddy
+          image: caddy:2.9.1-alpine # {"$imagepolicy": "private-endpoints:caddy"}
+          ports:
+            - containerPort: 8443
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: caddyfile
+              mountPath: /etc/caddy/Caddyfile
+              subPath: Caddyfile
+              readOnly: true
+            - name: certs
+              mountPath: /certs
+              readOnly: true
+            - name: config
+              mountPath: /config
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: caddyfile
+          configMap:
+            name: longhorn-caddy
+        - name: certs
+          secret:
+            secretName: longhorn-internal-tls
+        - name: config
+          emptyDir: {}
+        - name: data
+          emptyDir: {}

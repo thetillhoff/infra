@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-internal
+  namespace: private-endpoints
+  annotations:
+    tailscale.com/hostname: grafana-internal
+    external-dns.alpha.kubernetes.io/hostname: grafana.internal.thetillhoff.de
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  selector:
+    app: grafana-proxy
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8443

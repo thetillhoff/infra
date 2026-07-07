@@ -28,7 +28,7 @@ task configure-env | source /dev/stdin   # set TALOSCONFIG, KUBECONFIG, SOPS_AGE
 task configure-files                     # write talosconfig + kubeconfig files to pulumi/
 task deploy                              # pulumi up
 task build ARCH=amd64                    # build packer image (token auto-sourced from pulumi config)
-task reconcile                           # force-reconcile all flux kustomizations
+task reconcile                           # force-reconcile flux kustomizations (WARNING: Taskfile lists wrong names — see Known Gotchas)
 task delete-nodes -- <node1> <node2>    # drain + remove nodes before server deletion
 task upgrade-k8s -- 1.33.0             # upgrade k8s version via talosctl
 ```
@@ -84,8 +84,8 @@ Cluster entrypoints are in `kubernetes/clusters/hydra/`. All Kustomizations use 
 kubernetes/
   clusters/hydra/          # FluxCD Kustomization entrypoints
   infrastructure/
-    controllers/           # HelmReleases: cert-manager, longhorn, tailscale operator, kubelet-csr-approver
-    resources/             # Cluster resources: cert-manager issuers, gateways, firewall policies, monitoring, discord alerts
+    controllers/           # HelmReleases: cert-manager, external-dns, longhorn, tailscale operator, kubelet-csr-approver
+    resources/             # Cluster resources: cert-manager issuers, gateways, firewall policies, monitoring, discord alerts, private-endpoints
   apps/
     hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, tailscale
 ```
@@ -96,6 +96,16 @@ Each app dir typically contains: namespace, deployment/statefulset, service, HTT
 
 Cilium is both the CNI and the Gateway API implementation (no separate ingress controller). Apps expose themselves via `HTTPRoute` resources referencing Gateways in `kubernetes/infrastructure/resources/gateways/`. Network policies use `CiliumClusterwideNetworkPolicy` in `kubernetes/infrastructure/resources/firewall/`.
 
+Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}` — it is a **node/host** firewall, not a pod-to-pod policy. There is no pod-level default-deny, so cross-namespace pod traffic is unrestricted.
+
+### Private endpoints (tailnet-only)
+
+Admin UIs (grafana, longhorn, hubble) are exposed privately at `<app>.internal.thetillhoff.de` — reachable only over the Tailscale tailnet, not the public internet. Defined in `kubernetes/infrastructure/resources/private-endpoints/`.
+
+Per app: a small **Caddy** reverse-proxy (non-root, binds `:8443`) terminates a real LetsEncrypt cert (cert-manager DNS-01, per-name `Certificate`) and proxies to the in-cluster app Service. A `Service` `type: LoadBalancer, loadBalancerClass: tailscale` makes the tailscale operator join a proxy to the tailnet and write the private `100.x` (CGNAT) IP into the Service's LB status. **external-dns** (in the `cert-manager` namespace, reusing that namespace's `cloudflare-api-token`) reads the LB IP and creates the `A` record. Security is the WireGuard mesh + tailnet ACLs — the public resolves the DNS but cannot route to `100.64.0.0/10`.
+
+All proxies share the same caddy image automation (`imageRepository`/`imagePolicy`/`imageUpdateAutomation` in that dir). Adding an endpoint = copy a `certificate`/`configMap`/`deployment`/`service` quartet + wire into `kustomization.yaml`.
+
 ### Storage
 
 Longhorn for persistent volumes in Kubernetes. Bare-metal ZFS on `blackhole` (managed via Ansible).
@@ -103,6 +113,34 @@ Longhorn for persistent volumes in Kubernetes. Bare-metal ZFS on `blackhole` (ma
 ### Versions
 
 Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator, flux) are centralized in `pulumi/index.ts`.
+
+## Known Gotchas
+
+### kubectl/flux context
+
+Default kubeconfig context may be a local kind cluster, not hydra. Always run `eval "$(task configure-env)"` before any kubectl/flux commands.
+
+### task reconcile — wrong kustomization names
+
+`task reconcile` references `infrastructure-resources` and `apps` which don't exist. Actual names: `resource-cert-manager`, `resource-discord-notifications`, `resource-firewall`, `resource-gateways`, `resource-monitoring`, and `app-<name>` per app. Reconcile manually: `flux reconcile kustomization <name> --with-source`.
+
+### Private endpoints require out-of-band Tailscale config
+
+The `private-endpoints` manifests are inert until the tailnet is set up (done in the Tailscale admin console, not this repo):
+
+- The operator's OAuth client (`operator-oauth.secret.yaml`) must be allowed to create devices with the proxy tag (default `tag:k8s`).
+- Tailnet **ACLs** must grant your user access to `tag:k8s` devices on port `443` — otherwise the `100.x` IP resolves but connections are refused. This is the actual access control; DNS is not.
+- `task reconcile` list is stale here too: the new Kustomization is `resource-private-endpoints`.
+
+### Cilium Gateway API — PROGRAMMED: False is normal
+
+Gateways always show `PROGRAMMED: False / AddressNotAssigned` — expected, not a bug. Cilium runs in host-network mode (`pulumi/cilium-values.yaml`): Envoy daemonset binds directly to node IPs; no LoadBalancer IP is ever written to `.status.addresses`. Verify health via Envoy daemonset pods + actual HTTP response, not gateway status.
+
+### cert-manager Gateway TLS mechanics
+
+TLS is annotation-driven: `cert-manager.io/cluster-issuer` on a Gateway causes cert-manager to auto-create Certificates per listener. Listeners sharing the same `certificateRefs[0].name` → one multi-SAN cert; unique names → separate certs (one per app).
+
+DNS-01 required for any non-public gateway (HTTP-01 requires ACME server to reach the cluster). Cloudflare DNS-01 token: `Zone › DNS › Edit` scoped to `thetillhoff.de` only, stored as Secret `cloudflare-api-token` in `cert-manager` namespace.
 
 ## Known Pulumi Pitfalls
 

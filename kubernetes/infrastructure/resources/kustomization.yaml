@@ -6,3 +6,4 @@ resources:
 - cert-manager
 - discord-notifications
 - monitoring
+- private-endpoints

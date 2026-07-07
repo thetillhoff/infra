@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: longhorn-internal
+  namespace: private-endpoints
+spec:
+  secretName: longhorn-internal-tls
+  dnsNames:
+    - longhorn.internal.thetillhoff.de
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer

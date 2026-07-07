@@ -1,0 +1,40 @@
+# https://github.com/kubernetes-sigs/external-dns/blob/master/charts/external-dns/values.yaml
+
+provider:
+  name: cloudflare
+
+# Only manage records under this subdomain. This is the critical safety fence:
+# external-dns will NEVER create/update/delete public thetillhoff.de records
+# (those are owned by pulumi + cert-manager).
+domainFilters:
+  - internal.thetillhoff.de
+
+# Only watch Services (the tailscale LoadBalancer services in private-endpoints).
+sources:
+  - service
+
+# The tailscale operator writes BOTH an ip (100.x) and a <name>.ts.net hostname
+# into the Service LB status. Restrict to A records so external-dns creates the
+# A -> 100.x record and never a CNAME to the .ts.net name (which resolves only
+# inside the tailnet and would break the record). TXT ownership is unaffected.
+managedRecordTypes:
+  - A
+
+# sync => external-dns owns the internal.thetillhoff.de records and will delete
+# ones whose source Service is gone. Ownership is tracked via TXT registry records.
+policy: sync
+txtOwnerId: hydra
+txtPrefix: extdns- # avoids TXT/A name collision on the same record
+
+extraArgs:
+  # tailnet IPs (100.64.0.0/10, CGNAT) must be plain DNS records, never
+  # Cloudflare-proxied — the orange-cloud proxy can't reach a private IP.
+  - --cloudflare-proxied=false
+
+# Reuse cert-manager's Cloudflare token (same namespace, see kustomization.yaml).
+env:
+  - name: CF_API_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cloudflare-api-token
+        key: api-token

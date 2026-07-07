@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- namespace.yaml
+
+# Shared caddy image automation (all proxies run the same image)
+- imageRepository-caddy.yaml
+- imagePolicy-caddy.yaml
+- imageUpdateAutomation.yaml
+
+# grafana.internal.thetillhoff.de
+- certificate-grafana.yaml
+- configMap-grafana-caddy.yaml
+- deployment-grafana-proxy.yaml
+- service-grafana.yaml
+
+# longhorn.internal.thetillhoff.de
+- certificate-longhorn.yaml
+- configMap-longhorn-caddy.yaml
+- deployment-longhorn-proxy.yaml
+- service-longhorn.yaml
+
+# hubble.internal.thetillhoff.de
+- certificate-hubble.yaml
+- configMap-hubble-caddy.yaml
+- deployment-hubble-proxy.yaml
+- service-hubble.yaml

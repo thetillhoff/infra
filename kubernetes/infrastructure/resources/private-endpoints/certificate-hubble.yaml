@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hubble-internal
+  namespace: private-endpoints
+spec:
+  secretName: hubble-internal-tls
+  dnsNames:
+    - hubble.internal.thetillhoff.de
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer

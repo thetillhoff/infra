@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: caddy
+  namespace: private-endpoints
+spec:
+  image: caddy # docker.io/library/caddy
+  interval: 24h0m0s

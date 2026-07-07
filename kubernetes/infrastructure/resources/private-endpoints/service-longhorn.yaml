@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: longhorn-internal
+  namespace: private-endpoints
+  annotations:
+    tailscale.com/hostname: longhorn-internal
+    external-dns.alpha.kubernetes.io/hostname: longhorn.internal.thetillhoff.de
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  selector:
+    app: longhorn-proxy
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8443

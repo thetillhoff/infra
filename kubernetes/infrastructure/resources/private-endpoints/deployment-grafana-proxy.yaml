@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-proxy
+  namespace: private-endpoints
+spec:
+  # ponytail: single replica — homelab internal tooling. Bump to 2 if uptime matters.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana-proxy
+  template:
+    metadata:
+      labels:
+        app: grafana-proxy
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: caddy
+          image: caddy:2.9.1-alpine # {"$imagepolicy": "private-endpoints:caddy"}
+          ports:
+            - containerPort: 8443
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: caddyfile
+              mountPath: /etc/caddy/Caddyfile
+              subPath: Caddyfile
+              readOnly: true
+            - name: certs
+              mountPath: /certs
+              readOnly: true
+            - name: config # Caddy XDG_CONFIG_HOME, must be writable for non-root
+              mountPath: /config
+            - name: data # Caddy XDG_DATA_HOME
+              mountPath: /data
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: caddyfile
+          configMap:
+            name: grafana-caddy
+        - name: certs
+          secret:
+            secretName: grafana-internal-tls
+        - name: config
+          emptyDir: {}
+        - name: data
+          emptyDir: {}
