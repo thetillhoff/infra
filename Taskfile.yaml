@@ -28,6 +28,8 @@ tasks:
     desc: "Deploy pulumi stack. Example usage: task deploy"
     dir: 'pulumi'
     cmds:
+      # keep node_modules in sync with package.json (esp. after provider bumps)
+      - npm install
       - pulumi up
 
   configure-files:
