@@ -28,7 +28,7 @@ task configure-env | source /dev/stdin   # set TALOSCONFIG, KUBECONFIG, SOPS_AGE
 task configure-files                     # write talosconfig + kubeconfig files to pulumi/
 task deploy                              # pulumi up
 task build ARCH=amd64                    # build packer image (token auto-sourced from pulumi config)
-task reconcile                           # force-reconcile flux kustomizations (WARNING: Taskfile lists wrong names — see Known Gotchas)
+task reconcile                           # force-reconcile all flux kustomizations (--with-source)
 task delete-nodes -- <node1> <node2>    # drain + remove nodes before server deletion
 task upgrade-k8s -- 1.33.0             # upgrade k8s version via talosctl
 ```
@@ -120,17 +120,12 @@ Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator, flux) are c
 
 Default kubeconfig context may be a local kind cluster, not hydra. Always run `eval "$(task configure-env)"` before any kubectl/flux commands.
 
-### task reconcile — wrong kustomization names
-
-`task reconcile` references `infrastructure-resources` and `apps` which don't exist. Actual names: `resource-cert-manager`, `resource-discord-notifications`, `resource-firewall`, `resource-gateways`, `resource-monitoring`, and `app-<name>` per app. Reconcile manually: `flux reconcile kustomization <name> --with-source`.
-
 ### Private endpoints require out-of-band Tailscale config
 
 The `private-endpoints` manifests are inert until the tailnet is set up (done in the Tailscale admin console, not this repo):
 
 - The operator's OAuth client (`operator-oauth.secret.yaml`) must be allowed to create devices with the proxy tag (default `tag:k8s`).
 - Tailnet **ACLs** must grant your user access to `tag:k8s` devices on port `443` — otherwise the `100.x` IP resolves but connections are refused. This is the actual access control; DNS is not.
-- `task reconcile` list is stale here too: the new Kustomization is `resource-private-endpoints`.
 
 ### Cilium Gateway API — PROGRAMMED: False is normal
 

@@ -52,12 +52,23 @@ tasks:
     desc: Reconcile flux sources
     dir: '{{.USER_WORKING_DIR}}'
     cmds:
-      - flux reconcile source git flux-system
-      #- flux get source helm -A | xargs -n1 flux reconcile source helm -A # <- This does not work yet.
-      - flux reconcile kustomization flux-system
-      - flux reconcile kustomization infrastructure-controllers
-      - flux reconcile kustomization infrastructure-resources
-      - flux reconcile kustomization apps
+      - flux reconcile kustomization flux-system --with-source
+      - flux reconcile kustomization infrastructure-controllers --with-source
+      # resources (depend on controllers)
+      - flux reconcile kustomization resource-cert-manager --with-source
+      - flux reconcile kustomization resource-discord-notifications --with-source
+      - flux reconcile kustomization resource-firewall --with-source
+      - flux reconcile kustomization resource-gateways --with-source
+      - flux reconcile kustomization resource-monitoring --with-source
+      - flux reconcile kustomization resource-private-endpoints --with-source
+      # apps
+      - flux reconcile kustomization app-link-shortener --with-source
+      - flux reconcile kustomization app-thetillhoff-de --with-source
+      - flux reconcile kustomization app-trading --with-source
+      - flux reconcile kustomization app-umami --with-source
+      - flux reconcile kustomization app-vaultwarden --with-source
+      - flux reconcile kustomization app-webscan --with-source
+      - flux reconcile kustomization app-wedding-website --with-source
 
   flux-status:
     desc: Show flux status
