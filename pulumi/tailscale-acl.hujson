@@ -1,0 +1,71 @@
+// Tailnet ACL policy — source of truth once managed by Pulumi (pulumi/index.ts).
+// Adoption runbook lives next to the (commented) tailscale.Acl in pulumi/index.ts.
+//
+// Tag taxonomy (role-based):
+//   tag:k8s-operator  operator identity (the OAuth client); owns the tags below
+//   tag:service       devices serving web apps to members on :443
+//                       - k8s: operator-created reverse-proxy pods (private endpoints)
+//                       - blackhole: local apps behind a :443 reverse proxy (e.g. homeassistant)
+//   tag:exit          exit nodes (the k8s Connector + blackhole)
+//   tag:ssh           hosts reachable via Tailscale SSH (admin-tagged; not blackhole)
+//
+// IMPORTANT: tag:service/tag:exit must exist in tagOwners of the LIVE ACL BEFORE anything
+//     requests them (k8s service annotations, the Connector, blackhole's auth key)
+//     — a device cannot be created/tagged with a tag its creator does not own.
+//     autogroup:admin co-owns them so you can mint blackhole's tagged auth key;
+//     tag:k8s-operator owns them so the operator can tag the pods it creates.
+{
+	"tagOwners": {
+		"tag:k8s-operator": ["autogroup:admin"],
+		"tag:service":      ["tag:k8s-operator", "autogroup:admin"],
+		"tag:exit":         ["tag:k8s-operator", "autogroup:admin"],
+		"tag:ssh":          ["autogroup:admin"],
+	},
+
+	"grants": [
+		// Private endpoints / local web apps: members reach tag:service on 443.
+		{
+			"src": ["autogroup:member"],
+			"dst": ["tag:service"],
+			"ip":  ["443"],
+		},
+
+		// ── Least-privilege (recommended next step) ────────────────────────────
+		// Uncomment AND delete the allow-all grant to enforce least privilege, and
+		// uncomment the "tests" block below (tests are tautological under allow-all).
+		// Recoverable: owners can always fix ACLs in the admin console.
+		// {"src": ["autogroup:member"], "dst": ["autogroup:internet"], "ip": ["*"]},  // exit-node egress via tag:exit
+		// ───────────────────────────────────────────────────────────────────────
+
+		// Allow-all. DELETE to enforce the least-privilege block above.
+		{
+			"src": ["*"],
+			"dst": ["*"],
+			"ip":  ["*"],
+		},
+	],
+
+	// Auto-approve exit nodes advertised by the k8s Connector and blackhole.
+	"autoApprovers": {"exitNode": ["tag:exit"]},
+
+	"ssh": [
+		{
+			"src":    ["thetillhoff@gmail.com"],
+			"dst":    ["tag:ssh"],
+			"users":  ["user"],
+			"action": "accept",
+		},
+	],
+
+	// Access assertions — Tailscale runs these on every save/apply and rejects the
+	// policy if one fails. Only "accept" tests while allow-all is present (allow-all
+	// makes every "deny" test fail). Add deny tests when you remove it.
+	// Access assertions — run on every save; reject the policy if one fails.
+	// Only useful once allow-all is gone (under it every accept passes and every
+	// deny fails). Uncomment together with the least-privilege grants above.
+	// Test src must be a concrete user/device — autogroup:* is not valid here.
+	// "tests": [
+	// 	{"src": "thetillhoff@gmail.com", "accept": ["tag:service:443", "tag:ssh:22"]},
+	// 	{"src": "tag:service", "deny": ["tag:ssh:22"]},  // proxies can't reach ssh hosts
+	// ],
+}

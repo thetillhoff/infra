@@ -6,3 +6,5 @@ spec:
   replicas: 2
   hostnamePrefix: k8s-exit-node
   exitNode: true
+  tags:
+    - tag:exit

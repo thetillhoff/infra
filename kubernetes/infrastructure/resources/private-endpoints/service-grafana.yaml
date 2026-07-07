@@ -5,6 +5,7 @@ metadata:
   namespace: private-endpoints
   annotations:
     tailscale.com/hostname: grafana-internal
+    tailscale.com/tags: tag:service
     external-dns.alpha.kubernetes.io/hostname: grafana.internal.thetillhoff.de
 spec:
   type: LoadBalancer

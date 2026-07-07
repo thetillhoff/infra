@@ -124,8 +124,8 @@ Default kubeconfig context may be a local kind cluster, not hydra. Always run `e
 
 The `private-endpoints` manifests are inert until the tailnet is set up (done in the Tailscale admin console, not this repo):
 
-- The operator's OAuth client (`operator-oauth.secret.yaml`) must be allowed to create devices with the proxy tag (default `tag:k8s`).
-- Tailnet **ACLs** must grant your user access to `tag:k8s` devices on port `443` — otherwise the `100.x` IP resolves but connections are refused. This is the actual access control; DNS is not.
+- The operator's OAuth client (`operator-oauth.secret.yaml`) must be allowed to create devices with the proxy tag (`tag:service`, set via Service annotation).
+- Tailnet **ACLs** must grant your user access to `tag:service` devices on port `443` — otherwise the `100.x` IP resolves but connections are refused. This is the actual access control; DNS is not.
 
 ### Cilium Gateway API — PROGRAMMED: False is normal
 
