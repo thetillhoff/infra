@@ -7,6 +7,18 @@ admin:
 
 envFromSecret: grafana-discord-webhook
 
+# Served behind the Caddy proxy at grafana.internal.thetillhoff.de (TLS terminated
+# at the proxy, HTTP to grafana). root_url makes grafana build correct absolute URLs
+# (redirects, assets, Grafana Live websocket) for that external domain — without it
+# the SPA spins ("keeps loading"). Trailing slash per the docs (root-domain form).
+# Grafana Live's /api/live websocket upgrade is handled automatically by Caddy's
+# reverse_proxy, so no extra proxy/grafana config is needed. serve_from_sub_path
+# stays off — we serve at the domain root, not a subpath.
+grafana.ini:
+  server:
+    domain: grafana.internal.thetillhoff.de
+    root_url: https://grafana.internal.thetillhoff.de/
+
 # Grafana's service port is named `service` (not something our port-name auto-discovery
 # matches), so annotate the Service explicitly. Grafana exposes /metrics on the same
 # port as the UI by default.
