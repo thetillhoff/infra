@@ -23,7 +23,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: caddy
-          image: caddy:2.9.1-alpine # {"$imagepolicy": "private-endpoints:caddy"}
+          image: caddy:2.11.4-alpine # {"$imagepolicy": "private-endpoints:caddy"}
           ports:
             - containerPort: 8443
           securityContext:
