@@ -1,6 +1,14 @@
 # https://github.com/grafana/alloy/blob/main/operations/helm/charts/alloy/values.yaml
 
 alloy:
+  # Bound the per-node collector: request = scheduling floor, limit above the
+  # observed ~340Mi working set so a spike can't run the node dry. No CPU limit.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
   configMap:
     create: false
     name: alloy-config
