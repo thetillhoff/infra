@@ -29,6 +29,14 @@ singleBinary:
   replicas: 1
   persistence:
     size: 5Gi
+  # Requests = scheduling floor (Burstable, so it's not a first-evicted BestEffort);
+  # limit generous vs the ~100-200Mi working set to avoid OOMKilling loki on a spike.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
 
 # disable resouce hogging chunks cache - we're on local disk anyways
 chunksCache:

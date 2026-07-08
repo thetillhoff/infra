@@ -1,15 +1,15 @@
 # https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus/values.yaml
 
 server:
-  # Requests set a scheduling floor; the memory limit caps runaway growth (WAL
-  # replay, compaction) so a spike can't exhaust the node. CPU request only — a
-  # CPU limit would throttle.
+  # Requests set a scheduling floor; the memory limit caps runaway growth. Sized
+  # above the WAL-replay + compaction peak of the 15d/9GB TSDB — 1536Mi was too low
+  # and OOMKilled prometheus on startup. CPU request only — a CPU limit would throttle.
   resources:
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 1Gi
     limits:
-      memory: 1536Mi
+      memory: 3Gi
   global:
     scrape_interval: 15s
   persistentVolume:
