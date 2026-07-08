@@ -2,46 +2,46 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: trading
 resources:
-- namespace.yaml
-- ghcr-creds.secret.yaml
-- trading-postgres.secret.yaml
+  - namespace.yaml
+  - ghcr-creds.secret.yaml
+  - trading-postgres.secret.yaml
 
-- crds.yaml
-- rbac.yaml
-- serviceAccount-trading-worker.yaml
-- role-trading-worker.yaml
-- roleBinding-trading-worker.yaml
-- priorityClass-trading-batch-low.yaml
-- storage.pvc.yaml
+  - crds.yaml
+  - rbac.yaml
+  - serviceAccount-trading-worker.yaml
+  - role-trading-worker.yaml
+  - roleBinding-trading-worker.yaml
+  - priorityClass-trading-batch-low.yaml
+  - storage.pvc.yaml
 
-- postgres.yaml
-- backend.yaml
-- frontend.yaml
-- operator.yaml
+  - postgres.yaml
+  - backend.yaml
+  - frontend.yaml
+  - operator.yaml
 
-- httpRoute-http.yaml
-- httpRoute-https.yaml
+  - httpRoute-http.yaml
+  - httpRoute-https.yaml
 
-- imageRepository-backend.yaml
-- imageRepository-frontend.yaml
-- imageRepository-operator.yaml
-- imageRepository-worker.yaml
-- imagePolicy-backend.yaml
-- imagePolicy-frontend.yaml
-- imagePolicy-operator.yaml
-- imagePolicy-worker.yaml
-- imageRepository-livetrade.yaml
-- imagePolicy-livetrade.yaml
-- imageUpdateAutomation.yaml
+  - imageRepository-backend.yaml
+  - imageRepository-frontend.yaml
+  - imageRepository-operator.yaml
+  - imageRepository-worker.yaml
+  - imagePolicy-backend.yaml
+  - imagePolicy-frontend.yaml
+  - imagePolicy-operator.yaml
+  - imagePolicy-worker.yaml
+  - imageRepository-livetrade.yaml
+  - imagePolicy-livetrade.yaml
+  - imageUpdateAutomation.yaml
 
-- cronjob-livetrade-open.yaml
-- cronjob-livetrade-close.yaml
-- cronjob-data-refresh-open.yaml
-- cronjob-data-refresh-close.yaml
+  - cronjob-livetrade-open.yaml
+  - cronjob-livetrade-close.yaml
+  - cronjob-data-refresh-open.yaml
+  - cronjob-data-refresh-close.yaml
 
-- trading-ibkr.secret.yaml
+  - trading-ibkr.secret.yaml
 
-- deployment-ibkr-gateway.yaml
-- service-ibkr-gateway.yaml
+  - deployment-ibkr-gateway.yaml
+  - service-ibkr-gateway.yaml
 
-- autotrade-baseline.yaml
+  - autotrade-baseline.yaml

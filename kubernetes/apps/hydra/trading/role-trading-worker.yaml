@@ -6,24 +6,48 @@ metadata:
   name: trading-worker
   namespace: trading
 rules:
-  - apiGroups: ["trading.thetillhoff.de"]
-    resources: ["strategyconfigs"]
-    verbs: ["get", "list", "create"]
-  - apiGroups: ["trading.thetillhoff.de"]
-    resources: ["autotrades"]
-    verbs: ["get"]
-  - apiGroups: ["trading.thetillhoff.de"]
-    resources: ["gridsearches"]
-    verbs: ["get"]
-  - apiGroups: ["trading.thetillhoff.de"]
-    resources: ["gridsearches/status"]
-    verbs: ["patch"]
-  - apiGroups: ["trading.thetillhoff.de"]
-    resources: ["dataupdates"]
-    verbs: ["get", "create"]
-  - apiGroups: ["trading.thetillhoff.de"]
-    resources: ["dataupdates/status"]
-    verbs: ["patch"]
-  - apiGroups: ["trading.thetillhoff.de"]
-    resources: ["taskplans"]
-    verbs: ["create"]
+  - apiGroups:
+      - "trading.thetillhoff.de"
+    resources:
+      - "strategyconfigs"
+    verbs:
+      - "get"
+      - "list"
+      - "create"
+  - apiGroups:
+      - "trading.thetillhoff.de"
+    resources:
+      - "autotrades"
+    verbs:
+      - "get"
+  - apiGroups:
+      - "trading.thetillhoff.de"
+    resources:
+      - "gridsearches"
+    verbs:
+      - "get"
+  - apiGroups:
+      - "trading.thetillhoff.de"
+    resources:
+      - "gridsearches/status"
+    verbs:
+      - "patch"
+  - apiGroups:
+      - "trading.thetillhoff.de"
+    resources:
+      - "dataupdates"
+    verbs:
+      - "get"
+      - "create"
+  - apiGroups:
+      - "trading.thetillhoff.de"
+    resources:
+      - "dataupdates/status"
+    verbs:
+      - "patch"
+  - apiGroups:
+      - "trading.thetillhoff.de"
+    resources:
+      - "taskplans"
+    verbs:
+      - "create"

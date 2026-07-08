@@ -61,7 +61,8 @@ spec:
     - metadata:
         name: postgres-data
       spec:
-        accessModes: [ReadWriteOnce]
+        accessModes:
+          - ReadWriteOnce
         storageClassName: longhorn
         resources:
           requests:

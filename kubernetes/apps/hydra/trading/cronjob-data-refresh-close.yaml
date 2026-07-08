@@ -1,6 +1,8 @@
 apiVersion: batch/v1
 kind: CronJob
-metadata: {name: data-refresh-close, namespace: trading}
+metadata:
+  name: data-refresh-close
+  namespace: trading
 spec:
   schedule: "30 17 * * 1-5"
   timeZone: America/New_York
@@ -19,7 +21,9 @@ spec:
             - name: data-refresh
               image: bitnami/kubectl:latest
               imagePullPolicy: IfNotPresent
-              command: [sh, -c]
+              command:
+                - sh
+                - -c
               args:
                 - |
                   kubectl create -f - <<'EOF'
@@ -33,5 +37,8 @@ spec:
                   EOF
               resources:
                 # memory request==limit (Guaranteed); no CPU limit (avoids throttling).
-                requests: {cpu: 50m, memory: 128Mi}
-                limits: {memory: 128Mi}
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 128Mi

@@ -5,15 +5,15 @@ metadata:
   namespace: trading
 spec:
   parentRefs:
-  - name: https-gateway-thetillhoff-de
-    namespace: gateways
+    - name: https-gateway-thetillhoff-de
+      namespace: gateways
   hostnames:
-  - trading.thetillhoff.de
+    - trading.thetillhoff.de
   rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /
-    backendRefs:
-    - name: frontend
-      port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: frontend
+          port: 80

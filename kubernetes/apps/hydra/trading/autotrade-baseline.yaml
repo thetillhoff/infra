@@ -1,6 +1,8 @@
 apiVersion: trading.thetillhoff.de/v1alpha1
 kind: AutoTrade
-metadata: {name: autotrade, namespace: trading}
+metadata:
+  name: autotrade
+  namespace: trading
 spec:
   strategyConfig: baseline
   enabled: true

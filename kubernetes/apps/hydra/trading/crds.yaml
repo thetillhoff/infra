@@ -21,11 +21,17 @@ spec:
           properties:
             spec:
               type: object
-              required: ["strategyConfig"]
+              required:
+                - "strategyConfig"
               properties:
-                enabled: {type: boolean, default: false}
-                strategyConfig: {type: string}
-                preloadOnDeploy: {type: boolean, default: false}
+                enabled:
+                  type: boolean
+                  default: false
+                strategyConfig:
+                  type: string
+                preloadOnDeploy:
+                  type: boolean
+                  default: false
             status:
               type: object
               x-kubernetes-preserve-unknown-fields: true
@@ -55,7 +61,8 @@ spec:
             spec:
               type: object
               properties:
-                requestedAt: {type: string}
+                requestedAt:
+                  type: string
                 instruments:
                   type: array
                   items:
@@ -88,7 +95,8 @@ spec:
           properties:
             spec:
               type: object
-              required: ["configs"]
+              required:
+                - "configs"
               properties:
                 configs:
                   type: array
@@ -145,17 +153,28 @@ spec:
             spec:
               type: object
               properties:
-                gridSearch: {type: string}
-                period: {type: string}
-                alpha: {type: number}
-                winRate: {type: number}
-                totalTrades: {type: integer}
-                avgExposurePct: {type: number}
-                stressedAlphaBase: {type: number}
-                stressedAlphaMedium: {type: number}
-                stressedAlphaSevere: {type: number}
-                stressGatePassed: {type: boolean}
-                completedAt: {type: string}
+                gridSearch:
+                  type: string
+                period:
+                  type: string
+                alpha:
+                  type: number
+                winRate:
+                  type: number
+                totalTrades:
+                  type: integer
+                avgExposurePct:
+                  type: number
+                stressedAlphaBase:
+                  type: number
+                stressedAlphaMedium:
+                  type: number
+                stressedAlphaSevere:
+                  type: number
+                stressGatePassed:
+                  type: boolean
+                completedAt:
+                  type: string
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition

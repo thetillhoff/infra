@@ -5,13 +5,13 @@ metadata:
   namespace: trading
 spec:
   parentRefs:
-  - name: http-gateway
-    namespace: gateways
+    - name: http-gateway
+      namespace: gateways
   hostnames:
-  - trading.thetillhoff.de
+    - trading.thetillhoff.de
   rules:
-  - filters:
-    - type: RequestRedirect
-      requestRedirect:
-        scheme: https
-        statusCode: 301
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301

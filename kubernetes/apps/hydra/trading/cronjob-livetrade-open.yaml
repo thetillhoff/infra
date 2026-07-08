@@ -1,6 +1,8 @@
 apiVersion: batch/v1
 kind: CronJob
-metadata: {name: livetrade-open, namespace: trading}
+metadata:
+  name: livetrade-open
+  namespace: trading
 spec:
   schedule: "32 9 * * 1-5"
   timeZone: America/New_York
@@ -19,17 +21,28 @@ spec:
               image: ghcr.io/thetillhoff/trading-livetrade:56 # {"$imagepolicy": "trading:trading-livetrade"}
               imagePullPolicy: IfNotPresent
               env:
-                - {name: TRIGGER, value: open}
-                - {name: NAMESPACE, value: trading}
-                - {name: IBKR_HOST, value: ibkr-gateway}
-                - {name: IBKR_PORT, value: "4002"}
+                - name: TRIGGER
+                  value: open
+                - name: NAMESPACE
+                  value: trading
+                - name: IBKR_HOST
+                  value: ibkr-gateway
+                - name: IBKR_PORT
+                  value: "4004"
                 - name: POSTGRES_DSN
-                  valueFrom: {secretKeyRef: {name: trading-postgres, key: dsn}}
+                  valueFrom:
+                    secretKeyRef:
+                      name: trading-postgres
+                      key: dsn
               envFrom:
-                - secretRef: {name: trading-ibkr}
+                - secretRef:
+                    name: trading-ibkr
               resources:
                 # request = limit → Guaranteed QoS: reserves its full budget so the
                 # scheduler queues it (Pending) rather than overcommitting, and caps it
                 # so a spike can't take the node down. No CPU limit (avoids throttling).
-                requests: {cpu: 500m, memory: 1Gi}
-                limits: {memory: 1Gi}
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                limits:
+                  memory: 1Gi

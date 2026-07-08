@@ -5,18 +5,29 @@ metadata:
   namespace: trading
 spec:
   replicas: 1
-  selector: {matchLabels: {app: ibkr-gateway}}
+  selector:
+    matchLabels:
+      app: ibkr-gateway
   template:
-    metadata: {labels: {app: ibkr-gateway}}
+    metadata:
+      labels:
+        app: ibkr-gateway
     spec:
       containers:
         - name: gateway
           image: ghcr.io/gnzsnz/ib-gateway:stable
           envFrom:
-            - secretRef: {name: trading-ibkr}
+            - secretRef:
+                name: trading-ibkr
           ports:
-            - {containerPort: 4001, name: live}
-            - {containerPort: 4002, name: paper}
+            - containerPort: 4003
+              name: live
+            - containerPort: 4004
+              name: paper
           resources:
-            requests: {cpu: 250m, memory: 512Mi}
-            limits: {cpu: "1", memory: 1Gi}
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
