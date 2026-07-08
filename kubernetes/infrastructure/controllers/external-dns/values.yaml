@@ -26,10 +26,8 @@ policy: sync
 txtOwnerId: hydra
 txtPrefix: extdns- # avoids TXT/A name collision on the same record
 
-extraArgs:
-  # tailnet IPs (100.64.0.0/10, CGNAT) must be plain DNS records, never
-  # Cloudflare-proxied — the orange-cloud proxy can't reach a private IP.
-  - --cloudflare-proxied=false
+# Note: cloudflare "proxied" defaults to false already, so tailnet 100.x IPs are
+# created as plain DNS records (the orange-cloud proxy can't reach a private IP).
 
 # Reuse cert-manager's Cloudflare token (same namespace, see kustomization.yaml).
 env:
