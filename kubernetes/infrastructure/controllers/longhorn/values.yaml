@@ -29,6 +29,10 @@ csi:
 longhornUI:
   replicas: 1
 defaultSettings:
+  # V2 (SPDK) data engine off: it reserves 2Gi hugepages (vm.nr_hugepages in the
+  # talos machine config) that shrink node-allocatable memory, and no volume uses
+  # it (all volumes are V1). Keeping it on starved the nodes and OOMKilled the apiserver.
+  v2DataEngine: false
   defaultReplicaCount: 2 # needs to be 1 if data-locality is strict-local
   replicaAutoBalance: best-effort
   nodeDrainPolicy: block-for-eviction

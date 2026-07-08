@@ -1,8 +1,11 @@
 machine:
-  # Enable Longhorn dependencies
-  # More info at https://longhorn.io/docs/1.8.1/advanced-resources/os-distro-specific/talos-linux-support/#v2-data-engine
-  sysctls:
-    vm.nr_hugepages: "1024"
+  # Longhorn V2 (SPDK) data engine needs 2Gi hugepages. It's disabled (see longhorn
+  # values.yaml) and unused, so the reservation is commented out — it was carved from
+  # node memory, shrinking allocatable and OOMKilling the apiserver. Uncomment together
+  # with v2DataEngine if V2 is ever adopted (and size the nodes for it).
+  # Longhorn Talos support: https://longhorn.io/docs/1.8.1/advanced-resources/os-distro-specific/talos-linux-support/
+  # sysctls:
+  #   vm.nr_hugepages: "1024"
   kernel:
     modules:
       - name: nvme_tcp
