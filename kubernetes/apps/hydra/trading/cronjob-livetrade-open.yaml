@@ -27,5 +27,8 @@ spec:
               envFrom:
                 - secretRef: {name: trading-ibkr}
               resources:
-                requests: {cpu: 500m, memory: 512Mi}
+                # request = limit → Guaranteed QoS: reserves its full budget so the
+                # scheduler queues it (Pending) rather than overcommitting, and caps it
+                # so a spike can't take the node down. No CPU limit (avoids throttling).
+                requests: {cpu: 500m, memory: 1Gi}
                 limits: {memory: 1Gi}

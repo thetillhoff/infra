@@ -1,6 +1,15 @@
 # https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus/values.yaml
 
 server:
+  # Requests set a scheduling floor; the memory limit caps runaway growth (WAL
+  # replay, compaction) so a spike can't exhaust the node. CPU request only — a
+  # CPU limit would throttle.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1536Mi
   global:
     scrape_interval: 15s
   persistentVolume:
