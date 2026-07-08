@@ -3,11 +3,14 @@
 provider:
   name: cloudflare
 
-# Only manage records under this subdomain. This is the critical safety fence:
-# external-dns will NEVER create/update/delete public thetillhoff.de records
-# (those are owned by pulumi + cert-manager).
+# Must be the Cloudflare ZONE (thetillhoff.de), not a subdomain — external-dns
+# matches zones against this filter, and a subdomain filter makes it discard the
+# whole zone ("zone thetillhoff.de not in domain filter") and create nothing.
+# Safety comes from the TXT ownership registry below (txtOwnerId), NOT this filter:
+# external-dns only ever modifies/deletes records it created (the internal.* ones),
+# never the public records owned by pulumi/cert-manager.
 domainFilters:
-  - internal.thetillhoff.de
+  - thetillhoff.de
 
 # Only watch Services (the tailscale LoadBalancer services in private-endpoints).
 sources:
