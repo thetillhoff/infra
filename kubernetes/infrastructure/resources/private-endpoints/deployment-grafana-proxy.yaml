@@ -32,6 +32,11 @@ spec:
             capabilities:
               drop:
                 - ALL
+              # caddy's binary is setcap cap_net_bind_service; with an empty bounding
+              # set the kernel refuses to exec it (EPERM). Add it back (harmless — we
+              # bind 8443) so the binary can start.
+              add:
+                - NET_BIND_SERVICE
           volumeMounts:
             - name: caddyfile
               mountPath: /etc/caddy/Caddyfile
