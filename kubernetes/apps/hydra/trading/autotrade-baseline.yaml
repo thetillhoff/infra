@@ -5,5 +5,5 @@ metadata:
   namespace: trading
 spec:
   strategyConfig: baseline
-  enabled: true
+  enabled: false   # live-trading disabled: IBKR gateway login unresolved (see TODO)
   preloadOnDeploy: false   # data already loaded; set true to trigger a fresh full-universe refresh on next deploy
