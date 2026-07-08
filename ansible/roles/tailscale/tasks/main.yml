@@ -16,12 +16,14 @@
     # This commands either fails with "Logged out." or succeeds with "Logged in. <...>"
     changed_when: false
   rescue:
-  # authkey from sops host_vars (tailscale.sops.yaml). --reset makes the tags/flags
+  # authkey from sops host_vars (tailscale.sops.yaml) — an OAuth client secret.
+  # ephemeral=false keeps this persistent server registered when offline;
+  # preauthorized=true skips manual device approval. --reset makes the tags/flags
   # authoritative, so this also retags a node that was authed without them.
   - command: >-
       tailscale up
       --hostname={{ inventory_hostname }}
-      --authkey {{ tailscale_authkey }}
+      --authkey '{{ tailscale_authkey }}?ephemeral=false&preauthorized=true'
       --advertise-tags=tag:service,tag:exit
       --advertise-exit-node
       --reset
