@@ -11,6 +11,7 @@ spec:
       backoffLimit: 1
       template:
         spec:
+          priorityClassName: trading-batch-low
           serviceAccountName: trading-worker
           restartPolicy: Never
           containers:
