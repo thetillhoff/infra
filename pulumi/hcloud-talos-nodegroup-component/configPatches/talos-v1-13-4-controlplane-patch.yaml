@@ -61,14 +61,20 @@ machine:
       # requests (CSR).
       # serverTLSBootstrap: true
 
-      # Reserve CPU for node + kube daemons (kubelet, containerd, etcd — etcd runs as a
-      # Talos system service, outside pods) so a CPU-hungry workload can't starve them.
-      # Root cause of the 2026-06-30 control-plane wedge: a batch grid pinned CPU with no
-      # reservation, PLEG/containerd stalled, nodes went NotReady. 256m + 256m = 0.5 core.
+      # Reserve CPU + memory for node and kube daemons (kubelet, containerd, and etcd,
+      # which runs as a Talos system service outside pods) so workloads can't starve them
+      # and wedge the node NotReady.
       systemReserved:
         cpu: 256m
+        memory: 1Gi
       kubeReserved:
         cpu: 256m
+        memory: 512Mi
+      # Evict pods before the kernel OOM-killer fires, keeping the daemons above alive.
+      # Percentages hold regardless of node RAM.
+      evictionHard:
+        memory.available: 5%
+        nodefs.available: 10%
 
       # Age-prune container images unused for 30d (regardless of disk), so the run-number
       # image tags (a new trading-worker/operator per CI build) don't accumulate on nodes
