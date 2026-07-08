@@ -27,6 +27,18 @@ spec:
               value: trading-data
             - name: NAMESPACE
               value: trading
+            # Worker-job resources (memory request==limit==value, Guaranteed QoS). Retune here
+            # without a new image; the operator restarts and new jobs pick up the values.
+            - name: JOB_CPU
+              value: "512m"
+            - name: JOB_MEM_SIGNALS
+              value: "512Mi"
+            - name: JOB_MEM_SIMULATION
+              value: "1Gi"
+            - name: JOB_MEM_DOWNLOAD
+              value: "768Mi"
+            - name: JOB_MEM_PLANNING
+              value: "384Mi"
             - name: POSTGRES_DSN
               valueFrom:
                 secretKeyRef:
