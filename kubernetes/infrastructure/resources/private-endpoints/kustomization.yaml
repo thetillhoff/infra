@@ -25,3 +25,9 @@ resources:
 - configMap-hubble-caddy.yaml
 - deployment-hubble-proxy.yaml
 - service-hubble.yaml
+
+# trading.internal.thetillhoff.de
+- certificate-trading.yaml
+- configMap-trading-caddy.yaml
+- deployment-trading-proxy.yaml
+- service-trading.yaml

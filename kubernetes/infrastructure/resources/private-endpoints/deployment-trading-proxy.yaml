@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trading-proxy
+  namespace: private-endpoints
+spec:
+  # ponytail: single replica — homelab internal tooling. Bump to 2 if uptime matters.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trading-proxy
+  template:
+    metadata:
+      labels:
+        app: trading-proxy
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: caddy
+          image: caddy:2.11.4-alpine # {"$imagepolicy": "private-endpoints:caddy"}
+          ports:
+            - containerPort: 8443
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+              # caddy's binary is setcap cap_net_bind_service; with an empty bounding
+              # set the kernel refuses to exec it (EPERM). Add it back (harmless — we
+              # bind 8443) so the binary can start.
+              add:
+                - NET_BIND_SERVICE
+          volumeMounts:
+            - name: caddyfile
+              mountPath: /etc/caddy/Caddyfile
+              subPath: Caddyfile
+              readOnly: true
+            - name: certs
+              mountPath: /certs
+              readOnly: true
+            - name: config # Caddy XDG_CONFIG_HOME, must be writable for non-root
+              mountPath: /config
+            - name: data # Caddy XDG_DATA_HOME
+              mountPath: /data
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: caddyfile
+          configMap:
+            name: trading-caddy
+        - name: certs
+          secret:
+            secretName: trading-internal-tls
+        - name: config
+          emptyDir: {}
+        - name: data
+          emptyDir: {}
