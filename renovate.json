@@ -9,7 +9,9 @@
   ],
   "lockFileMaintenance": {
     "enabled": true,
-    "automerge": true
+    "automerge": true,
+    "automergeType": "branch",
+    "ignoreTests": true
   },
   "flux": {
     "managerFilePatterns": [
