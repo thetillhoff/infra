@@ -26,6 +26,12 @@ homeassistant.local, homeassistant.lan, https://192.168.1.254 {
 }
 ```
 
+### Browser access
+
+The self-signed `tls_internal` cert can leave Firefox stuck on the HSTS/cert
+error with no bypass. Use a non-Firefox browser, or clear all Firefox history
+for the page (Forget About This Site) before it will load.
+
 ## Host access
 
 Connect a monitor + keyboard to the Pi:
