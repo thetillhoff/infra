@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: webscan
-        image: ghcr.io/thetillhoff/webscan:5.4.1 # {"$imagepolicy": "webscan:webscan"}
+        image: ghcr.io/thetillhoff/webscan:5.4.2 # {"$imagepolicy": "webscan:webscan"}
         ports:
         - containerPort: 8080
         args:
