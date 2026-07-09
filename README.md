@@ -63,6 +63,13 @@ To encrypt/decrypt in place use `sops encrypt -i <filename>` and `sops decrypt -
 Default keys can be configured in `~/.config/sops/age/keys.txt` with one private age key per line.
 A private key can be set temporarily with `export SOPS_AGE_KEY=<value>` or `SOPS_AGE_KEY=<value> sops ...`.
 
+## Standalone devices
+
+Raspberry Pis that aren't part of the Kubernetes cluster, each with its own setup doc:
+
+- Magic Mirror (Raspberry Pi 3B): `magic-mirror-setup.md`
+- Home Assistant (Home Assistant OS + Caddy2 reverse proxy): `homeassistant-setup.md`
+
 ## Storage
 
 Rook was too complex and had too harsh requirements for a homelab.

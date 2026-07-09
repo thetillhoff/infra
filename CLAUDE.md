@@ -11,6 +11,8 @@ Multi-tool homelab infra repo. Cluster name: `hydra`. Domain: `thetillhoff.de`. 
 - **`ansible/`** — Config management for bare-metal hosts (e.g. `blackhole` storage server)
 - **`packer/`** — Builds Talos Linux images for Hetzner Cloud (amd64/arm64)
 
+Standalone Raspberry Pis (not in the cluster) have their own root-level setup docs: `magic-mirror-setup.md`, `homeassistant-setup.md` (Home Assistant OS + Caddy2 reverse proxy).
+
 ## Commands
 
 ### Pulumi (run from `pulumi/`)
