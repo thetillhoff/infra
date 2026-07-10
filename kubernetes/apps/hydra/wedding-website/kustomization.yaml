@@ -5,6 +5,7 @@ resources:
 - namespace.yaml
 - ghcr-pull.secret.yaml
 - wedding-password.secret.yaml
+- smtp.secret.yaml
 
 - pvc.yaml
 - deployment.yaml

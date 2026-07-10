@@ -39,6 +39,21 @@ spec:
               key: password
         - name: DB_PATH
           value: /data/wedding.db
+        - name: SMTP_USER
+          valueFrom:
+            secretKeyRef:
+              name: wedding-smtp
+              key: user
+        - name: SMTP_PASS
+          valueFrom:
+            secretKeyRef:
+              name: wedding-smtp
+              key: password
+        - name: NOTIFY_TO
+          valueFrom:
+            secretKeyRef:
+              name: wedding-smtp
+              key: to
         livenessProbe:
           httpGet:
             port: 80
