@@ -122,6 +122,25 @@ Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator, flux) are c
 
 Default kubeconfig context may be a local kind cluster, not hydra. Always run `eval "$(task configure-env)"` before any kubectl/flux commands.
 
+### Memory is oversubscribed — batch bursts OOM the whole cluster
+
+3 small control-plane nodes, no workers. Baseline already fills them (~90-100% mem): prometheus
+~2.75GB, 3× kube-apiserver 1.6-3.9GB, Longhorn, Cilium. Any spike hits the kernel OOM-killer.
+
+- 2026-07-13: a large trading grid (~2082 pods) tipped nodes into **global OOM** → killed
+  kube-apiserver, kubelet (node-0 went NotReady), longhorn-manager → cascade (Longhorn volumes
+  detached, postgres down, Cilium/flux crashlooping). Recovery: hard-reset node-0, then the cluster
+  self-heals as memory frees + the failed workload is cleaned.
+- **Recover an unresponsive Talos node** via a **Hetzner hard reset** (console or `hcloud server
+  reset`) — if `apid` is dead, `talosctl reboot` can't reach it.
+- **Longhorn-manager was BestEffort** (no resource requests) → first OOM victim (~500 restarts/25d).
+  Fixed: `defaultSettings.priorityClass: system-node-critical` in the Longhorn `values.yaml`.
+- **Prometheus RAM = active-series cardinality** (in-memory head block), NOT retention/disk. Hubble
+  `httpV2` per-IP labels + `port-distribution` were ~90k series — trimmed in `pulumi/cilium-values.yaml`
+  (Cilium is Pulumi-managed; `pulumi up` + a `kubectl rollout restart daemonset cilium` to pick it up).
+- Real fix (open): add capacity — a worker node / bigger instances. Until then, batch workloads must
+  be quota-bounded (the `trading` namespace has a ResourceQuota).
+
 ### Private endpoints require out-of-band Tailscale config
 
 The `private-endpoints` manifests are inert until the tailnet is set up (done in the Tailscale admin console, not this repo):
