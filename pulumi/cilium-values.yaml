@@ -88,8 +88,13 @@ hubble:
       - tcp
       - flow
       - icmp
-      - port-distribution
-      - "httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction"
+      # port-distribution dropped: hubble_port_distribution_total was ~39k series (one per
+      # observed port) with little observability value on this cluster.
+      # httpV2: dropped source_ip/destination_ip labels (unbounded — every pod IP pair × method ×
+      # status × le buckets; churns on pod restarts; ~51k series) and exemplars. Workload/namespace
+      # labels stay: same per-service HTTP golden signals, bounded cardinality. Cuts prometheus
+      # head RAM by ~0.7-1GB (was the top driver of its 2.75GB / 352k active series).
+      - "httpV2:labelsContext=source_namespace,source_workload,destination_namespace,destination_workload,traffic_direction"
   relay:
     enabled: true
   # TLS for the Hubble API is issued by cert-manager via the `selfsigned-ca` ClusterIssuer
