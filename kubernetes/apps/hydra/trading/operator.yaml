@@ -59,7 +59,10 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 256Mi
             limits:
               cpu: 500m
-              memory: 256Mi
+              # Holds the full TaskPlan + per-job reconcile state in memory. A multi-config
+              # grid (e.g. 6 configs x 347 instruments = ~2082 tasks, ~350KB plan) OOM'd at
+              # 256Mi and stalled/failed the run. 1Gi gives headroom for large grids.
+              memory: 1Gi
