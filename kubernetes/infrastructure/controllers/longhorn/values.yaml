@@ -29,6 +29,12 @@ csi:
 longhornUI:
   replicas: 1
 defaultSettings:
+  # Protect Longhorn's own components (manager, instance-managers, CSI) from the node
+  # OOM-killer. Without a priority class they run BestEffort and are the FIRST processes
+  # killed under memory pressure — longhorn-manager was OOMKilled ~500x/25d, which stops
+  # replicas and detaches volumes (postgres went down this way on 2026-07-13). A high
+  # priority class lowers their oom_score_adj so batch/burstable pods are sacrificed first.
+  priorityClass: system-node-critical
   # V2 (SPDK) data engine off: it reserves 2Gi hugepages (vm.nr_hugepages in the
   # talos machine config) that shrink node-allocatable memory, and no volume uses
   # it (all volumes are V1). Keeping it on starved the nodes and OOMKilled the apiserver.
