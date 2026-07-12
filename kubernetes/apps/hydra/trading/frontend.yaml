@@ -17,7 +17,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: frontend
-          image: ghcr.io/thetillhoff/trading-frontend:66 # {"$imagepolicy": "trading:trading-frontend"}
+          image: ghcr.io/thetillhoff/trading-frontend:67 # {"$imagepolicy": "trading:trading-frontend"}
           ports:
             - containerPort: 8080
           securityContext:
