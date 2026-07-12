@@ -24,6 +24,13 @@ spec:
           envFrom:
             - secretRef:
                 name: trading-ibkr
+          env:
+            # New login preempts a lingering session instead of hanging on the "Existing session
+            # detected" dialog (IBC default is 'manual' = wait forever). 'primaryoverride' = the
+            # existing session terminates and the new one proceeds — clean auto-recovery on a
+            # Recreate rollout. ('primary'/'secondary' would kill the NEW session instead.)
+            - name: EXISTING_SESSION_DETECTED_ACTION
+              value: primaryoverride
           ports:
             - containerPort: 4003
               name: live
