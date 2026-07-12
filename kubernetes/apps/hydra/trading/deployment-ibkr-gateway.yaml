@@ -24,6 +24,19 @@ spec:
               name: live
             - containerPort: 4004
               name: paper
+          # socat on :4004 accepts immediately, so probe the real IB API on loopback :4002
+          # (paper) instead — it opens only after login completes. bash /dev/tcp is used because
+          # the image has bash but no nc. Live mode would probe 4001; switch if TRADING_MODE flips.
+          startupProbe:
+            exec:
+              command: ["bash", "-c", "echo > /dev/tcp/127.0.0.1/4002"]
+            periodSeconds: 10
+            failureThreshold: 30   # ~5 min budget for a cold IB Gateway login
+          readinessProbe:
+            exec:
+              command: ["bash", "-c", "echo > /dev/tcp/127.0.0.1/4002"]
+            periodSeconds: 15
+            failureThreshold: 3
           resources:
             requests:
               cpu: 250m
