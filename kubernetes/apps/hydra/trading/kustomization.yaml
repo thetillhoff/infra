@@ -3,6 +3,8 @@ kind: Kustomization
 namespace: trading
 resources:
   - namespace.yaml
+  - resourceQuota-trading.yaml
+  - limitRange-trading.yaml
   - ghcr-creds.secret.yaml
   - trading-postgres.secret.yaml
 

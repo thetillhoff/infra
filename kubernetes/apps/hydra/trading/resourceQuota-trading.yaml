@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: trading-quota
+  namespace: trading
+spec:
+  # Hard ceiling so the trading namespace can never exhaust the whole cluster again.
+  # 2026-07-13: a grid fanned out ~2082 worker pods; combined memory tipped the nodes into
+  # global OOM (killed apiserver, kubelet, longhorn-manager). These caps bound both the
+  # memory footprint and the pod-object count so a runaway grid stays contained.
+  hard:
+    requests.memory: 6Gi
+    limits.memory: 8Gi
+    pods: "80"
