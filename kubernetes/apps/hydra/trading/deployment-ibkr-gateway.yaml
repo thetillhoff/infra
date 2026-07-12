@@ -5,6 +5,11 @@ metadata:
   namespace: trading
 spec:
   replicas: 1
+  # Recreate, not RollingUpdate: IBKR allows one live session, so two gateway pods can't
+  # coexist — the old pod holds the session and blocks the new pod's login ("Existing session
+  # detected"). Kill the old first so the session frees before the new logs in.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: ibkr-gateway
