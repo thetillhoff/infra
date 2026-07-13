@@ -30,6 +30,8 @@ spec:
               value: trading-data
             - name: NAMESPACE
               value: trading
+            - name: MAX_INFLIGHT_JOBS
+              value: "5" # cap concurrent grid Jobs low (was default 40): fewer live pods = lower peak cAdvisor/prometheus cardinality + apiserver churn. Matches the ~5 grid slots left by the pods=10 quota (minus ~5 always-on trading pods), so no FailedCreate churn. Slower grids, safer.
             # Worker-job resources (memory request==limit==value, Guaranteed QoS). Retune here
             # without a new image; the operator restarts and new jobs pick up the values.
             - name: JOB_CPU
