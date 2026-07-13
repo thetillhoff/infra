@@ -33,9 +33,9 @@ spec:
             # Worker-job resources (memory request==limit==value, Guaranteed QoS). Retune here
             # without a new image; the operator restarts and new jobs pick up the values.
             - name: JOB_CPU
-              value: "512m"
+              value: "1000m" # 1 full core: workers were pinned/throttled at 512m (½ core); unthrottle so fewer, fatter pods finish ~2x faster (less apiserver load than more thin pods)
             - name: JOB_MEM_SIGNALS
-              value: "512Mi"
+              value: "256Mi" # right-sized: measured peak ~208Mi (1.23x headroom); frees mem-quota so CPU is the concurrency limiter, not memory
             - name: JOB_MEM_SIMULATION
               value: "1Gi"
             - name: JOB_MEM_DOWNLOAD
