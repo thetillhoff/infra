@@ -11,7 +11,7 @@ server:
     limits:
       memory: 3Gi
   global:
-    scrape_interval: 15s
+    scrape_interval: 60s
   persistentVolume:
     enabled: true
     size: 10Gi
