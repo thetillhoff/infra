@@ -6,9 +6,16 @@ metadata:
 spec:
   # Hard ceiling so the trading namespace can never exhaust the whole cluster again.
   # 2026-07-13: a grid fanned out ~2082 worker pods; combined memory tipped the nodes into
-  # global OOM (killed apiserver, kubelet, longhorn-manager). These caps bound both the
-  # memory footprint and the pod-object count so a runaway grid stays contained.
+  # global OOM (killed apiserver, kubelet, longhorn-manager). These caps bound the memory
+  # footprint, pod-object count, and CPU so a runaway grid stays contained.
+  #
+  # requests.cpu 9 == ~3 full cores per node across the 3-node cluster (quota is namespace-total,
+  # not per-node; the scheduler spreads pods). With Guaranteed workers at JOB_CPU=1000m this caps
+  # trading at ~9 concurrent fat pods, leaving CPU headroom for baseline workloads + node daemons.
+  # This restores the explicit CPU ceiling that the memory quota implicitly provided before signal
+  # jobs were right-sized from 512Mi to 256Mi.
   hard:
+    requests.cpu: "9"
     requests.memory: 6Gi
     limits.memory: 8Gi
-    pods: "80"
+    pods: "40"
