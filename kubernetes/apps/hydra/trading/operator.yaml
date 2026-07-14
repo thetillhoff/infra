@@ -35,7 +35,9 @@ spec:
             # Worker-job resources (memory request==limit==value, Guaranteed QoS). Retune here
             # without a new image; the operator restarts and new jobs pick up the values.
             - name: JOB_CPU
-              value: "1500m" # 1.5 cores: signal workers peg a full core (multi-threaded indicator ThreadPool, GIL-releasing) and want more; give them 1.5 to finish faster. Global (all task types); ~3 concurrent still fit per the pods=10 / requests.cpu=7 quota.
+              value: "1000m" # CPU limit: workers plateau at ~1 core, so 1000m is the useful ceiling (1.5 was wasted).
+            - name: JOB_CPU_REQUEST
+              value: "500m" # burstable: request 0.5 core so ~5-6 pods fit (real concurrency win), each bursts to the 1000m limit. Guaranteed-CPU dropped since workers are ~1-core-bound + CPU is compressible.
             - name: JOB_MEM_SIGNALS
               value: "256Mi" # right-sized: measured peak ~208Mi (1.23x headroom); frees mem-quota so CPU is the concurrency limiter, not memory
             - name: JOB_MEM_SIMULATION
