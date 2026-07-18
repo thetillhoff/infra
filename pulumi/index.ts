@@ -17,7 +17,7 @@ const enableBlueskyVerification = "did:plc:yfywvq4oa4bx5gtd2fk3uenw";
 const versions = {
   kubernetes: "v1.36.2", // From https://kubernetes.io/releases/
   cilium: "1.19.6", // From https://github.com/cilium/cilium/releases
-  gatewayApiCrds: "v1.6.0", // From https://github.com/kubernetes-sigs/gateway-api/releases
+  gatewayApiCrds: "v1.6.1", // From https://github.com/kubernetes-sigs/gateway-api/releases
   fluxOperator: "0.54.1", // From https://github.com/controlplaneio-fluxcd/flux-operator/releases
   flux: "v2.9.2", // From https://github.com/fluxcd/flux2/releases
 };
