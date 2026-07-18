@@ -18,7 +18,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: operator
-          image: ghcr.io/thetillhoff/trading-operator:75 # {"$imagepolicy": "trading:trading-operator"}
+          image: ghcr.io/thetillhoff/trading-operator:76 # {"$imagepolicy": "trading:trading-operator"}
           command:
             - "python"
             - "-m"
