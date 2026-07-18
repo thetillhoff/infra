@@ -19,7 +19,7 @@ const versions = {
   cilium: "1.19.6", // From https://github.com/cilium/cilium/releases
   gatewayApiCrds: "v1.6.0", // From https://github.com/kubernetes-sigs/gateway-api/releases
   fluxOperator: "0.54.1", // From https://github.com/controlplaneio-fluxcd/flux-operator/releases
-  flux: "v2.9.1", // From https://github.com/fluxcd/flux2/releases
+  flux: "v2.9.2", // From https://github.com/fluxcd/flux2/releases
 };
 const clusterDnsNames = [
   `${domain}`,
