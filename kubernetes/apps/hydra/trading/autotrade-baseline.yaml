@@ -4,6 +4,6 @@ metadata:
   name: autotrade
   namespace: trading
 spec:
-  strategyConfig: baseline
+  strategyConfig: ew-champion
   enabled: true
   preloadOnDeploy: false   # data already loaded; set true to trigger a fresh full-universe refresh on next deploy

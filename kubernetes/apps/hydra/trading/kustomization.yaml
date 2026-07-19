@@ -46,4 +46,5 @@ resources:
   - deployment-ibkr-gateway.yaml
   - service-ibkr-gateway.yaml
 
+  - strategyConfig-ew-champion.yaml
   - autotrade-baseline.yaml

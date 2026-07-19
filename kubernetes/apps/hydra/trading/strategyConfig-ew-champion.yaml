@@ -1,0 +1,87 @@
+apiVersion: trading.thetillhoff.de/v1alpha1
+kind: StrategyConfig
+metadata:
+  name: ew-champion
+  namespace: trading
+spec:
+  name: ew-champion
+  description: "EW champion (paper): EW impulse ws=0.10 + reserve_slots 10 + equal_weight sizing. Validated +3.7%/yr floor at realistic cost, positive all 4 windows incl 2010-13 OOS holdout."
+  indicators:
+    elliott_wave: {enabled: true, min_confidence: 0.00, min_wave_size: 0.10}
+    rsi: {period: 7, oversold: 30, overbought: 70}
+    ema: {short_period: 20, long_period: 50}
+    macd: {fast: 12, slow: 26, signal: 12}
+  risk: {risk_reward: 2.6, position_size_pct: 0.20, max_allocation_pct_per_instrument: 0.20, reserve_slots: 10, sizing_mode: equal_weight, sizing_tilt_ref: 0.5, min_position_size: 20, bankruptcy_threshold: 100, use_confidence_sizing: false}
+  signals:
+    signal_types: all
+    min_certainty: 0.0
+    use_multi_timeframe: true
+    use_multi_timeframe_filter: false
+    confidence_weights:
+      ew:     {weight: 1.0, threshold: 0.0}
+      rsi:    {weight: 0.0, threshold: 0.0}
+      ema:    {weight: 0.0, threshold: 0.0}
+      macd:   {weight: 0.0, threshold: 0.0}
+      mtf_2w: {weight: 0.0, threshold: 0.0}
+      mtf_4w: {weight: 0.0, threshold: 0.0}
+  costs: {interest_rate_pa: 0.02, trade_fee_absolute: 0, trade_fee_pct: 0.0003, trade_fee_min: 1, trade_fee_max: 10, slippage_bps: 4}
+  evaluation: {step_days: 1, lookback_days: 365, execution_delay_bars: 1, initial_capital: 100000}
+  data:
+    column: "Open"
+    start_date: '2021-01-01'
+    instruments:
+      - AAPL
+      - AMZN
+      - CSCO
+      - ORCL
+      - IBM
+      - QCOM
+      - JPM
+      - BAC
+      - WFC
+      - C
+      - GS
+      - MS
+      - AXP
+      - USB
+      - PNC
+      - SCHW
+      - XOM
+      - CVX
+      - COP
+      - SLB
+      - EOG
+      - JNJ
+      - PFE
+      - ABT
+      - TMO
+      - MDT
+      - BMY
+      - GILD
+      - KO
+      - PEP
+      - WMT
+      - COST
+      - MO
+      - CL
+      - MCD
+      - SBUX
+      - NKE
+      - LOW
+      - HD
+      - TJX
+      - CAT
+      - DE
+      - HON
+      - MMM
+      - GE
+      - EMR
+      - UPS
+      - LMT
+      - NEE
+      - DUK
+      - AEP
+      - DIS
+      - CMCSA
+      - VZ
+      - T
