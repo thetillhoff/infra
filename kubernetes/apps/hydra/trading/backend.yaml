@@ -17,7 +17,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: backend
-          image: ghcr.io/thetillhoff/trading-backend:100 # {"$imagepolicy": "trading:trading-backend"}
+          image: ghcr.io/thetillhoff/trading-backend:101 # {"$imagepolicy": "trading:trading-backend"}
           command:
             - "uvicorn"
             - "backend.main:app"
