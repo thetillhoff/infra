@@ -1,40 +1,47 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: ibkr-broker
   namespace: trading
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend
+      app: ibkr-broker
   template:
     metadata:
       labels:
-        app: backend
+        app: ibkr-broker
     spec:
       imagePullSecrets:
         - name: ghcr-creds
       containers:
-        - name: backend
-          image: ghcr.io/thetillhoff/trading-backend:102 # {"$imagepolicy": "trading:trading-backend"}
+        - name: ibkr-broker
+          image: ghcr.io/thetillhoff/trading-ibkr-broker:79 # {"$imagepolicy": "trading:trading-ibkr-broker"}
+          workingDir: /app/broker
           command:
             - "uvicorn"
-            - "backend.main:app"
+            - "app:app"
             - "--host"
             - "0.0.0.0"
             - "--port"
-            - "8000"
+            - "8002"
+          envFrom:
+            - secretRef:
+                name: trading-ibkr
           env:
-            - name: POSTGRES_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: trading-postgres
-                  key: dsn
-            - name: IBKR_BROKER_URL
-              value: http://ibkr-broker:8002
+            - name: IBKR_HOST
+              value: ibkr-gateway
+            - name: IBKR_PORT
+              value: "4004"
+            - name: IBKR_CLIENT_ID
+              value: "2"
           ports:
-            - containerPort: 8000
+            - containerPort: 8002
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8002
           securityContext:
             runAsNonRoot: true
             runAsUser: 10001
@@ -49,17 +56,5 @@ spec:
               cpu: 100m
               memory: 128Mi
             limits:
-              cpu: 500m
+              cpu: 300m
               memory: 256Mi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend
-  namespace: trading
-spec:
-  selector:
-    app: backend
-  ports:
-    - port: 8000
-      targetPort: 8000

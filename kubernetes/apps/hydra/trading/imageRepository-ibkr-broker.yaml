@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: trading-ibkr-broker
+  namespace: trading
+spec:
+  image: ghcr.io/thetillhoff/trading-ibkr-broker
+  interval: 5m0s
+  secretRef:
+    name: ghcr-creds

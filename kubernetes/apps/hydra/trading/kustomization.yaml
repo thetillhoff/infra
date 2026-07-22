@@ -34,6 +34,8 @@ resources:
   - imagePolicy-worker.yaml
   - imageRepository-livetrade.yaml
   - imagePolicy-livetrade.yaml
+  - imageRepository-ibkr-broker.yaml
+  - imagePolicy-ibkr-broker.yaml
   - imageUpdateAutomation.yaml
 
   - cronjob-livetrade-open.yaml
@@ -45,6 +47,8 @@ resources:
 
   - deployment-ibkr-gateway.yaml
   - service-ibkr-gateway.yaml
+  - deployment-ibkr-broker.yaml
+  - service-ibkr-broker.yaml
 
   - strategyConfig-ew-champion.yaml
   - autotrade-baseline.yaml
