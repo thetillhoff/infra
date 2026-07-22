@@ -25,7 +25,7 @@ spec:
             - "trading_operator"
           env:
             - name: WORKER_IMAGE
-              value: ghcr.io/thetillhoff/trading-worker:98 # {"$imagepolicy": "trading:trading-worker"}
+              value: ghcr.io/thetillhoff/trading-worker:99 # {"$imagepolicy": "trading:trading-worker"}
             - name: PVC_NAME
               value: trading-data
             - name: NAMESPACE
