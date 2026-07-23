@@ -17,7 +17,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: ibkr-broker
-          image: ghcr.io/thetillhoff/trading-ibkr-broker:103 # {"$imagepolicy": "trading:trading-ibkr-broker"}
+          image: ghcr.io/thetillhoff/trading-ibkr-broker:104 # {"$imagepolicy": "trading:trading-ibkr-broker"}
           workingDir: /app/broker
           command:
             - "uvicorn"
