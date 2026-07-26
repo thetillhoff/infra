@@ -36,6 +36,14 @@ spec:
               value: "4004"
             - name: IBKR_CLIENT_ID
               value: "2"
+            # This pod holds the only warm broker connection, so it also runs the periodic
+            # reconcile (order/position state vs broker truth) and appends the wallet series.
+            # Without the DSN it degrades to serving snapshots only.
+            - name: POSTGRES_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: trading-postgres
+                  key: dsn
           ports:
             - containerPort: 8002
           readinessProbe:
