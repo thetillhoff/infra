@@ -4,6 +4,11 @@ metadata:
   name: livetrade-close
   namespace: trading
 spec:
+  # NO `suspend:` HERE, deliberately. The trading-operator owns this field: it suspends
+  # whichever session does not match the active StrategyConfig's execution column, and both
+  # when AutoTrade is disabled (trading_operator/handlers/autotrade.py). Declaring it here
+  # would hand the field to Flux's server-side apply, which would then revert the operator
+  # on every reconcile. Cluster and git differing on `suspend` is correct, not drift.
   schedule: "30 16 * * 1-5"
   timeZone: America/New_York
   concurrencyPolicy: Forbid
