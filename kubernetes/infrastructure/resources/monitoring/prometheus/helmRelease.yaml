@@ -12,6 +12,13 @@ spec:
         name: prometheus-community
   interval: 10m
 
+  # Recreate strategy + RWO PVC: old pod must fully terminate before the new one
+  # can bind the volume, and WAL replay under memory pressure is slow. Default ~5m
+  # timeout false-fails the release before the rollout converges. 15m absorbs it.
+  timeout: 15m
+  upgrade:
+    timeout: 15m
+
   valuesFrom:
     - kind: ConfigMap # This value is case sensitive
       name: prometheus-helm-values # automatically overridden by kustomize
