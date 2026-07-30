@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend
+  namespace: trading
+# The API answers /api/live/* - account value, open positions, order history - and its own token is
+# unset, so this policy is what stands in front of it. Only the frontend's Caddy reaches it
+# (`handle /api/*` -> backend:8000).
+#
+# Pod-scoped, not namespace-wide: a namespace-wide rule would let any Job the operator schedules read
+# the account. If trading_mcp is ever deployed here, it needs its own `from` entry.
+spec:
+  podSelector:
+    matchLabels: {app: backend}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: {app: frontend}
+      ports:
+        - {protocol: TCP, port: 8000}

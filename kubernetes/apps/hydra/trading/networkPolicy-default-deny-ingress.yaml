@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: trading
+# Baseline: nothing in this namespace accepts traffic unless a policy below allows it. Before this,
+# postgres:5432 and the UNAUTHENTICATED IBKR trading API were reachable from every pod on the
+# cluster - anything that could run a pod anywhere could place orders against the account.
+#
+# INGRESS ONLY here, deliberately. A namespace-wide egress deny would need a DNS + apiserver +
+# internet allowlist to keep working (workers fetch prices from Yahoo), which is a bigger change than
+# the exposure it removes. Egress is restricted per-pod for the two that matter - see
+# networkPolicy-ibkr-gateway.yaml and networkPolicy-ibkr-broker.yaml.
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]

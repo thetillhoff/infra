@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: trading-worker-download
+  namespace: trading
+# A download Job LISTS strategy configs (to resolve the traded-instrument half of the refresh universe)
+# and reports progress on its own DataUpdate. It has no business creating a TaskPlan or touching a
+# GridSearch, which one shared Role granted it.
+rules:
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["strategyconfigs"]
+    verbs: ["get", "list"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["dataupdates"]
+    verbs: ["get"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["dataupdates/status"]
+    verbs: ["patch"]

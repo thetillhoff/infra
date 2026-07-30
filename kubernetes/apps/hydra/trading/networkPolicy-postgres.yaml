@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres
+  namespace: trading
+# Postgres is the single source of truth for prices, orders and results, and every consumer runs in
+# this namespace (backend, ibkr-broker, worker Jobs, livetrade Jobs, the operator, the backup cron).
+# Namespace-scoped is therefore free, and it is what the default-deny needs in order not to break
+# everything. Nothing outside the namespace has any reason to reach it.
+spec:
+  podSelector:
+    matchLabels: {app: postgres}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        # Empty podSelector = every pod IN THIS NAMESPACE (a namespaceSelector would be needed to
+        # widen it).
+        - podSelector: {}
+      ports:
+        - {protocol: TCP, port: 5432}

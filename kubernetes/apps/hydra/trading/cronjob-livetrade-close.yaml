@@ -17,6 +17,12 @@ spec:
     spec:
       backoffLimit: 1
       template:
+        # `app: livetrade` is what networkPolicy-ibkr-gateway.yaml allows through to the gateway's
+        # unauthenticated API. Without it this Job cannot connect at all, and the symptom is a cycle
+        # that runs, finds its signals and places nothing.
+        metadata:
+          labels:
+            app: livetrade
         spec:
           priorityClassName: trading-batch-low
           serviceAccountName: trading-worker

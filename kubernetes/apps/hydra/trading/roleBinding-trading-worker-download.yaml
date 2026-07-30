@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: trading-worker-download
+  namespace: trading
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: trading-worker-download
+subjects:
+  - kind: ServiceAccount
+    name: trading-worker-download
+    namespace: trading

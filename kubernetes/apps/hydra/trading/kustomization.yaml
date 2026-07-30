@@ -13,16 +13,43 @@ resources:
   - serviceAccount-trading-worker.yaml
   - role-trading-worker.yaml
   - roleBinding-trading-worker.yaml
+  # One account per worker task type, each carrying only the rights that task uses. The operator picks
+  # by the Job's task-type label (trading_operator/jobs.py SERVICE_ACCOUNTS) and an unknown type gets
+  # the read-only one, so a new task type fails visibly instead of inheriting CR-write rights. These
+  # MUST exist before an operator that references them: a Job naming a missing account never gets a
+  # pod. `trading-worker` above stays - it is the CronJobs' account.
+  - serviceAccount-trading-worker-download.yaml
+  - role-trading-worker-download.yaml
+  - roleBinding-trading-worker-download.yaml
+  - serviceAccount-trading-worker-planning.yaml
+  - role-trading-worker-planning.yaml
+  - roleBinding-trading-worker-planning.yaml
+  - serviceAccount-trading-worker-readonly.yaml
+  - role-trading-worker-readonly.yaml
+  - roleBinding-trading-worker-readonly.yaml
   - priorityClass-trading-batch-low.yaml
   - storage.pvc.yaml
+
+  # Default-deny ingress plus one policy per workload. The gateway's IBKR API is unauthenticated and
+  # the backend's own token is unset, so these are what keep the account unreachable.
+  - networkPolicy-default-deny-ingress.yaml
+  - networkPolicy-frontend.yaml
+  - networkPolicy-backend.yaml
+  - networkPolicy-postgres.yaml
+  - networkPolicy-ibkr-broker.yaml
+  - networkPolicy-ibkr-gateway.yaml
 
   - postgres.yaml
   - backend.yaml
   - frontend.yaml
   - operator.yaml
 
-  - httpRoute-http.yaml
-  - httpRoute-https.yaml
+  # No HTTPRoute: this UI is reached over the tailnet only, through
+  # private-endpoints/trading-proxy -> https://trading.internal.thetillhoff.de. Adding a public route
+  # would expose /api/live/* (account value, open positions, order history) to anyone, because the
+  # frontend's Caddy proxies /api/* and injects the API token itself - a caller arriving through Caddy
+  # is indistinguishable from the UI. Public access needs authentication AT THE EDGE first, and
+  # networkPolicy-frontend.yaml widened to the gateway's namespace.
 
   - imageRepository-backend.yaml
   - imageRepository-frontend.yaml

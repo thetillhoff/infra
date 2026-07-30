@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ibkr-gateway
+  namespace: trading
+# The gateway's API is UNAUTHENTICATED: anything that can open a socket to 4003/4004 can place orders
+# against the live account. Only the two workloads that legitimately hold a client id may reach it -
+# ibkr-broker (the single persistent read connection) and the livetrade Jobs (which place the orders).
+#
+# The `app: livetrade` label is load-bearing: without it on the CronJobs' pod template the live cycle
+# cannot connect at all, and the symptom is a cycle that runs, finds signals and places nothing.
+#
+# Egress: the internet (IBKR's servers) and DNS, but nothing inside the cluster. The cluster's pod and
+# service CIDRs are excluded rather than listed, so a compromise here cannot reach postgres, the API
+# server or any other namespace, while the connection out to IBKR is untouched.
+spec:
+  podSelector:
+    matchLabels: {app: ibkr-gateway}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: {app: ibkr-broker}
+        - podSelector:
+            matchLabels: {app: livetrade}
+      ports:
+        - {protocol: TCP, port: 4003}
+        - {protocol: TCP, port: 4004}
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.244.0.0/16   # pod CIDR (cilium cluster pool)
+              - 10.96.0.0/12    # service CIDR
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: kube-system}
+      ports:
+        - {protocol: UDP, port: 53}
+        - {protocol: TCP, port: 53}

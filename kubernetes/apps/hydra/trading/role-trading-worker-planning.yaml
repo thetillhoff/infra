@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: trading-worker-planning
+  namespace: trading
+# Planning is the only task type that WRITES a new CR: it reads the GridSearch and its configs, reports
+# the grid's phase, and creates the TaskPlan the operator then expands. It also creates a DataUpdate when
+# prices are missing.
+rules:
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["gridsearches", "strategyconfigs"]
+    verbs: ["get", "list"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["gridsearches/status"]
+    verbs: ["patch"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["taskplans"]
+    verbs: ["create"]
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["dataupdates"]
+    verbs: ["get", "create"]

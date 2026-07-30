@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ibkr-broker
+  namespace: trading
+# /snapshot carries account value and open positions, and BROKER_TOKEN is unset, so this is the only
+# check. Only the backend reads it.
+#
+# Egress is restricted too, and only here and on the gateway: this pod holds a live broker connection,
+# so the blast radius of anything running inside it is the account. It needs the gateway, postgres
+# (reconcile + the wallet series) and DNS - nothing else, and notably not the kube API.
+spec:
+  podSelector:
+    matchLabels: {app: ibkr-broker}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: {app: backend}
+      ports:
+        - {protocol: TCP, port: 8002}
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: {app: ibkr-gateway}
+      ports:
+        - {protocol: TCP, port: 4003}
+        - {protocol: TCP, port: 4004}
+    - to:
+        - podSelector:
+            matchLabels: {app: postgres}
+      ports:
+        - {protocol: TCP, port: 5432}
+    # DNS. Cluster service names are resolved through kube-dns in kube-system.
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: kube-system}
+      ports:
+        - {protocol: UDP, port: 53}
+        - {protocol: TCP, port: 53}

@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: trading-worker-readonly
+  namespace: trading
+# Signals and simulation Jobs only READ the config they were told to run - one identical need, so one
+# Role rather than two identical ones. Everything they produce goes to the PVC and to postgres, never to
+# the API. Between them they are the overwhelming majority of Jobs the operator creates, which is exactly
+# why they should carry the least.
+rules:
+  - apiGroups: ["trading.thetillhoff.de"]
+    resources: ["strategyconfigs"]
+    verbs: ["get"]

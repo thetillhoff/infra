@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend
+  namespace: trading
+# The ONLY way into this namespace, and it comes from the tailnet: private-endpoints/trading-proxy
+# terminates https://trading.internal.thetillhoff.de and proxies to frontend:80 -> :8080. Nothing else
+# may reach it, which is what makes the API's own token redundant rather than merely unset: the UI
+# proxies /api/* to the backend, so anything that can load the page can read the account.
+#
+# There is deliberately no public HTTPRoute any more. If one is ever added, this policy must widen to
+# the gateway's namespace AND the API needs its own authentication again - the token that Caddy
+# injects server-side protects nothing against a caller arriving through Caddy.
+spec:
+  podSelector:
+    matchLabels: {app: frontend}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: private-endpoints}
+      ports:
+        - {protocol: TCP, port: 8080}
