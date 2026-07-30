@@ -19,7 +19,10 @@ spec:
           priorityClassName: trading-batch-low
           containers:
             - name: data-refresh
-              image: bitnami/kubectl:latest
+              # NOT bitnami/kubectl: that catalog moved to bitnamilegacy, so `:latest` there is a
+              # mutable tag that can stop resolving - on the pod that triggers every price refresh.
+              # Kept on the CLUSTER's minor (1.36): kubectl supports one minor of skew either way.
+              image: registry.k8s.io/kubectl:v1.36.2
               imagePullPolicy: IfNotPresent
               command:
                 - sh
