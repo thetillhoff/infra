@@ -29,7 +29,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: livetrade
-              image: ghcr.io/thetillhoff/trading-livetrade:132 # {"$imagepolicy": "trading:trading-livetrade"}
+              image: ghcr.io/thetillhoff/trading-livetrade:133 # {"$imagepolicy": "trading:trading-livetrade"}
               imagePullPolicy: IfNotPresent
               env:
                 - name: TRIGGER
