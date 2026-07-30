@@ -56,11 +56,9 @@ spec:
                 secretKeyRef:
                   name: fcp-clerk
                   key: secretKey
-            - name: ADMIN_CLERK_SUBJECTS
-              valueFrom:
-                secretKeyRef:
-                  name: fcp-clerk
-                  key: adminSubjects
+            # Admin tier is the Clerk `role` claim; no allowlist env needed.
+            - name: ENVIRONMENT
+              value: production
           ports:
             - containerPort: 8080
           readinessProbe:

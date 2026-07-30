@@ -12,16 +12,21 @@ resources:
 - backend.yaml
 - scraper.yaml
 - frontend.yaml
+- frontend-admin.yaml
 
 - httpRoute-http.yaml
 - httpRoute-https.yaml
+- httpRoute-admin-http.yaml
+- httpRoute-admin-https.yaml
 
 - imageRepository-backend.yaml
 - imageRepository-frontend.yaml
+- imageRepository-frontend-admin.yaml
 - imageRepository-scrapers.yaml
 - imageRepository-migrations.yaml
 - imagePolicy-backend.yaml
 - imagePolicy-frontend.yaml
+- imagePolicy-frontend-admin.yaml
 - imagePolicy-scrapers.yaml
 - imagePolicy-migrations.yaml
 - imageUpdateAutomation.yaml
