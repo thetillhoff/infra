@@ -21,8 +21,12 @@ spec:
             - name: data-refresh
               # NOT bitnami/kubectl: that catalog moved to bitnamilegacy, so `:latest` there is a
               # mutable tag that can stop resolving - on the pod that triggers every price refresh.
-              # Kept on the CLUSTER's minor (1.36): kubectl supports one minor of skew either way.
-              image: registry.k8s.io/kubectl:v1.36.2
+              # NOT registry.k8s.io/kubectl: that image is distroless (no /bin/sh), so the heredoc
+              # below failed at container start with "exec: sh: executable file not found" - every
+              # refresh silently StartError'd for days with no logs and no DataUpdate CR ever created.
+              # alpine/k8s carries a shell AND kubectl on the CLUSTER's minor (1.36): kubectl supports
+              # one minor of skew either way.
+              image: alpine/k8s:1.36.2
               imagePullPolicy: IfNotPresent
               command:
                 - sh
