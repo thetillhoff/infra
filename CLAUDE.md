@@ -158,6 +158,12 @@ TLS is annotation-driven: `cert-manager.io/cluster-issuer` on a Gateway causes c
 
 DNS-01 required for any non-public gateway (HTTP-01 requires ACME server to reach the cluster). Cloudflare DNS-01 token: `Zone › DNS › Edit` scoped to `thetillhoff.de` only, stored as Secret `cloudflare-api-token` in `cert-manager` namespace.
 
+### selfsigned-ca lifetime must exceed hubble leaf renewal interval
+
+`hubble.tls.auto.method: certmanager` (in `pulumi/cilium-values.yaml`) issues hubble certs off the `selfsigned-ca` ClusterIssuer. cert-manager embeds a **snapshot** of the CA cert in each leaf's `ca.crt` and only refreshes it when the leaf re-issues. So the CA must outlive the leaf renewal cycle, else it rotates out from under the leaves and hubble-relay's trust bundle expires → `x509: certificate has expired` → CrashLoopBackOff → hubble-relay Service never Ready → **`task deploy` fails on the Service await** (surfacing as `resource monitor shut down` / `grpc: client connection is closing`, both red herrings). Current: CA `duration: 8760h` (1y, `certificate-selfsigned-ca.yaml`) + leaf `certValidityDuration: 30` (30d). Blast radius of the CA is only the two hubble certs — everything else uses `letsencrypt-prod`.
+
+Force-reissue recovery (cert-manager won't early-renew if `renewBefore` exceeds the current short cert's life): delete `selfsigned-ca-secret` (cert-manager), then `hubble-server-certs` + `hubble-relay-client-certs` (kube-system), then `rollout restart daemonset/cilium deployment/hubble-relay`.
+
 ## Known Pulumi Pitfalls
 
 ### @pulumiverse/talos provider bump triggers kubernetes cascade
