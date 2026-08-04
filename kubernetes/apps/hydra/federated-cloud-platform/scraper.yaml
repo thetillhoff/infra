@@ -4,7 +4,7 @@ metadata:
   name: scraper
   namespace: federated-cloud-platform
 spec:
-  schedule: "0 2 * * *"
+  schedule: "0 2 * * 0" # weekly, Sunday 02:00 UTC
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
