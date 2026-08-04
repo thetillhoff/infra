@@ -74,16 +74,20 @@ spec:
                 - name: cache
                   mountPath: /cache
               resources:
-                # Providers run serially and AWS's big pricing files are
-                # streamed (json.Decoder), never buffered — so peak RAM is low.
-                # req=limit (Guaranteed QoS) for a predictable batch job.
+                # The adapter buffers each provider's full offer slice in memory
+                # (adapter.Scrape returns []Offer), and AWS's set is large — 512Mi
+                # OOM-killed the run before it could report stats. Burstable: keep
+                # the request modest (fits the namespace ResourceQuota) but allow a
+                # 3Gi ceiling so the AWS pass completes.
+                # ponytail: 3Gi is a measured jump from the 512Mi OOM, not a proven
+                # peak — raise further if AWS still OOMs.
                 requests:
                   cpu: 250m
-                  memory: 512Mi
+                  memory: 1Gi
                   ephemeral-storage: 1Gi
                 limits:
                   cpu: "1"
-                  memory: 512Mi
+                  memory: 3Gi
                   ephemeral-storage: 2Gi
           volumes:
             # Ephemeral working cache — only holds parsed offers + small HTML
