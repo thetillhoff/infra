@@ -17,7 +17,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: scraper-backend
-          image: ghcr.io/thetillhoff/federated-cloud-platform/scraper-backend:1 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper-backend"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/scraper-backend:27 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper-backend"}
           env:
             - name: HOST
               value: "0.0.0.0"
