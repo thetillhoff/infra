@@ -13,6 +13,7 @@ spec:
       labels:
         app: backend
     spec:
+      serviceAccountName: backend
       imagePullSecrets:
         - name: ghcr-creds
       initContainers:
@@ -21,6 +22,20 @@ spec:
           command: ["sh", "-c"]
           args:
             - atlas migrate apply --dir file:///migrations --url $(DB_DSN)
+          env:
+            - name: DB_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: fcp-postgres
+                  key: dsn
+        # Seed reference data (provider teams, datacenters, regions, scraper
+        # team API keys). Tracked in a separate atlas_seed revisions schema so
+        # it never co-mingles with public schema-migration revisions.
+        - name: atlas-seed
+          image: ghcr.io/thetillhoff/federated-cloud-platform/migrations:1 # {"$imagepolicy": "federated-cloud-platform:fcp-migrations"}
+          command: ["sh", "-c"]
+          args:
+            - atlas migrate apply --allow-dirty --revisions-schema atlas_seed --dir file:///dummy-data --url $(DB_DSN)
           env:
             - name: DB_DSN
               valueFrom:
@@ -51,6 +66,8 @@ spec:
               value: "5432"
             - name: POSTGRES_SCHEMA
               value: fcp
+            - name: SCRAPER_BACKEND_URL
+              value: http://scraper-backend.federated-cloud-platform.svc.cluster.local:9090
             - name: CLERK_SECRET_KEY
               valueFrom:
                 secretKeyRef:

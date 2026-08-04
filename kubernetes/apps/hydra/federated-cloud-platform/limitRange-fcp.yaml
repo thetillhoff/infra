@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: fcp-defaults
+  namespace: federated-cloud-platform
+spec:
+  # Default requests/limits for any container that doesn't set its own (e.g. the
+  # busybox wait-for-backend initContainers), so the ResourceQuota is always
+  # satisfiable.
+  limits:
+    - type: Container
+      default:
+        memory: 256Mi
+        cpu: 250m
+      defaultRequest:
+        memory: 64Mi
+        cpu: 50m

@@ -3,28 +3,44 @@ kind: Kustomization
 namespace: federated-cloud-platform
 resources:
 - namespace.yaml
+- resourceQuota-fcp.yaml
+- limitRange-fcp.yaml
 - ghcr-creds.secret.yaml
 - fcp-postgres.secret.yaml
 - fcp-clerk.secret.yaml
 - fcp-scrapers.secret.yaml
 
+- rbac.yaml
+
 - postgres.yaml
 - backend.yaml
+- scraper-backend.yaml
 - scraper.yaml
+- exchange-rate.yaml
 - frontend.yaml
 - frontend-admin.yaml
 
-- httpRoute-http.yaml
+# NetworkPolicy: data/api tiers locked to their real in-cluster callers. The
+# web tier (frontend/frontend-admin) is intentionally unrestricted - it is the
+# gateway/tailnet entrypoint.
+- networkPolicy-postgres.yaml
+- networkPolicy-backend.yaml
+- networkPolicy-scraper-backend.yaml
+
+# Public exposure: marketplace frontend only (cloud.thetillhoff.de). The admin
+# UI stays unexposed (no route) until it goes tailnet-only - out of scope here.
+# TODO: rate limiting still not in place - no cluster precedent yet.
 - httpRoute-https.yaml
-- httpRoute-admin-http.yaml
-- httpRoute-admin-https.yaml
+- httpRoute-http.yaml
 
 - imageRepository-backend.yaml
+- imageRepository-scraper-backend.yaml
 - imageRepository-frontend.yaml
 - imageRepository-frontend-admin.yaml
 - imageRepository-scrapers.yaml
 - imageRepository-migrations.yaml
 - imagePolicy-backend.yaml
+- imagePolicy-scraper-backend.yaml
 - imagePolicy-frontend.yaml
 - imagePolicy-frontend-admin.yaml
 - imagePolicy-scrapers.yaml

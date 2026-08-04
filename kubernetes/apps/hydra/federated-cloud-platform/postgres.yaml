@@ -50,11 +50,11 @@ spec:
               mountPath: /var/lib/postgresql
           resources:
             requests:
-              cpu: 200m
-              memory: 512Mi
+              cpu: 100m
+              memory: 256Mi
             limits:
-              cpu: 1000m
-              memory: 1Gi
+              cpu: 500m
+              memory: 512Mi
   volumeClaimTemplates:
     - metadata:
         name: postgres-data
@@ -63,4 +63,5 @@ spec:
         storageClassName: longhorn
         resources:
           requests:
-            storage: 20Gi
+            # ~17k offers + reference data is a few hundred MB; 5Gi is ample headroom.
+            storage: 5Gi
