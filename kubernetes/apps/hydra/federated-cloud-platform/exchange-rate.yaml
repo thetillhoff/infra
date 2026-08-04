@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: exchange-rate
+  namespace: federated-cloud-platform
+spec:
+  # Daily, offset from the scraper (02:00). ECB publishes once per business day.
+  schedule: "30 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: exchange-rate # NetworkPolicy source selector (reaches postgres)
+        spec:
+          imagePullSecrets:
+            - name: ghcr-creds
+          restartPolicy: OnFailure
+          initContainers:
+            # Backend readiness implies the schema migrations have run.
+            - name: wait-for-backend
+              image: busybox:1.37
+              command: ["sh", "-c", "until wget -qO- http://backend.federated-cloud-platform.svc.cluster.local:8080/health; do echo waiting; sleep 2; done"]
+          containers:
+            - name: exchange-rate
+              # Reuses the backend image + its ImagePolicy; runs the subcommand.
+              image: ghcr.io/thetillhoff/federated-cloud-platform/backend:1 # {"$imagepolicy": "federated-cloud-platform:fcp-backend"}
+              command: ["/backend", "refresh-exchange-rate"]
+              env:
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-postgres
+                      key: user
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-postgres
+                      key: password
+                - name: POSTGRES_HOST
+                  value: postgres.federated-cloud-platform.svc.cluster.local
+                - name: POSTGRES_PORT
+                  value: "5432"
+                - name: POSTGRES_SCHEMA
+                  value: fcp
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 10001
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+                seccompProfile:
+                  type: RuntimeDefault

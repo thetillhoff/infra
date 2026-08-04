@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres
+  namespace: federated-cloud-platform
+# Pod-scoped, not namespace-wide: the public frontend is the exposed attack
+# surface, so a namespace-wide `podSelector: {}` would let a compromised
+# frontend reach the DB directly - the exact pivot this gate exists to block.
+# Only the three real DB clients may connect: backend (+ its atlas init
+# containers, same pod label), scraper-backend, and the exchange-rate Job.
+spec:
+  podSelector:
+    matchLabels: { app: postgres }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: backend }
+        - podSelector:
+            matchLabels: { app: scraper-backend }
+        - podSelector:
+            matchLabels: { app: exchange-rate }
+      ports:
+        - { protocol: TCP, port: 5432 }

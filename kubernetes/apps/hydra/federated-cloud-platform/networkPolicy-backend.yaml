@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend
+  namespace: federated-cloud-platform
+# The backend serves both public and admin route prefixes on one port; the
+# admin prefixes are gated by Clerk/RequireAdmin. Its only in-cluster callers
+# are the two frontends' Caddy proxies and the scraper CronJob (run
+# lifecycle + upserts). Pod-scoped so no other Job can reach it.
+spec:
+  podSelector:
+    matchLabels: { app: backend }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: frontend }
+        - podSelector:
+            matchLabels: { app: frontend-admin }
+        - podSelector:
+            matchLabels: { app: scraper }
+      ports:
+        - { protocol: TCP, port: 8080 }

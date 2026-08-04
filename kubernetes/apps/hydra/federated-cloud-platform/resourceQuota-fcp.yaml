@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: fcp-quota
+  namespace: federated-cloud-platform
+spec:
+  # Hard ceiling so the fcp namespace can't exhaust the cluster. Sized for the
+  # always-on pods (postgres, backend, scraper-backend, frontend, frontend-admin)
+  # plus headroom for the daily scraper Job (up to 2Gi/2 CPU) and short-lived
+  # migration / exchange-rate Jobs. Requires memory requests+limits on every
+  # container; the LimitRange supplies defaults for those that don't set them.
+  hard:
+    requests.cpu: "3"
+    requests.memory: 3Gi
+    limits.memory: 6Gi
+    pods: "15"

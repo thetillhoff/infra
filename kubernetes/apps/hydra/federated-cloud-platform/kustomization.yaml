@@ -3,25 +3,50 @@ kind: Kustomization
 namespace: federated-cloud-platform
 resources:
 - namespace.yaml
+- resourceQuota-fcp.yaml
+- limitRange-fcp.yaml
 - ghcr-creds.secret.yaml
 - fcp-postgres.secret.yaml
 - fcp-clerk.secret.yaml
 - fcp-scrapers.secret.yaml
 
+- rbac.yaml
+
 - postgres.yaml
 - backend.yaml
+- scraper-backend.yaml
 - scraper.yaml
+- exchange-rate.yaml
 - frontend.yaml
+# frontend-admin intentionally NOT deployed: public-only launch. Re-enable
+# (with a tailnet Service + real Clerk key) when the admin UI goes live. Its
+# imageRepository/imagePolicy below keep tracking the image, harmless until then.
+# - frontend-admin.yaml
 
-- httpRoute-http.yaml
+# NetworkPolicy: data/api tiers locked to their real in-cluster callers. The
+# web tier (frontend) is intentionally unrestricted - it is the gateway
+# entrypoint. (The frontend-admin `from` entry in networkPolicy-backend is inert
+# while admin is undeployed, and ready for when it returns.)
+- networkPolicy-postgres.yaml
+- networkPolicy-backend.yaml
+- networkPolicy-scraper-backend.yaml
+
+# Public exposure: marketplace frontend only (cloud.thetillhoff.de). The admin
+# UI stays unexposed (no route) until it goes tailnet-only - out of scope here.
+# TODO: rate limiting still not in place - no cluster precedent yet.
 - httpRoute-https.yaml
+- httpRoute-http.yaml
 
 - imageRepository-backend.yaml
+- imageRepository-scraper-backend.yaml
 - imageRepository-frontend.yaml
+- imageRepository-frontend-admin.yaml
 - imageRepository-scrapers.yaml
 - imageRepository-migrations.yaml
 - imagePolicy-backend.yaml
+- imagePolicy-scraper-backend.yaml
 - imagePolicy-frontend.yaml
+- imagePolicy-frontend-admin.yaml
 - imagePolicy-scrapers.yaml
 - imagePolicy-migrations.yaml
 - imageUpdateAutomation.yaml

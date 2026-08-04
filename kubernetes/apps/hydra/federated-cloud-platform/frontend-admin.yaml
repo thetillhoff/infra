@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-admin
+  namespace: federated-cloud-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-admin
+  template:
+    metadata:
+      labels:
+        app: frontend-admin
+    spec:
+      imagePullSecrets:
+        - name: ghcr-creds
+      containers:
+        - name: frontend-admin
+          image: ghcr.io/thetillhoff/federated-cloud-platform/frontend-admin:1 # {"$imagepolicy": "federated-cloud-platform:fcp-frontend-admin"}
+          ports:
+            - containerPort: 8080
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-admin
+  namespace: federated-cloud-platform
+spec:
+  selector:
+    app: frontend-admin
+  ports:
+    - port: 8080
+      targetPort: 8080

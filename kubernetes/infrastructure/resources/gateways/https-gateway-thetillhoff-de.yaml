@@ -73,3 +73,14 @@ spec:
         mode: Terminate
         certificateRefs:
           - name: wedding-thetillhoff-de-tls-certificate
+    - name: cloud-thetillhoff-de
+      hostname: "cloud.thetillhoff.de"
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: cloud-thetillhoff-de-tls-certificate
