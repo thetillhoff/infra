@@ -28,6 +28,7 @@ const clusterDnsNames = [
   `pw.${domain}`,
   `webscan.${domain}`,
   `wedding.${domain}`,
+  `cloud.${domain}`, // federated-cloud-platform public marketplace
   // "logs.thetillhoff.de",
 ];
 
