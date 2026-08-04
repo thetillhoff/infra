@@ -16,6 +16,7 @@ resources:
 - backend.yaml
 - scraper-backend.yaml
 - scraper.yaml
+- spot-scraper.yaml
 - exchange-rate.yaml
 - frontend.yaml
 # frontend-admin intentionally NOT deployed: public-only launch. Re-enable

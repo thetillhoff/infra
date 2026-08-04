@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: spot-scraper
+  namespace: federated-cloud-platform
+spec:
+  # Hourly. Spot prices move constantly; this samples them for the per-instance
+  # spot history page. Reuses the scrapers image via SCRAPER_MODE=spot.
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: spot-scraper # NetworkPolicy source selector (reaches backend)
+        spec:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          imagePullSecrets:
+            - name: ghcr-creds
+          restartPolicy: OnFailure
+          initContainers:
+            - name: wait-for-backend
+              image: busybox:1.37
+              command: ["sh", "-c", "until wget -qO- http://backend.federated-cloud-platform.svc.cluster.local:8080/health; do echo waiting; sleep 2; done"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+          containers:
+            - name: spot-scraper
+              image: ghcr.io/thetillhoff/federated-cloud-platform/scrapers:29 # {"$imagepolicy": "federated-cloud-platform:fcp-scrapers"}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              env:
+                - name: SCRAPER_MODE
+                  value: spot
+                - name: API_URL
+                  value: http://backend.federated-cloud-platform.svc.cluster.local:8080
+                - name: AZURE_SCRAPER_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-scrapers
+                      key: azureKey
+              resources:
+                # Light: pages the Azure retail API and holds ~47k small spot rows.
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
