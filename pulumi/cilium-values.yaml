@@ -105,7 +105,10 @@ hubble:
     auto:
       enabled: true
       method: certmanager
-      certValidityDuration: 365
+      # 30d leaves under the 1y selfsigned-ca (see certificate-selfsigned-ca.yaml).
+      # Leaf renews at ~2/3 (~20d), refreshing its embedded CA snapshot well inside the
+      # CA's 1y life - the trust bundle can never go stale-expired between renewals.
+      certValidityDuration: 30
       certManagerIssuerRef:
         group: cert-manager.io
         kind: ClusterIssuer

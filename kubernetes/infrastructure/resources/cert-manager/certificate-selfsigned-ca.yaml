@@ -5,6 +5,12 @@ metadata:
   namespace: cert-manager
 spec:
   isCA: true
+  # Root CA must outlive the trust snapshot every leaf embeds. cert-manager refreshes a
+  # leaf's ca.crt only when the leaf re-issues, so the invariant is: leaf renewal interval
+  # << CA lifetime. The 90d default CA rotated out from under leaves and broke their chain
+  # when the old CA cert expired. 1y CA + 30d leaf (see cilium-values.yaml) = ~335d slack.
+  duration: 8760h # 1 year
+  renewBefore: 2160h # 90 days
   commonName: selfsigned-ca
   subject:
     organizations:
