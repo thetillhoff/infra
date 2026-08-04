@@ -15,6 +15,14 @@ spec:
           labels:
             app: scraper # NetworkPolicy source selector (reaches backend + scraper-backend)
         spec:
+          # fsGroup so uid 10001 can write the /cache emptyDir; the rest satisfies
+          # the namespace's restricted PodSecurity level.
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            fsGroup: 10001
+            seccompProfile:
+              type: RuntimeDefault
           imagePullSecrets:
             - name: ghcr-creds
           restartPolicy: OnFailure
@@ -22,9 +30,17 @@ spec:
             - name: wait-for-backend
               image: busybox:1.37
               command: ["sh", "-c", "until wget -qO- http://backend.federated-cloud-platform.svc.cluster.local:8080/health && wget -qO- http://scraper-backend.federated-cloud-platform.svc.cluster.local:9090/health; do echo waiting; sleep 2; done"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
           containers:
             - name: scraper
               image: ghcr.io/thetillhoff/federated-cloud-platform/scrapers:28 # {"$imagepolicy": "federated-cloud-platform:fcp-scrapers"}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
               env:
                 - name: API_URL
                   value: http://backend.federated-cloud-platform.svc.cluster.local:8080
