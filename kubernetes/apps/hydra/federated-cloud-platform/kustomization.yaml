@@ -18,11 +18,15 @@ resources:
 - scraper.yaml
 - exchange-rate.yaml
 - frontend.yaml
-- frontend-admin.yaml
+# frontend-admin intentionally NOT deployed: public-only launch. Re-enable
+# (with a tailnet Service + real Clerk key) when the admin UI goes live. Its
+# imageRepository/imagePolicy below keep tracking the image, harmless until then.
+# - frontend-admin.yaml
 
 # NetworkPolicy: data/api tiers locked to their real in-cluster callers. The
-# web tier (frontend/frontend-admin) is intentionally unrestricted - it is the
-# gateway/tailnet entrypoint.
+# web tier (frontend) is intentionally unrestricted - it is the gateway
+# entrypoint. (The frontend-admin `from` entry in networkPolicy-backend is inert
+# while admin is undeployed, and ready for when it returns.)
 - networkPolicy-postgres.yaml
 - networkPolicy-backend.yaml
 - networkPolicy-scraper-backend.yaml
