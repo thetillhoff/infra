@@ -18,7 +18,7 @@ spec:
         - name: ghcr-creds
       initContainers:
         - name: atlas-schema
-          image: ghcr.io/thetillhoff/federated-cloud-platform/migrations:1 # {"$imagepolicy": "federated-cloud-platform:fcp-migrations"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/migrations:27 # {"$imagepolicy": "federated-cloud-platform:fcp-migrations"}
           command: ["sh", "-c"]
           args:
             - atlas migrate apply --dir file:///migrations --url $(DB_DSN)
@@ -32,7 +32,7 @@ spec:
         # team API keys). Tracked in a separate atlas_seed revisions schema so
         # it never co-mingles with public schema-migration revisions.
         - name: atlas-seed
-          image: ghcr.io/thetillhoff/federated-cloud-platform/migrations:1 # {"$imagepolicy": "federated-cloud-platform:fcp-migrations"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/migrations:27 # {"$imagepolicy": "federated-cloud-platform:fcp-migrations"}
           command: ["sh", "-c"]
           args:
             - atlas migrate apply --allow-dirty --revisions-schema atlas_seed --dir file:///dummy-data --url $(DB_DSN)
@@ -44,7 +44,7 @@ spec:
                   key: dsn
       containers:
         - name: backend
-          image: ghcr.io/thetillhoff/federated-cloud-platform/backend:1 # {"$imagepolicy": "federated-cloud-platform:fcp-backend"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/backend:27 # {"$imagepolicy": "federated-cloud-platform:fcp-backend"}
           env:
             - name: HOST
               value: "0.0.0.0"

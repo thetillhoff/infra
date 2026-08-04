@@ -24,7 +24,7 @@ spec:
               command: ["sh", "-c", "until wget -qO- http://backend.federated-cloud-platform.svc.cluster.local:8080/health && wget -qO- http://scraper-backend.federated-cloud-platform.svc.cluster.local:9090/health; do echo waiting; sleep 2; done"]
           containers:
             - name: scraper
-              image: ghcr.io/thetillhoff/federated-cloud-platform/scrapers:1 # {"$imagepolicy": "federated-cloud-platform:fcp-scrapers"}
+              image: ghcr.io/thetillhoff/federated-cloud-platform/scrapers:27 # {"$imagepolicy": "federated-cloud-platform:fcp-scrapers"}
               env:
                 - name: API_URL
                   value: http://backend.federated-cloud-platform.svc.cluster.local:8080
