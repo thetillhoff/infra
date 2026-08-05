@@ -42,7 +42,7 @@ spec:
                   key: dsn
       containers:
         - name: backend
-          image: ghcr.io/thetillhoff/federated-cloud-platform/backend:33 # {"$imagepolicy": "federated-cloud-platform:fcp-backend"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/backend:34 # {"$imagepolicy": "federated-cloud-platform:fcp-backend"}
           env:
             - name: HOST
               value: "0.0.0.0"
