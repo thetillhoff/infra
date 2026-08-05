@@ -17,7 +17,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: frontend-admin
-          image: ghcr.io/thetillhoff/federated-cloud-platform/frontend-admin:31 # {"$imagepolicy": "federated-cloud-platform:fcp-frontend-admin"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/frontend-admin:32 # {"$imagepolicy": "federated-cloud-platform:fcp-frontend-admin"}
           ports:
             - containerPort: 8080
           securityContext:
