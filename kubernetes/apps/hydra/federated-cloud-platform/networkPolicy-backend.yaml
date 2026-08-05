@@ -6,8 +6,9 @@ metadata:
 # The backend serves both public and admin route prefixes on one port; the
 # admin prefixes are gated by Clerk/RequireAdmin. Its only in-cluster callers
 # are the two frontends' Caddy proxies, the scraper CronJob (run lifecycle +
-# upserts), and the spot-scraper CronJob (spot samples). Pod-scoped so no other
-# Job can reach it.
+# upserts), the spot-scraper CronJob (spot samples), and the exchange-rate
+# CronJob (its wait-for-backend init probes /health as a migration-ready gate).
+# Pod-scoped so no other Job can reach it.
 spec:
   podSelector:
     matchLabels: { app: backend }
@@ -22,5 +23,7 @@ spec:
             matchLabels: { app: scraper }
         - podSelector:
             matchLabels: { app: spot-scraper }
+        - podSelector:
+            matchLabels: { app: exchange-rate }
       ports:
         - { protocol: TCP, port: 8080 }
