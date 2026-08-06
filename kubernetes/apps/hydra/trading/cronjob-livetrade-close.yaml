@@ -52,8 +52,10 @@ spec:
                 # request = limit → Guaranteed QoS: reserves its full budget so the
                 # scheduler queues it (Pending) rather than overcommitting, and caps it
                 # so a spike can't take the node down. No CPU limit (avoids throttling).
+                # 2026-08-06: bumped 1Gi→2Gi alongside livetrade-open, which OOMKilled at
+                # 1Gi during signal analysis (same memory profile). Rightsize later.
                 requests:
                   cpu: 500m
-                  memory: 1Gi
+                  memory: 2Gi
                 limits:
-                  memory: 1Gi
+                  memory: 2Gi

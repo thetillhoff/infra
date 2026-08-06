@@ -52,8 +52,11 @@ spec:
                 # request = limit → Guaranteed QoS: reserves its full budget so the
                 # scheduler queues it (Pending) rather than overcommitting, and caps it
                 # so a spike can't take the node down. No CPU limit (avoids throttling).
+                # 2026-08-06: 1Gi OOMKilled (exit 137) a market-open run during signal
+                # analysis (loads price history + indicators over the universe in memory);
+                # bumped to 2Gi. Rightsize from observed peak later.
                 requests:
                   cpu: 500m
-                  memory: 1Gi
+                  memory: 2Gi
                 limits:
-                  memory: 1Gi
+                  memory: 2Gi
