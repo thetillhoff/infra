@@ -2,6 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "outDir": "bin",
+    "rootDir": ".",
     "target": "es2020",
     "module": "nodenext",
     "moduleResolution": "nodenext",

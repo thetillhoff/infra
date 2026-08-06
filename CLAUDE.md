@@ -20,8 +20,13 @@ Standalone Raspberry Pis (not in the cluster) have their own root-level setup do
 ```sh
 pulumi preview          # dry-run
 pulumi up               # deploy
-npm run format          # prettier
+npm run format          # prettier — see caution below
 ```
+
+> **`npm run format` = `prettier --write .`** — reformats the *whole tree*, including `cilium-values.yaml`
+> and the `configPatches/*.yaml` files. Reindenting a comment in a nodegroup patch changes the string fed to
+> `talos.machine.ConfigurationApply` → a spurious `~ update` re-apply against the **live** controlplanes on the
+> next `pulumi up`. Format scoped files only, or revert unrelated reformats (`git checkout -- <file>`) before deploying.
 
 ### Taskfile (run from repo root)
 
@@ -115,6 +120,10 @@ Longhorn for persistent volumes in Kubernetes. Bare-metal ZFS on `blackhole` (ma
 ### Versions
 
 Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator, flux) are centralized in `pulumi/index.ts`.
+Talos version lives in `packer/common.pkrvars.hcl` + the nodegroup name (`hcloud-talos-vX-Y-Z-controlplane`).
+
+**Only ever upgrade to GA versions** — no alpha/beta/rc. Check each project's releases page for the latest
+GA before bumping; a "next minor" that isn't GA yet (k8s/Talos often lag each other) is out of scope until released.
 
 ## Known Gotchas
 
@@ -122,10 +131,11 @@ Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator, flux) are c
 
 Default kubeconfig context may be a local kind cluster, not hydra. Always run `eval "$(task configure-env)"` before any kubectl/flux commands.
 
-### Memory is oversubscribed — batch bursts OOM the whole cluster
+### Memory pressure — batch bursts can OOM the whole cluster
 
-3 small control-plane nodes, no workers. Baseline already fills them (~90-100% mem): prometheus
-~2.75GB, 3× kube-apiserver 1.6-3.9GB, Longhorn, Cilium. Any spike hits the kernel OOM-killer.
+3 control-plane nodes, no workers. **cx43 (8 vCPU / 16 GB) since 2026-08-06** — was cx33/8 GB;
+RAM doubled via a blue/green nodegroup swap. Baseline is still heavy: prometheus ~2.75GB, 3×
+kube-apiserver 1.6-3.9GB, Longhorn, Cilium. A big enough spike can still hit the kernel OOM-killer.
 
 - 2026-07-13: a large trading grid (~2082 pods) tipped nodes into **global OOM** → killed
   kube-apiserver, kubelet (node-0 went NotReady), longhorn-manager → cascade (Longhorn volumes
@@ -138,8 +148,25 @@ Default kubeconfig context may be a local kind cluster, not hydra. Always run `e
 - **Prometheus RAM = active-series cardinality** (in-memory head block), NOT retention/disk. Hubble
   `httpV2` per-IP labels + `port-distribution` were ~90k series — trimmed in `pulumi/cilium-values.yaml`
   (Cilium is Pulumi-managed; `pulumi up` + a `kubectl rollout restart daemonset cilium` to pick it up).
-- Real fix (open): add capacity — a worker node / bigger instances. Until then, batch workloads must
-  be quota-bounded (the `trading` namespace has a ResourceQuota).
+- Capacity fix applied 2026-08-06: cx33→cx43 (8→16 GB/node) via blue/green nodegroup swap. Batch
+  workloads still quota-bounded (the `trading` namespace has a ResourceQuota) — headroom is bigger, not infinite.
+
+### Blue/green node replacement — Longhorn data safety
+
+Swapping the whole controlplane nodegroup (cx33→cx43, or a Talos bump) via `UPGRADE-TALOS.md`: the drain
+migrates Longhorn replicas **only for attached volumes** — `nodeDrainPolicy: block-for-eviction` blocks
+the drain until each replica rebuilds on a surviving node. It **skips detached volumes** (no running
+engine → nothing to copy), so a detached volume whose replicas sit only on the outgoing nodes is lost.
+
+- Detached shows as `ROBUSTNESS: unknown` in `kubectl -n longhorn get volumes.longhorn.io`. Before draining,
+  **attach each detached volume in maintenance mode** (Longhorn UI) so it rebuilds onto the new nodes.
+- Delete old nodes **one at a time**, verifying all volumes `healthy` between each.
+- `task delete-nodes`' interactive prompt can't be answered from a non-interactive shell — script the raw
+  `kubectl cordon` + `kubectl drain --ignore-daemonsets --delete-emptydir-data` + `talosctl reset
+  --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --wait=false` + `kubectl delete node`.
+- The old nodegroup's Cloudflare A/AAAA records (per clusterDnsName, per node) live until the final
+  `pulumi up` removes them — until then public DNS round-robins to the dead node IPs (~50% failed conns).
+  Run the old-nodegroup-removal `pulumi up` promptly after the nodes are gone.
 
 ### Private endpoints require out-of-band Tailscale config
 

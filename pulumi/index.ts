@@ -65,7 +65,7 @@ const talosSecrets = new machine.Secrets("talosSecrets", {});
 const nodegroups = new HcloudTalosNodegroups(
   "hcloudTalosNodegroups",
   {
-    "hcloud-talos-v1-13-4-controlplane": {
+    "hcloud-talos-v1-13-8-controlplane": {
       nodeCount: 3,
       clusterName: k8sClusterName,
       clusterEndpointDomain: k8sClusterEndpointDomain,
@@ -79,7 +79,7 @@ const nodegroups = new HcloudTalosNodegroups(
             __dirname,
             "hcloud-talos-nodegroup-component",
             "configPatches",
-            "talos-v1-13-4-controlplane-patch.yaml",
+            "talos-v1-13-8-controlplane-patch.yaml",
           ),
           "utf8",
         ),
@@ -87,16 +87,16 @@ const nodegroups = new HcloudTalosNodegroups(
 
       hcloudLocation: "nbg1",
 
-      hcloudImageId: "398555717",
+      hcloudImageId: "416907541",
       // hcloudServerType: "cax21", // arm64
-      hcloudServerType: "cx33", // amd64
+      hcloudServerType: "cx43", // amd64
       cloudflareZoneId: cloudflareZoneId,
     },
   },
   {},
 );
 
-const primaryControlplaneNodegroupName = "hcloud-talos-v1-13-4-controlplane";
+const primaryControlplaneNodegroupName = "hcloud-talos-v1-13-8-controlplane";
 
 const hcloudTalosCluster = new HcloudTalosCluster(
   "hcloud-talos-cluster",
