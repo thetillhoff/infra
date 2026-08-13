@@ -79,11 +79,14 @@ Pulumi secrets required in stack config: `flux.git-auth` (deploy token), `flux.s
 ```text
 flux-system
   └── infrastructure-controllers   (kubernetes/infrastructure/controllers/)
-        └── infrastructure-resources  (kubernetes/infrastructure/resources/)
-  └── apps                         (kubernetes/apps/hydra/)
+        └── resource-*             (one per kubernetes/infrastructure/resources/<component>/)
+  └── app-*                        (one per kubernetes/apps/hydra/<app>/)
 ```
 
-Cluster entrypoints are in `kubernetes/clusters/hydra/`. All Kustomizations use SOPS decryption via the `sops-age` secret.
+Kustomizations are **per component and per app**, not two big ones — a broken app or component can't
+block unrelated deploys. Names match the entrypoint filenames in `kubernetes/clusters/hydra/`, e.g.
+`resource-private-endpoints`, `app-trading`. `flux get kustomizations` lists the live set; there is no
+`infrastructure-resources` or `apps` Kustomization. All use SOPS decryption via the `sops-age` secret.
 
 ### Kubernetes manifest layout
 
