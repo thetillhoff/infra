@@ -97,8 +97,10 @@ kubernetes/
     controllers/           # HelmReleases: cert-manager, external-dns, longhorn, tailscale operator, kubelet-csr-approver
     resources/             # Cluster resources: cert-manager issuers, gateways, firewall policies, monitoring, discord alerts, private-endpoints
   apps/
-    hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, tailscale, trading
+    hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, tailscale, trading, federated-cloud-platform, manga-scraper
 ```
+
+`kubernetes/apps/hydra/manga-scraper/` runs the manga scraper: postgres + api + ui, with the schema applied by a migrations initContainer (atlas image built by that repo's CI, so the database follows the image). Reachable only at `manga.internal.thetillhoff.de` — its UI has unauthenticated buttons that start crawls, so a public route would let anyone drive the cluster's headed Chromium at third-party sites. The api runs Chromium: single replica (its per-source crawl lock is in-process), 1.5Gi limit, 256Mi `/dev/shm`, and a namespace ResourceQuota.
 
 `kubernetes/apps/hydra/trading/` is the **source of truth for the trading app on hydra** (Flux `app-trading`). The `~/code/trading` repo's `k8s/`/`services/` manifests are **local-dev (kind) only** and intentionally diverge — never edit them expecting a hydra change.
 
@@ -112,7 +114,7 @@ Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}
 
 ### Private endpoints (tailnet-only)
 
-Admin UIs (grafana, longhorn, hubble) are exposed privately at `<app>.internal.thetillhoff.de` — reachable only over the Tailscale tailnet, not the public internet. Defined in `kubernetes/infrastructure/resources/private-endpoints/`.
+Admin UIs (grafana, longhorn, hubble) and the two app UIs that must not be public (trading, manga) are exposed privately at `<name>.internal.thetillhoff.de` — reachable only over the Tailscale tailnet, not the public internet. Defined in `kubernetes/infrastructure/resources/private-endpoints/`.
 
 Per app: a small **Caddy** reverse-proxy (non-root, binds `:8443`) terminates a real LetsEncrypt cert (cert-manager DNS-01, per-name `Certificate`) and proxies to the in-cluster app Service. A `Service` `type: LoadBalancer, loadBalancerClass: tailscale` makes the tailscale operator join a proxy to the tailnet and write the private `100.x` (CGNAT) IP into the Service's LB status. **external-dns** (in the `cert-manager` namespace, reusing that namespace's `cloudflare-api-token`) reads the LB IP and creates the `A` record. Security is the WireGuard mesh + tailnet ACLs — the public resolves the DNS but cannot route to `100.64.0.0/10`.
 
