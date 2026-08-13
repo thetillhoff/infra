@@ -115,6 +115,8 @@ Per app: a small **Caddy** reverse-proxy (non-root, binds `:8443`) terminates a 
 
 All proxies share the same caddy image automation (`imageRepository`/`imagePolicy`/`imageUpdateAutomation` in that dir). Adding an endpoint = copy a `certificate`/`configMap`/`deployment`/`service` quartet + wire into `kustomization.yaml`.
 
+`home.internal.thetillhoff.de` is the index of all the others. Its pod runs a kubectl sidecar that lists the namespace's Services every 60s and renders one link per `external-dns.alpha.kubernetes.io/hostname` annotation, so a new endpoint appears there with no extra step — that annotation is the only source of truth.
+
 ### Storage
 
 Longhorn for persistent volumes in Kubernetes. Bare-metal ZFS on `blackhole` (managed via Ansible).

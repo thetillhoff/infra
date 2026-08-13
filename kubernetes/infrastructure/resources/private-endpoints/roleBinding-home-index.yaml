@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: home-index
+  namespace: private-endpoints
+subjects:
+  - kind: ServiceAccount
+    name: home-index
+    namespace: private-endpoints
+roleRef:
+  kind: Role
+  name: home-index
+  apiGroup: rbac.authorization.k8s.io

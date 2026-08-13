@@ -8,6 +8,16 @@ resources:
 - imagePolicy-caddy.yaml
 - imageUpdateAutomation.yaml
 
+# home.internal.thetillhoff.de — index of all the endpoints below, generated from
+# their external-dns hostname annotations
+- certificate-home.yaml
+- configMap-home-caddy.yaml
+- serviceAccount-home-index.yaml
+- role-home-index.yaml
+- roleBinding-home-index.yaml
+- deployment-home-proxy.yaml
+- service-home.yaml
+
 # grafana.internal.thetillhoff.de
 - certificate-grafana.yaml
 - configMap-grafana-caddy.yaml

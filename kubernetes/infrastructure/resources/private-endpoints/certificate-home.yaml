@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: home-internal
+  namespace: private-endpoints
+spec:
+  secretName: home-internal-tls
+  dnsNames:
+    - home.internal.thetillhoff.de
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer

@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: home-index
+  namespace: private-endpoints
+rules:
+  # The index is generated from the external-dns hostname annotations on this
+  # namespace's Services — that annotation is the single source of truth for
+  # which private endpoints exist.
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["list"]

@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-proxy
+  namespace: private-endpoints
+spec:
+  # ponytail: single replica — homelab internal tooling. Bump to 2 if uptime matters.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: home-proxy
+  template:
+    metadata:
+      labels:
+        app: home-proxy
+    spec:
+      serviceAccountName: home-index
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: caddy
+          image: caddy:2.11.4-alpine # {"$imagepolicy": "private-endpoints:caddy"}
+          ports:
+            - containerPort: 8443
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+              # caddy's binary is setcap cap_net_bind_service; with an empty bounding
+              # set the kernel refuses to exec it (EPERM). Add it back (harmless — we
+              # bind 8443) so the binary can start.
+              add:
+                - NET_BIND_SERVICE
+          volumeMounts:
+            - name: caddyfile
+              mountPath: /etc/caddy/Caddyfile
+              subPath: Caddyfile
+              readOnly: true
+            - name: certs
+              mountPath: /certs
+              readOnly: true
+            - name: srv
+              mountPath: /srv
+              readOnly: true
+            - name: config
+              mountPath: /config
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+
+        # Same image rationale as the trading cronjobs: alpine/k8s ships a shell AND
+        # kubectl on the cluster's minor; the distroless kubectl image has no /bin/sh.
+        - name: index
+          image: alpine/k8s:1.36.2
+          command: ["sh", "/scripts/index.sh"]
+          env:
+            - name: HOME # kubectl writes its discovery cache under $HOME
+              value: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: caddyfile
+              mountPath: /scripts/index.sh
+              subPath: index.sh
+              readOnly: true
+            - name: srv
+              mountPath: /srv
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+      volumes:
+        - name: caddyfile
+          configMap:
+            name: home-caddy
+        - name: certs
+          secret:
+            secretName: home-internal-tls
+        - name: srv
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: config
+          emptyDir: {}
+        - name: data
+          emptyDir: {}
