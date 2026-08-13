@@ -26,7 +26,7 @@ resources:
   - service-ui.yaml
 
   # No HTTPRoute: this UI is reached over the tailnet only, through
-  # private-endpoints/manga-scraper-proxy -> https://manga-scraper.internal.thetillhoff.de.
+  # private-endpoints/manga-proxy -> https://manga.internal.thetillhoff.de.
   # Its buttons start crawls with no authentication in front of them.
 
   - imageRepository-api.yaml

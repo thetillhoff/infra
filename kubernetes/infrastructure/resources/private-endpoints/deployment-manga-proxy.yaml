@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: manga-scraper-proxy
+  name: manga-proxy
   namespace: private-endpoints
 spec:
   # ponytail: single replica — homelab internal tooling. Bump to 2 if uptime matters.
   replicas: 1
   selector:
     matchLabels:
-      app: manga-scraper-proxy
+      app: manga-proxy
   template:
     metadata:
       labels:
-        app: manga-scraper-proxy
+        app: manga-proxy
     spec:
       securityContext:
         runAsNonRoot: true
@@ -58,10 +58,10 @@ spec:
       volumes:
         - name: caddyfile
           configMap:
-            name: manga-scraper-caddy
+            name: manga-caddy
         - name: certs
           secret:
-            secretName: manga-scraper-internal-tls
+            secretName: manga-internal-tls
         - name: config
           emptyDir: {}
         - name: data

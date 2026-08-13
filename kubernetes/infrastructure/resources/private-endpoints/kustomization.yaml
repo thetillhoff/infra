@@ -42,8 +42,8 @@ resources:
 - deployment-trading-proxy.yaml
 - service-trading.yaml
 
-# manga-scraper.internal.thetillhoff.de
-- certificate-manga-scraper.yaml
-- configMap-manga-scraper-caddy.yaml
-- deployment-manga-scraper-proxy.yaml
-- service-manga-scraper.yaml
+# manga.internal.thetillhoff.de
+- certificate-manga.yaml
+- configMap-manga-caddy.yaml
+- deployment-manga-proxy.yaml
+- service-manga.yaml

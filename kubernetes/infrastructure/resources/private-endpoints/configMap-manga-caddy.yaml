@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: manga-scraper-caddy
+  name: manga-caddy
   namespace: private-endpoints
 data:
   Caddyfile: |
@@ -10,7 +10,7 @@ data:
       auto_https off       # we supply our own cert; no ACME from Caddy
       https_port 8443      # unprivileged port so the pod need not run as root
     }
-    https://manga-scraper.internal.thetillhoff.de {
+    https://manga.internal.thetillhoff.de {
       tls /certs/tls.crt /certs/tls.key
       reverse_proxy ui.manga-scraper.svc.cluster.local:80
     }

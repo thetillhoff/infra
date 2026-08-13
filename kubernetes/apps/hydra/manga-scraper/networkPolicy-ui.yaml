@@ -4,7 +4,7 @@ metadata:
   name: ui
   namespace: manga-scraper
 # The only way in, and it arrives over the tailnet: private-endpoints'
-# manga-scraper-proxy terminates https://manga-scraper.internal.thetillhoff.de and
+# manga-proxy terminates https://manga.internal.thetillhoff.de and
 # proxies to ui:80 -> :3000.
 #
 # There is deliberately no public HTTPRoute. The UI's buttons start crawls and

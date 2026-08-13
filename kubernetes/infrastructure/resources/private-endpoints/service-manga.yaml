@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: manga-scraper-internal
+  name: manga-internal
   namespace: private-endpoints
   annotations:
-    tailscale.com/hostname: manga-scraper-internal
+    tailscale.com/hostname: manga-internal
     tailscale.com/tags: tag:service
-    external-dns.alpha.kubernetes.io/hostname: manga-scraper.internal.thetillhoff.de
+    external-dns.alpha.kubernetes.io/hostname: manga.internal.thetillhoff.de
 spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
   selector:
-    app: manga-scraper-proxy
+    app: manga-proxy
   ports:
     - name: https
       port: 443
