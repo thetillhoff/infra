@@ -1,4 +1,5 @@
-# Values documented at https://artifacthub.io/packages/helm/cilium/cilium/1.19.2
+# Values documented at https://artifacthub.io/packages/helm/cilium/cilium/1.20.0
+# Keep this in sync with `versions.cilium` in index.ts - that constant is what actually installs.
 
 # namespaceOverride: cilium-system # default is kube-system
 
@@ -95,6 +96,25 @@ hubble:
       # labels stay: same per-service HTTP golden signals, bounded cardinality. Cuts prometheus
       # head RAM by ~0.7-1GB (was the top driver of its 2.75GB / 352k active series).
       - "httpV2:labelsContext=source_namespace,source_workload,destination_namespace,destination_workload,traffic_direction"
+  # L7 flows carry full request headers verbatim - measured: `Cookie` and `Authorization` values
+  # were readable in `hubble observe -o json`. Tolerable while flows only live in the in-memory ring
+  # buffer (minutes), not once a flow exporter persists them to Loki. `headers.allow` is an
+  # allowlist, so anything not named here is redacted - a new sensitive header cannot leak by
+  # being forgotten. Trading a little request detail for not storing credentials.
+  redact:
+    enabled: true
+    http:
+      urlQuery: true
+      headers:
+        allow:
+          - ":method"
+          - ":scheme"
+          - "Accept"
+          - "Referer"
+          - "User-Agent"
+          - "X-Envoy-External-Address"
+          - "X-Forwarded-For"
+          - "X-Request-Id"
   relay:
     enabled: true
   # TLS for the Hubble API is issued by cert-manager via the `selfsigned-ca` ClusterIssuer
