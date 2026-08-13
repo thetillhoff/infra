@@ -54,11 +54,12 @@ spec:
             - name: data
               mountPath: /data
           resources:
+            # measured: ~10Mi serving one static page
             requests:
               cpu: 10m
-              memory: 32Mi
+              memory: 16Mi
             limits:
-              memory: 64Mi
+              memory: 48Mi
 
         # Same image rationale as the trading cronjobs: alpine/k8s ships a shell AND
         # kubectl on the cluster's minor; the distroless kubectl image has no /bin/sh.
@@ -84,9 +85,11 @@ spec:
             - name: tmp
               mountPath: /tmp
           resources:
+            # idle ~0Mi (sleeping); the limit only has to cover kubectl's brief
+            # once-a-minute run, so keep headroom there but request almost nothing.
             requests:
               cpu: 10m
-              memory: 64Mi
+              memory: 16Mi
             limits:
               memory: 128Mi
       volumes:
