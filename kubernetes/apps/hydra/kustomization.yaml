@@ -9,4 +9,5 @@ resources:
 - wedding-website
 - trading
 - federated-cloud-platform
+- manga-scraper
 # - tailscale # tailscale requires a new token every 90 days...

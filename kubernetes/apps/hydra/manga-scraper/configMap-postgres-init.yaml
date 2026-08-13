@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+  namespace: manga-scraper
+data:
+  # Atlas plans the declarative schema diff against a scratch database it is free
+  # to wipe. Created here because postgres only runs files in
+  # /docker-entrypoint-initdb.d on an empty data directory, which is exactly when
+  # the migrations initContainer first needs it.
+  01-atlas-dev-db.sql: |
+    SELECT 'CREATE DATABASE atlas_dev'
+    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'atlas_dev')\gexec

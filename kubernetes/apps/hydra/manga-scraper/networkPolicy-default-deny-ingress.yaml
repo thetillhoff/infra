@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: manga-scraper
+# Baseline: nothing here accepts traffic unless a policy below allows it.
+# Without it, postgres:5432 and the api — whose scrape triggers need no
+# authentication — would be reachable from every pod in the cluster.
+#
+# Ingress only, deliberately. The api must reach the sites it scrapes and their
+# cover CDNs, so a namespace-wide egress deny would need an internet allowlist to
+# be useful; that is a bigger change than the exposure it removes.
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]

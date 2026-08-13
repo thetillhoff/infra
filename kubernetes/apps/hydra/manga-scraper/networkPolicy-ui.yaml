@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ui
+  namespace: manga-scraper
+# The only way in, and it arrives over the tailnet: private-endpoints'
+# manga-scraper-proxy terminates https://manga-scraper.internal.thetillhoff.de and
+# proxies to ui:80 -> :3000.
+#
+# There is deliberately no public HTTPRoute. The UI's buttons start crawls and
+# nothing authenticates them, so a public route would let anyone drive this
+# cluster's Chromium at third-party sites.
+spec:
+  podSelector:
+    matchLabels: {app: ui}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: private-endpoints}
+      ports:
+        - {protocol: TCP, port: 3000}

@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: manga-scraper
+spec:
+  replicas: 1
+  # The api owns a Longhorn-free but stateful thing — the per-source in-flight
+  # lock and rate limiter are in-process — so two replicas would each think they
+  # were the only crawler of a site. Keep it at one until that lock moves into
+  # the database.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      imagePullSecrets:
+        - name: ghcr-creds
+      initContainers:
+        # Applies the schema, the versioned migrations and the source seed data.
+        # Idempotent, so running it on every pod start is the simplest way to keep
+        # the database in step with the image without a separate Job to re-run.
+        - name: migrations
+          image: ghcr.io/thetillhoff/manga-scraper-migrations:6 # {"$imagepolicy": "manga-scraper:manga-scraper-migrations"}
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: manga-scraper-postgres
+                  key: url
+            - name: DEV_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: manga-scraper-postgres
+                  key: dev-url
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+      containers:
+        - name: api
+          image: ghcr.io/thetillhoff/manga-scraper-api:6 # {"$imagepolicy": "manga-scraper:manga-scraper-api"}
+          ports:
+            - containerPort: 3001
+          env:
+            - name: DATABASE_HOST
+              value: postgres
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
+              value: manga_scraper
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: manga-scraper-postgres
+                  key: user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: manga-scraper-postgres
+                  key: password
+            - name: WEB_PORT
+              value: "3001"
+            # Deliberately empty: crawls are operator-triggered from the UI. Set a
+            # Go duration here to also run the scheduled keep-fresh sweep.
+            - name: SCRAPE_INTERVAL
+              value: ""
+          # No readOnlyRootFilesystem and no runAsNonRoot: the image starts Xvfb
+          # and a headed Chromium, which want a writable /tmp and their own
+          # sandbox handling (the scraper already passes --no-sandbox).
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            # Chromium puts its shared renderer memory here and crashes on the
+            # 64MB default that containers get.
+            - name: dev-shm
+              mountPath: /dev/shm
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              # Chromium is the reason this is not smaller. A crawl runs three
+              # workers, each with its own tab; the limit is what stops a runaway
+              # page from taking the node down with it.
+              cpu: 2000m
+              memory: 1536Mi
+      volumes:
+        - name: dev-shm
+          emptyDir:
+            medium: Memory
+            # Counts against the container's memory limit above.
+            sizeLimit: 256Mi

@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: manga-scraper
+resources:
+  - namespace.yaml
+  - resourceQuota-manga-scraper.yaml
+  - limitRange-manga-scraper.yaml
+  - ghcr-creds.secret.yaml
+  - manga-scraper-postgres.secret.yaml
+
+  # Default-deny plus one policy per workload. The api's scrape triggers are
+  # unauthenticated, so these are what keep them reachable only from the UI.
+  - networkPolicy-default-deny-ingress.yaml
+  - networkPolicy-ui.yaml
+  - networkPolicy-api.yaml
+  - networkPolicy-postgres.yaml
+
+  - configMap-postgres-init.yaml
+  - service-postgres.yaml
+  - statefulSet-postgres.yaml
+
+  # api applies the schema itself, via a migrations initContainer.
+  - deployment-api.yaml
+  - service-api.yaml
+  - deployment-ui.yaml
+  - service-ui.yaml
+
+  # No HTTPRoute: this UI is reached over the tailnet only, through
+  # private-endpoints/manga-scraper-proxy -> https://manga-scraper.internal.thetillhoff.de.
+  # Its buttons start crawls with no authentication in front of them.
+
+  - imageRepository-api.yaml
+  - imagePolicy-api.yaml
+  - imageRepository-ui.yaml
+  - imagePolicy-ui.yaml
+  - imageRepository-migrations.yaml
+  - imagePolicy-migrations.yaml
+  - imageUpdateAutomation.yaml

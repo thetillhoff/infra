@@ -1,0 +1,16 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: manga-scraper-migrations
+  namespace: manga-scraper
+spec:
+  imageRepositoryRef:
+    name: manga-scraper-migrations
+  # CI tags with the workflow run number; 'latest' is filtered out so the newest
+  # numeric tag wins.
+  filterTags:
+    pattern: '^(?P<run>[0-9]+)$'
+    extract: ''
+  policy:
+    numerical:
+      order: asc

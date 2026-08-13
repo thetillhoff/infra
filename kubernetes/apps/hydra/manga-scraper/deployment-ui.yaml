@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui
+  namespace: manga-scraper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ui
+  template:
+    metadata:
+      labels:
+        app: ui
+    spec:
+      imagePullSecrets:
+        - name: ghcr-creds
+      containers:
+        - name: ui
+          image: ghcr.io/thetillhoff/manga-scraper-ui:6 # {"$imagepolicy": "manga-scraper:manga-scraper-ui"}
+          ports:
+            - containerPort: 3000
+          env:
+            - name: API_BASE_URL
+              value: http://api:3001
+            - name: WEB_PORT
+              value: "3000"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 192Mi

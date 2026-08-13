@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: manga-scraper-ui
+  namespace: manga-scraper
+spec:
+  image: ghcr.io/thetillhoff/manga-scraper-ui
+  interval: 5m0s
+  secretRef:
+    name: ghcr-creds
