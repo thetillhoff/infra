@@ -198,6 +198,24 @@ DNS-01 required for any non-public gateway (HTTP-01 requires ACME server to reac
 
 Force-reissue recovery (cert-manager won't early-renew if `renewBefore` exceeds the current short cert's life): delete `selfsigned-ca-secret` (cert-manager), then `hubble-server-certs` + `hubble-relay-client-certs` (kube-system), then `rollout restart daemonset/cilium deployment/hubble-relay`.
 
+### Hubble records request headers verbatim — never persist flows unredacted
+
+L7 flows include full `Cookie` / `Authorization` values and URL query strings (verified with a canary request). Fine in the in-memory ring buffer, which turns over in minutes; a hard no once anything exports flows to Loki. `hubble.redact` in `pulumi/cilium-values.yaml` uses a header **allowlist** — add to it deliberately, and never convert it to a denylist.
+
+### Client IP at the ingress is only on L7 flows
+
+Cilium Gateway API = Envoy in host-network mode. Envoy terminates the client TCP connection, so **L3/L4 flows show `reserved:ingress` (identity 8)** with the node's cilium `ingress` IP (`cilium-dbg status --all-addresses`), never the client. The real client IP is in `IP.source` on the `http-request`/`http-response` (L7, `event_type.type: 129`) flows only. The world→node hop is not observed at all — Envoy binds in the host netns and no host firewall is enabled.
+
+Consequences: the Hubble UI **service map** always draws "ingress" (it groups by identity, not IP) — the client IP is visible only in the flow table's detail pane. The two rows for one request **cannot be correlated by port** (the L7 row carries the client's port, the L3 row Envoy's upstream port); only timestamp + destination pod. `hubble observe --protocol http` is the clean access-log view. Ratio measured on one namespace: 1 L7 row per ~324 L3/L4 rows.
+
+`hubble.metrics` httpV2 deliberately omits `source_ip` (cardinality) — Prometheus has no client IPs by design.
+
+### Loki retention is required, not optional
+
+Retention is off by default in this chart and the 5Gi PVC filled at ~48Mi/day. `loki.compactor.retention_enabled` + `limits_config.retention_period` are set in `monitoring/loki/values.yaml`. SingleBinary runs the compactor in-process — the top-level `compactor.replicas: 0` does **not** disable it. Validate config changes before pushing: render with `helm template` and run `loki -verify-config` against the rendered `config.yaml` in Docker.
+
+Alloy already tails every pod's logs, `kube-system/cilium-agent` included — anything a cluster component writes to stdout lands in Loki with no alloy change.
+
 ## Known Pulumi Pitfalls
 
 ### @pulumiverse/talos provider bump triggers kubernetes cascade
