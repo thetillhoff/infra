@@ -17,9 +17,24 @@ loki:
     type: filesystem
   pattern_ingester:
       enabled: true
+  # Without this, chunks are never deleted: the PVC was 35% full after 36 days (~48Mi/day) and
+  # would have hit ENOSPC in ~67 more. SingleBinary runs the compactor in-process, so the
+  # top-level `compactor.replicas: 0` below does not disable it.
+  compactor:
+    retention_enabled: true
+    delete_request_store: filesystem
   limits_config:
     allow_structured_metadata: true
     volume_enabled: true
+    # 30d ≈ 1.4Gi at the measured rate, leaving headroom in the 5Gi PVC.
+    retention_period: 720h
+    # cilium-agent carries the hubble L7 flow log (one line per HTTP request cluster-wide), so it
+    # is by far the highest-volume and shortest-useful stream. 7d bounds it without touching the
+    # rest. Covers the agent's own logs too - same stream labels, and they age out just as fast.
+    retention_stream:
+      - selector: '{container="cilium-agent"}'
+        priority: 1
+        period: 168h
   ruler:
     enable_api: true
 
