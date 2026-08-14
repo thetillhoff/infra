@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valkey
+  namespace: manga-scraper
+# The reader's page cache: chapter page images the api fetched from a source, so
+# scrolling a chapter does not re-fetch them. A Deployment rather than a
+# StatefulSet because there is nothing to keep — losing it costs one re-fetch per
+# page, which is why it runs without persistence at all.
+spec:
+  replicas: 1
+  # Recreate, not RollingUpdate: two pods behind one Service would each hold half
+  # the cache and answer for the other's keys, so a rollout would look like a
+  # storm of misses.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: valkey
+  template:
+    metadata:
+      labels:
+        app: valkey
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: valkey
+          image: valkey/valkey:8-alpine
+          # Cache only, and it must stay that way: no RDB, no AOF, a hard memory
+          # ceiling and LRU eviction. It cannot outgrow the cap, cannot survive a
+          # restart, and needs no sweeper to stay bounded.
+          args:
+            - valkey-server
+            - --save
+            - ""
+            - --appendonly
+            - "no"
+            - --maxmemory
+            - 512mb
+            - --maxmemory-policy
+            - allkeys-lru
+          ports:
+            - containerPort: 6379
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            # Valkey's working directory. Nothing is written with persistence off,
+            # but it wants the directory to exist and be writable.
+            - name: data
+              mountPath: /data
+          livenessProbe:
+            exec:
+              command: [valkey-cli, ping]
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            exec:
+              command: [valkey-cli, ping]
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              # Above the 512mb ceiling above, which bounds stored values only —
+              # fragmentation and client buffers sit on top of it.
+              cpu: 300m
+              memory: 640Mi
+      volumes:
+        - name: data
+          emptyDir:
+            sizeLimit: 16Mi

@@ -68,6 +68,12 @@ spec:
                   key: password
             - name: WEB_PORT
               value: "3001"
+            # The reader's page cache. Required by the api: without it every page
+            # of every chapter would be re-fetched from the source on every read.
+            # An unreachable valkey is logged and then behaves like an empty
+            # cache, so this does not make reading depend on it.
+            - name: REDIS_ADDR
+              value: valkey:6379
             # Deliberately empty: crawls are operator-triggered from the UI. Set a
             # Go duration here to also run the scheduled keep-fresh sweep.
             - name: SCRAPE_INTERVAL

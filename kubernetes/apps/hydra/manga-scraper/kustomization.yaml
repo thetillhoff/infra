@@ -14,10 +14,16 @@ resources:
   - networkPolicy-ui.yaml
   - networkPolicy-api.yaml
   - networkPolicy-postgres.yaml
+  - networkPolicy-valkey.yaml
 
   - configMap-postgres-init.yaml
   - service-postgres.yaml
   - statefulSet-postgres.yaml
+
+  # The reader's page cache. Nothing in it is worth keeping, so it has no volume
+  # and no persistence — see deployment-valkey.yaml.
+  - service-valkey.yaml
+  - deployment-valkey.yaml
 
   # api applies the schema itself, via a migrations initContainer.
   - deployment-api.yaml
