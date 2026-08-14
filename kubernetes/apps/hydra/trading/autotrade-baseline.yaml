@@ -4,6 +4,11 @@ metadata:
   name: autotrade
   namespace: trading
 spec:
-  strategyConfig: ew-champion
+  # PAPER ONLY, and macd-only does not clear the deploy bar either - it is 2-of-4 windows on a
+  # held-out universe and below cash. It runs because it is the best-RANKED arm (MIN alphaCash -6.4
+  # vs ew-champion's -25.5 on the same basket and windows), and live evidence is worth more accruing
+  # on that than on a config whose recorded edge turned out to be look-ahead. No real capital follows
+  # until an arm clears the bar.
+  strategyConfig: macd-only
   enabled: true
   preloadOnDeploy: false   # data already loaded; set true to trigger a fresh full-universe refresh on next deploy

@@ -77,5 +77,8 @@ resources:
   - deployment-ibkr-broker.yaml
   - service-ibkr-broker.yaml
 
+  # ew-champion is kept but no longer traded: its edge was look-ahead in the EW size filter, so the
+  # CR stays only to keep its mirror row and paper-trading history addressable.
   - strategyConfig-ew-champion.yaml
+  - strategyConfig-macd-only.yaml
   - autotrade-baseline.yaml

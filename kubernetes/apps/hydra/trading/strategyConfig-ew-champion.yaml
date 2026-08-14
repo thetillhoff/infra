@@ -5,7 +5,7 @@ metadata:
   namespace: trading
 spec:
   name: ew-champion
-  description: "EW champion (paper): EW impulse ws=0.10 + reserve_slots 10 + equal_weight sizing. Validated +3.7%/yr floor at realistic cost, positive all 4 windows incl 2010-13 OOS holdout."
+  description: "RETIRED, not traded. The recorded +3.7%/yr floor was produced by look-ahead in the EW wave-size filter (the threshold scaled by the WHOLE series' range); causally it loses every validation window, MIN alphaCash -25.5. Kept addressable for its paper-trading history only. See HYPOTHESIS_TEST_RESULTS.md."
   indicators:
     elliott_wave: {enabled: true, min_confidence: 0.00, min_wave_size: 0.10}
     rsi: {period: 7, oversold: 30, overbought: 70}

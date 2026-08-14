@@ -1,0 +1,174 @@
+apiVersion: trading.thetillhoff.de/v1alpha1
+kind: StrategyConfig
+metadata:
+  name: macd-only
+  namespace: trading
+spec:
+  name: macd-only
+  description: MACD alone, champion risk/costs/universe. Best-ranked arm of the component
+    study (MIN alphaCash -6.4 vs the EW champion -25.5 on the same basket and windows),
+    and still BELOW CASH - paper only, never a promotion. See HYPOTHESIS_TEST_RESULTS.md.
+  indicators:
+    elliott_wave:
+      enabled: false
+      min_confidence: 0.0
+      min_wave_size: 0.1
+    elliott_wave_inverted:
+      enabled: false
+      min_confidence: 0.65
+      min_wave_size: 0.02
+    elliott_wave_inverted_exit:
+      enabled: false
+    rsi:
+      enabled: false
+      period: 7
+      oversold: 30
+      overbought: 70
+    ema:
+      enabled: false
+      short_period: 20
+      long_period: 50
+    macd:
+      enabled: true
+      fast: 12
+      slow: 26
+      signal: 12
+    atr:
+      period: 14
+  risk:
+    risk_reward: 2.6
+    position_size_pct: 0.2
+    max_positions: null
+    max_allocation_pct_per_instrument: 0.2
+    min_position_size: 20
+    bankruptcy_threshold: 100
+    use_atr_stops: false
+    atr_stop_multiplier: 2.0
+    reserve_slots: 10
+    sizing_mode: equal_weight
+    sizing_tilt_ref: 0.5
+    sizing_vol_ref: 0.02
+    trailing_stop_pct: null
+    use_confidence_sizing: false
+    use_confirmation_modulation: false
+    confirmation_size_factors:
+      '0': 0.0
+      '1': 0.5
+      '2': 2.0
+      '3': 2.0
+    use_flexible_sizing: false
+    flexible_sizing_method: confidence
+    flexible_sizing_target_rr: 2.5
+    use_wave_relationship_targets: true
+    use_volatility_sizing: false
+    volatility_threshold: 0.03
+    volatility_size_reduction: 0.5
+  costs:
+    trade_fee_pct: 0.0003
+    trade_fee_absolute: 0
+    trade_fee_min: 1
+    trade_fee_max: 10
+    slippage_bps: 4.0
+    slippage_entry_bps: null
+    slippage_exit_bps: null
+    max_participation_pct: null
+    adv_window: 20
+    adv_stat: min
+    impact_coef: 0.0
+    interest_rate_pa: 0.02
+  signals:
+    signal_types: all
+    min_certainty: 0.0
+    confidence_weights:
+      ew:
+        weight: 0.0
+        threshold: 0.0
+      rsi:
+        weight: 0.0
+        threshold: 0.0
+      ema:
+        weight: 0.0
+        threshold: 0.0
+      macd:
+        weight: 1.0
+        threshold: 0.0
+      mtf_2w:
+        weight: 0.0
+        threshold: 0.0
+      mtf_4w:
+        weight: 0.0
+        threshold: 0.0
+    confidence_curve: null
+    use_volatility_filter: false
+    volatility_max: 0.02
+    use_multi_timeframe: false
+    use_multi_timeframe_filter: false
+    mtf_signal_mode: null
+    trend_filter_ma_days: null
+    rank_by_expectancy_per_day: false
+  evaluation:
+    step_days: 1
+    lookback_days: 365
+    initial_capital: 100000.0
+    execution_delay_bars: 1
+    max_days: null
+  data:
+    instruments:
+    - AAPL
+    - AMZN
+    - CSCO
+    - ORCL
+    - IBM
+    - QCOM
+    - JPM
+    - BAC
+    - WFC
+    - C
+    - GS
+    - MS
+    - AXP
+    - USB
+    - PNC
+    - SCHW
+    - XOM
+    - CVX
+    - COP
+    - SLB
+    - EOG
+    - JNJ
+    - PFE
+    - ABT
+    - TMO
+    - MDT
+    - BMY
+    - GILD
+    - KO
+    - PEP
+    - WMT
+    - COST
+    - MO
+    - CL
+    - MCD
+    - SBUX
+    - NKE
+    - LOW
+    - HD
+    - TJX
+    - CAT
+    - DE
+    - HON
+    - MMM
+    - GE
+    - EMR
+    - UPS
+    - LMT
+    - NEE
+    - DUK
+    - AEP
+    - DIS
+    - CMCSA
+    - VZ
+    - T
+    column: Open
+    start_date: '2021-01-01'
+    end_date: null
