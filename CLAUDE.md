@@ -194,8 +194,11 @@ The proxies bind `https_port 8443` and the tailscale `Service` forwards **TCP/44
 support then advertises `alt-svc: h3=":8443"` — a port that is neither what the client dialled nor forwarded
 at all, so QUIC black-holes. Chrome/Firefox race QUIC against TCP and fall back in milliseconds; **WebKit
 (every iOS browser) sticks with the cached Alt-Svc and just spins**, which is why a page loads on mac/linux
-and hangs on iPhone. Every `configMap-*-caddy.yaml` therefore sets `servers { protocols h1 h2 }` — keep it
-when adding an endpoint.
+and hangs on iPhone. Every `configMap-*-caddy.yaml` therefore sets `servers { protocols h1 h2 }`.
+
+Those Caddyfiles are 6 independent copies — nothing enforces the line. Copy an existing configMap when
+adding an endpoint; a hand-written one silently brings h3 back. Public ingress is unaffected (Envoy sends
+no `alt-svc` at all).
 
 WebKit persists the Alt-Svc entry for the advertised `ma` (30d), so after fixing the server, an
 already-poisoned iPhone needs *Settings → Safari → Clear History and Website Data* (a Private tab uses an
