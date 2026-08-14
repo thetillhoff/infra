@@ -223,6 +223,17 @@ Consequences: the Hubble UI **service map** always draws "ingress" (it groups by
 
 `hubble.metrics` httpV2 deliberately omits `source_ip` (cardinality) — Prometheus has no client IPs by design.
 
+### Durable access log: hubble flow export → Loki
+
+`hubble.export.static` (in `pulumi/cilium-values.yaml`) writes L7-only flows to the agent's stdout, where alloy already picks them up. The ring buffer holds 4095 flows/node and was measured churning at 118 flows/s — a ~35s window — so anything older is only answerable from Loki. Query it:
+
+```logql
+{container="cilium-agent"} |= "\"REQUEST\"" | json
+  | line_format "{{.flow_IP_source}} -> {{.flow_destination_namespace}}/{{.flow_destination_pod_name}} {{.flow_l7_http_method}} {{.flow_l7_http_url}}"
+```
+
+`filePath: stdout` is a literal, not a path — the dynamic exporter writes a rotated file inside the container instead, which alloy cannot see (it tails `/var/log/pods`).
+
 ### Loki retention is required, not optional
 
 Retention is off by default in this chart and the 5Gi PVC filled at ~48Mi/day. `loki.compactor.retention_enabled` + `limits_config.retention_period` are set in `monitoring/loki/values.yaml`. SingleBinary runs the compactor in-process — the top-level `compactor.replicas: 0` does **not** disable it. Validate config changes before pushing: render with `helm template` and run `loki -verify-config` against the rendered `config.yaml` in Docker.
