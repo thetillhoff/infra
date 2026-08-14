@@ -112,6 +112,10 @@ Cilium is both the CNI and the Gateway API implementation (no separate ingress c
 
 Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}` — it is a **node/host** firewall, not a pod-to-pod policy. There is no pod-level default-deny, so cross-namespace pod traffic is unrestricted.
 
+That host policy is also **inert**: host policy enforcement needs `hostFirewall.enabled` in `pulumi/cilium-values.yaml`, which is unset (`kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.enable-host-firewall}'` → `false`). Nothing world→node is actually filtered today. Before switching it on, note its `toPorts` entries carry no `protocol:`, and Cilium defaults that to TCP — so UDP/443 (QUIC) would start being dropped.
+
+Public ingress is TCP-only: Envoy advertises h2/h1.1 via `gatewayAPI.enableAlpn` and no `alt-svc`, and Cilium 1.20 has no HTTP/3 knob (nothing matching `quic|http3` in the chart values). Gateway API's `protocol: HTTPS` is TLS-over-TCP by spec, so h3 would mean a hand-written `CiliumEnvoyConfig` UDP listener — or letting Cloudflare's edge serve h3 (records are currently unproxied, straight to node IPs).
+
 ### Private endpoints (tailnet-only)
 
 Admin UIs (grafana, longhorn, hubble) and the two app UIs that must not be public (trading, manga) are exposed privately at `<name>.internal.thetillhoff.de` — reachable only over the Tailscale tailnet, not the public internet. Defined in `kubernetes/infrastructure/resources/private-endpoints/`.
