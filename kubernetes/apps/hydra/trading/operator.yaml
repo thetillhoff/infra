@@ -31,7 +31,7 @@ spec:
             - name: NAMESPACE
               value: trading
             - name: MAX_INFLIGHT_JOBS
-              value: "5" # cap concurrent grid Jobs low (was default 40): fewer live pods = lower peak cAdvisor/prometheus cardinality + apiserver churn. Matches the ~5 grid slots left by the pods=10 quota (minus ~5 always-on trading pods), so no FailedCreate churn. Slower grids, safer.
+              value: "12" # cap concurrent grid Jobs (default is 40): fewer live pods = lower peak cAdvisor/prometheus cardinality + apiserver churn, which is what tipped a node NotReady in July. Must match the grid slots the ResourceQuota leaves - pods=20 minus the ~6 always-on trading pods, minus margin for a transient cronjob pod - or the operator churns FailedCreate. Raised from 5 with the pods=10→20 quota (cx33→cx43 nodes).
             # Worker-job resources (memory request==limit==value, Guaranteed QoS). Retune here
             # without a new image; the operator restarts and new jobs pick up the values.
             - name: JOB_CPU

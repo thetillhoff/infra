@@ -10,13 +10,20 @@ spec:
   # footprint, pod-object count, and CPU so a runaway grid stays contained.
   #
   # Tightened 2026-07-14 after a full grid tipped node-2 NotReady: the driver is peak object
-  # count (live pods → cAdvisor/prometheus series + apiserver churn), not worker pod memory. Cap
-  # concurrent pods hard at 10 and CPU at 7 cores so a grid stays small on this control-plane-only
-  # cluster. pods=10 counts the ~5 always-on trading pods too, so ~5 grid slots; paired with
-  # MAX_INFLIGHT_JOBS=5 (operator, matched so no FailedCreate churn) + Job TTL (completed pods self-delete).
+  # count (live pods → cAdvisor/prometheus series + apiserver churn), not worker pod memory. So the
+  # pod cap is the load-bearing number; the CPU/memory ceilings exist to make it schedulable.
+  # pods counts the ~6 always-on trading pods too, so grid slots = pods - 6; MAX_INFLIGHT_JOBS
+  # (operator) must match those slots or the operator churns FailedCreate. Job TTL self-deletes
+  # completed pods, so the total Jobs a grid runs does not raise the peak.
   # quota is namespace-total, not per-node; the scheduler spreads pods.
+  #
+  # Doubled 2026-08-14 with the cx33→cx43 control-plane upgrade (4 vCPU/8Gi → 8 vCPU/16Gi per node,
+  # infra 4ff3ace). Every ceiling here is a namespace TOTAL, so the CPU/memory numbers have to scale
+  # with `pods` or the extra pods cannot schedule - per-pod worker resources are unchanged
+  # (JOB_MEM_SIGNALS 256Mi, JOB_CPU_REQUEST 500m). 12 concurrent signals workers request 6.8 cores /
+  # 4.4Gi, so CPU stays the concurrency limiter and memory keeps headroom for simulation jobs (1Gi each).
   hard:
-    requests.cpu: "7"
-    requests.memory: 6Gi
-    limits.memory: 8Gi
-    pods: "10"
+    requests.cpu: "14"
+    requests.memory: 12Gi
+    limits.memory: 16Gi
+    pods: "20"
