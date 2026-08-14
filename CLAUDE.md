@@ -184,6 +184,26 @@ The `private-endpoints` manifests are inert until the tailnet is set up (done in
 - The operator's OAuth client (`operator-oauth.secret.yaml`) must be allowed to create devices with the proxy tag (`tag:service`, set via Service annotation).
 - Tailnet **ACLs** must grant your user access to `tag:service` devices on port `443` — otherwise the `100.x` IP resolves but connections are refused. This is the actual access control; DNS is not.
 
+### Private endpoints must not offer HTTP/3 (iOS hangs)
+
+The proxies bind `https_port 8443` and the tailscale `Service` forwards **TCP/443 only**. Caddy's default h3
+support then advertises `alt-svc: h3=":8443"` — a port that is neither what the client dialled nor forwarded
+at all, so QUIC black-holes. Chrome/Firefox race QUIC against TCP and fall back in milliseconds; **WebKit
+(every iOS browser) sticks with the cached Alt-Svc and just spins**, which is why a page loads on mac/linux
+and hangs on iPhone. Every `configMap-*-caddy.yaml` therefore sets `servers { protocols h1 h2 }` — keep it
+when adding an endpoint.
+
+WebKit persists the Alt-Svc entry for the advertised `ma` (30d), so after fixing the server, an
+already-poisoned iPhone needs *Settings → Safari → Clear History and Website Data* (a Private tab uses an
+ephemeral store, which makes it the cheap test).
+
+Caddy does **not** watch its Caddyfile, and these are plain ConfigMaps (no `configMapGenerator` hash), so
+Flux applying a Caddyfile change restarts nothing:
+
+```sh
+kubectl -n private-endpoints rollout restart deployment --all
+```
+
 ### Cilium Gateway API — PROGRAMMED: False is normal
 
 Gateways always show `PROGRAMMED: False / AddressNotAssigned` — expected, not a bug. Cilium runs in host-network mode (`pulumi/cilium-values.yaml`): Envoy daemonset binds directly to node IPs; no LoadBalancer IP is ever written to `.status.addresses`. Verify health via Envoy daemonset pods + actual HTTP response, not gateway status.

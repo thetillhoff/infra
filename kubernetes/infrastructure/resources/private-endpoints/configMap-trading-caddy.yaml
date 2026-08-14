@@ -9,6 +9,12 @@ data:
       admin off
       auto_https off       # we supply our own cert; no ACME from Caddy
       https_port 8443      # unprivileged port so the pod need not run as root
+      servers {
+        # No HTTP/3: caddy would advertise `alt-svc: h3=":8443"`, but the tailscale
+        # LoadBalancer forwards TCP/443 only - QUIC to UDP/8443 is a black hole.
+        # WebKit (every iOS browser) honours that Alt-Svc and hangs forever on it.
+        protocols h1 h2
+      }
     }
     https://trading.internal.thetillhoff.de {
       tls /certs/tls.crt /certs/tls.key
