@@ -200,6 +200,17 @@ DNS-01 required for any non-public gateway (HTTP-01 requires ACME server to reac
 
 Force-reissue recovery (cert-manager won't early-renew if `renewBefore` exceeds the current short cert's life): delete `selfsigned-ca-secret` (cert-manager), then `hubble-server-certs` + `hubble-relay-client-certs` (kube-system), then `rollout restart daemonset/cilium deployment/hubble-relay`.
 
+### `pulumi up` alone does not apply a cilium-values.yaml change
+
+It rewrites the `cilium-config` ConfigMap but leaves the daemonset untouched, and the agent reads most flags **only at startup**. So the ConfigMap shows the new value while every agent still runs the old behaviour — verified the hard way with `hubble.redact`: config correct, pods 7d old, credentials still logged. Always follow with:
+
+```sh
+kubectl -n kube-system rollout restart daemonset cilium
+kubectl -n kube-system rollout status daemonset cilium
+```
+
+Check `kubectl -n kube-system get pods -l k8s-app=cilium` ages against the deploy time before trusting any values change — and verify the behaviour, not the ConfigMap.
+
 ### Hubble records request headers verbatim — never persist flows unredacted
 
 L7 flows include full `Cookie` / `Authorization` values and URL query strings (verified with a canary request). Fine in the in-memory ring buffer, which turns over in minutes; a hard no once anything exports flows to Loki. `hubble.redact` in `pulumi/cilium-values.yaml` uses a header **allowlist** — add to it deliberately, and never convert it to a denylist.
