@@ -5,12 +5,6 @@ metadata:
   namespace: manga-scraper
 spec:
   replicas: 1
-  # Recreate, like the api: a RollingUpdate surges a second pod, and with valkey
-  # in the namespace the quota's limits.cpu has less headroom than one extra ui
-  # pod needs — the rollout would sit in FailedCreate instead. One replica behind
-  # a tailnet-only proxy can afford the seconds of downtime.
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: ui

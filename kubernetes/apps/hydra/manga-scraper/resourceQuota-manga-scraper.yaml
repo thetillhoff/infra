@@ -11,6 +11,10 @@ spec:
   hard:
     requests.cpu: "1"
     requests.memory: 1Gi
-    limits.cpu: "4"
+    # Headroom for one surged pod during a rolling update on top of everything
+    # running: the api alone is allowed 2000m for Chromium, and a ui rollout adds
+    # 500m for as long as both pods exist. Memory, not CPU, is what took the
+    # cluster down before, so this ceiling is the loose one.
+    limits.cpu: "5"
     limits.memory: 4Gi
     pods: "10"
