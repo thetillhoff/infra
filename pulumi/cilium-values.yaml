@@ -115,6 +115,22 @@ hubble:
           - "X-Envoy-External-Address"
           - "X-Forwarded-For"
           - "X-Request-Id"
+  # Durable access log: who reached which app from which IP. The in-memory ring buffer holds
+  # ~4095 flows/node and churns in well under a minute at observed rates, so anything older than
+  # "just now" is only answerable from here. `stdout` (a literal, not a path) makes the agent log
+  # flows instead of writing a rotated file - alloy already tails every pod's stdout, so they reach
+  # Loki with no alloy change, under {container="cilium-agent"} where a 7d retention bounds them.
+  #
+  # allowList keeps only L7 (event_type 129 = access log). That is the sole flow type carrying the
+  # real client IP: Envoy terminates the connection, so L3/L4 flows show reserved:ingress instead.
+  # It is also ~1 row per 324, which is what makes persisting this affordable at all.
+  # Depends on `redact` above - do not enable one without the other.
+  export:
+    static:
+      enabled: true
+      filePath: stdout
+      allowList:
+        - '{"event_type":[{"type":129}]}'
   relay:
     enabled: true
   # TLS for the Hubble API is issued by cert-manager via the `selfsigned-ca` ClusterIssuer
