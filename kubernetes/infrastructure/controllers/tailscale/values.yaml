@@ -1,1 +1,7 @@
 # https://github.com/tailscale/tailscale/blob/main/cmd/k8s-operator/deploy/chart/values.yaml
+
+proxyConfig:
+  # Applies to every Service and Ingress proxy that names no proxy class of its
+  # own, so all *.internal endpoints get it. See proxyClass-prefer-derp.yaml for
+  # why. Override per resource with `tailscale.com/proxy-class: <name>`.
+  defaultProxyClass: prefer-derp

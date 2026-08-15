@@ -1,0 +1,27 @@
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyClass
+metadata:
+  name: prefer-derp
+spec:
+  statefulSet:
+    pod:
+      tailscaleContainer:
+        env:
+          # Carry proxy traffic over DERP (HTTPS/TCP) instead of a direct
+          # WireGuard path (UDP). Hole punching between a port-restricted home
+          # NAT and a proxy pod behind node masquerade produces a path that
+          # establishes unreliably and, when it does, delivers ~80KB/s —
+          # measured against a temp nginx pod, 5MB over one connection:
+          # relay 2,514,207 B/s vs direct 87,551 B/s, with nothing else changed.
+          # The clamp is not the link (laptop 241Mbit TCP / 50Mbit UDP clean,
+          # cluster egress 5.95Gbit TCP / 50Mbit UDP clean, raw UDP between the
+          # two lossless in both directions), so this stops using the broken
+          # path rather than fixing it.
+          #
+          # TS_DEBUG_* is an unsupported knob: if a future tailscale drops it,
+          # direct paths simply return, which is the behaviour this replaces.
+          # DERP is shared infrastructure that tailscale throttles for fairness
+          # — measured 22 Mbit/s, steady over 100s. Enough for the reader; move
+          # to ProxyClass staticEndpoints if bulk transfer ever matters.
+          - name: TS_DEBUG_ALWAYS_USE_DERP
+            value: "true"
