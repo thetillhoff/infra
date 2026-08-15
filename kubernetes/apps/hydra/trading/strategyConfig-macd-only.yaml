@@ -5,9 +5,11 @@ metadata:
   namespace: trading
 spec:
   name: macd-only
-  description: MACD alone, champion risk/costs/universe. Best-ranked arm of the component
-    study (MIN alphaCash -6.4 vs the EW champion -25.5 on the same basket and windows),
-    and still BELOW CASH - paper only, never a promotion. See HYPOTHESIS_TEST_RESULTS.md.
+  description: 'MACD alone, open_same_bar, champion 55-name basket, live costs. Best-ranked
+    config measured: beats the execution_delay_bars=1 arm on MIN expectancy AND MIN
+    alphaCash on all THREE universes (champion 55, held-out 50, full 343-name pool),
+    and is 4/4 positive per-trade expectancy on each. Still BELOW CASH on MIN alphaCash
+    (-1.74) - paper only, never a promotion. See HYPOTHESIS_TEST_RESULTS.md.'
   indicators:
     elliott_wave:
       enabled: false
@@ -110,7 +112,8 @@ spec:
     step_days: 1
     lookback_days: 365
     initial_capital: 100000.0
-    execution_delay_bars: 1
+    execution_mode: open_same_bar
+    execution_delay_bars: 0
     max_days: null
   data:
     instruments:
