@@ -35,12 +35,22 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
+          # /health answers from the ui process alone. Probing a real page (this
+          # read / until 2026-08-17) makes this pod's life depend on api and
+          # postgres, which have health checks of their own — a slow catalog
+          # query restarted ui 8 times in one afternoon.
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: 3000
             initialDelaySeconds: 5
             periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
           resources:
             requests:
               cpu: 50m
