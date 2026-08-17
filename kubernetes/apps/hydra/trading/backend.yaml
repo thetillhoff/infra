@@ -51,6 +51,14 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
+          # The compute cache, so /api/cache can size it and clear it. Read-WRITE because clearing
+          # is the point; the endpoint only ever removes children of `cache/`, which leaves the
+          # sibling `backups/` and the configs alone. Prices are in postgres, not here.
+          volumeMounts:
+            - {name: trading-data, mountPath: /mnt/trading}
+      volumes:
+        - name: trading-data
+          persistentVolumeClaim: {claimName: trading-data}
 ---
 apiVersion: v1
 kind: Service
