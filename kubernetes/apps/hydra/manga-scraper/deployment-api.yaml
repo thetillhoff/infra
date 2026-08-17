@@ -78,6 +78,14 @@ spec:
             # Go duration here to also run the scheduled keep-fresh sweep.
             - name: SCRAPE_INTERVAL
               value: ""
+            # The page store: the next unread chapter of every followed manga,
+            # kept on the volume below at reading width, so opening it costs a
+            # file read instead of a fetch from the source. Filling it goes
+            # through the same rate limiter as a crawl, so depth stays small.
+            - name: PAGE_STORE_DIR
+              value: /pages
+            - name: PRELOAD_CHAPTERS_AHEAD
+              value: "1"
           # No readOnlyRootFilesystem and no runAsNonRoot: the image starts Xvfb
           # and a headed Chromium, which want a writable /tmp and their own
           # sandbox handling (the scraper already passes --no-sandbox).
@@ -93,6 +101,8 @@ spec:
             # 64MB default that containers get.
             - name: dev-shm
               mountPath: /dev/shm
+            - name: page-store
+              mountPath: /pages
           livenessProbe:
             httpGet:
               path: /health
@@ -121,3 +131,8 @@ spec:
             medium: Memory
             # Counts against the container's memory limit above.
             sizeLimit: 256Mi
+        # ReadWriteOnce, which is why this Deployment is strategy: Recreate —
+        # a rolling update would leave two pods wanting the same volume.
+        - name: page-store
+          persistentVolumeClaim:
+            claimName: page-store

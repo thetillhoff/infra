@@ -25,6 +25,11 @@ resources:
   - service-valkey.yaml
   - deployment-valkey.yaml
 
+  # The reader's page store: the chapters it is about to open, on disk. Unlike
+  # the cache this is worth keeping — refilling it means fetching from the
+  # source sites again at their own rate limit.
+  - persistentVolumeClaim-page-store.yaml
+
   # api applies the schema itself, via a migrations initContainer.
   - deployment-api.yaml
   - service-api.yaml

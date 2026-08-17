@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: page-store
+  namespace: manga-scraper
+# The pages of the chapters the reader is about to open, re-encoded to reading
+# width. Durable rather than cached: refilling it means fetching from the source
+# sites again at their own rate limit, which is hours for a library this size.
+#
+# 5Gi against a measured need of ~400MB — one chapter ahead of ~115 followed
+# manga, ~2000 pages at ~200KB. The headroom is for a deeper preload later
+# without a resize, and Longhorn can expand this if it is ever wrong.
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 5Gi
