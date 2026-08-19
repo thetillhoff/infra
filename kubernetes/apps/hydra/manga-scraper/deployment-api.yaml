@@ -22,9 +22,8 @@ spec:
       imagePullSecrets:
         - name: ghcr-creds
       initContainers:
-        # Applies the schema, the versioned migrations and the source seed data.
-        # Idempotent, so running it on every pod start is the simplest way to keep
-        # the database in step with the image without a separate Job to re-run.
+        # Idempotent, so running it on every pod start keeps the database in step
+        # with the image without a separate Job to re-run.
         - name: migrations
           image: ghcr.io/thetillhoff/manga-scraper-migrations:45 # {"$imagepolicy": "manga-scraper:manga-scraper-migrations"}
           env:
@@ -68,20 +67,15 @@ spec:
                   key: password
             - name: WEB_PORT
               value: "3001"
-            # The reader's page cache. Required by the api: without it every page
-            # of every chapter would be re-fetched from the source on every read.
-            # An unreachable valkey is logged and then behaves like an empty
-            # cache, so this does not make reading depend on it.
+            # Required by the api, which refuses to start without a cache address.
             - name: REDIS_ADDR
               value: valkey:6379
             # Deliberately empty: crawls are operator-triggered from the UI. Set a
             # Go duration here to also run the scheduled keep-fresh sweep.
             - name: SCRAPE_INTERVAL
               value: ""
-            # The page store: the next unread chapter of every followed manga,
-            # kept on the volume below at reading width, so opening it costs a
-            # file read instead of a fetch from the source. Filling it goes
-            # through the same rate limiter as a crawl, so depth stays small.
+            # The volume below holds chapters the reader is about to open. Filling
+            # it fetches from the sources at crawl pace, so depth stays small.
             - name: PAGE_STORE_DIR
               value: /pages
             - name: PRELOAD_CHAPTERS_AHEAD
@@ -120,9 +114,8 @@ spec:
               cpu: 100m
               memory: 256Mi
             limits:
-              # Chromium is the reason this is not smaller. A crawl runs three
-              # workers, each with its own tab; the limit is what stops a runaway
-              # page from taking the node down with it.
+              # Chromium is the reason this is not smaller: one tab per crawl
+              # worker, and the limit is what keeps a runaway page off the node.
               cpu: 2000m
               memory: 1536Mi
       volumes:

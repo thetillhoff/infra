@@ -60,6 +60,6 @@ spec:
         storageClassName: longhorn
         resources:
           requests:
-            # Covers the catalog plus cover images, which live in the database
-            # (~14KB each). Longhorn volumes can be expanded if it fills.
+            # Covers the catalog plus the cover images, which live in the
+            # database. Longhorn volumes can be expanded if it fills.
             storage: 8Gi
