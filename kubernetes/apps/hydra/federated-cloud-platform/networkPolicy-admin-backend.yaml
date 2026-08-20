@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: admin-backend
+  namespace: federated-cloud-platform
+# This is what lets the admin UI run without a login. These endpoints - session
+# replays, per-provider scraper stats, POST /scraper/trigger - used to sit on the
+# public backend behind a Clerk admin claim, where no NetworkPolicy could reach
+# them: same pod and port as the public API, which the public frontend must be
+# able to call. Here the only permitted caller is the admin UI pod, which is
+# itself only reachable from the tailnet caddy proxy. A compromised public
+# frontend has no path to this service at all.
+spec:
+  podSelector:
+    matchLabels: { app: admin-backend }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: frontend-admin }
+      ports:
+        - { protocol: TCP, port: 9091 }

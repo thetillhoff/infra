@@ -6,8 +6,8 @@ metadata:
 # Pod-scoped, not namespace-wide: the public frontend is the exposed attack
 # surface, so a namespace-wide `podSelector: {}` would let a compromised
 # frontend reach the DB directly - the exact pivot this gate exists to block.
-# Only the three real DB clients may connect: backend (+ its atlas init
-# containers, same pod label), scraper-backend, and the exchange-rate Job.
+# Only the real DB clients may connect: backend (+ its atlas init containers,
+# same pod label), scraper-backend, admin-backend, and the exchange-rate Job.
 spec:
   podSelector:
     matchLabels: { app: postgres }
@@ -18,6 +18,8 @@ spec:
             matchLabels: { app: backend }
         - podSelector:
             matchLabels: { app: scraper-backend }
+        - podSelector:
+            matchLabels: { app: admin-backend }
         - podSelector:
             matchLabels: { app: exchange-rate }
       ports:

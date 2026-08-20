@@ -3,12 +3,12 @@ kind: NetworkPolicy
 metadata:
   name: backend
   namespace: federated-cloud-platform
-# The backend serves both public and admin route prefixes on one port; the
-# admin prefixes are gated by Clerk/RequireAdmin. Its only in-cluster callers
-# are the two frontends' Caddy proxies, the scraper CronJob (run lifecycle +
-# upserts), the spot-scraper CronJob (spot samples), and the exchange-rate
-# CronJob (its wait-for-backend init probes /health as a migration-ready gate).
-# Pod-scoped so no other Job can reach it.
+# The backend now serves only public routes: the admin endpoints moved to
+# admin-backend, so the admin UI does not call this service at all. Its
+# in-cluster callers are the public frontend's Caddy proxy, the scraper CronJob
+# (run lifecycle + upserts), the spot-scraper CronJob (spot samples), and the
+# exchange-rate CronJob (its wait-for-backend init probes /health as a
+# migration-ready gate). Pod-scoped so no other Job can reach it.
 spec:
   podSelector:
     matchLabels: { app: backend }
@@ -17,8 +17,6 @@ spec:
     - from:
         - podSelector:
             matchLabels: { app: frontend }
-        - podSelector:
-            matchLabels: { app: frontend-admin }
         - podSelector:
             matchLabels: { app: scraper }
         - podSelector:

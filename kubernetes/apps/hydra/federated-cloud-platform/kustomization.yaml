@@ -11,10 +11,12 @@ resources:
 - fcp-scrapers.secret.yaml
 
 - rbac.yaml
+- rbac-admin-backend.yaml
 
 - postgres.yaml
 - backend.yaml
 - scraper-backend.yaml
+- admin-backend.yaml
 - scraper.yaml
 - spot-scraper.yaml
 - exchange-rate.yaml
@@ -32,6 +34,7 @@ resources:
 - networkPolicy-backend.yaml
 - networkPolicy-scraper-backend.yaml
 - networkPolicy-frontend-admin.yaml
+- networkPolicy-admin-backend.yaml
 
 # Public exposure: marketplace frontend only (cloud.thetillhoff.de). The admin
 # UI stays unexposed (no route) until it goes tailnet-only - out of scope here.
@@ -41,12 +44,14 @@ resources:
 
 - imageRepository-backend.yaml
 - imageRepository-scraper-backend.yaml
+- imageRepository-admin-backend.yaml
 - imageRepository-frontend.yaml
 - imageRepository-frontend-admin.yaml
 - imageRepository-scrapers.yaml
 - imageRepository-migrations.yaml
 - imagePolicy-backend.yaml
 - imagePolicy-scraper-backend.yaml
+- imagePolicy-admin-backend.yaml
 - imagePolicy-frontend.yaml
 - imagePolicy-frontend-admin.yaml
 - imagePolicy-scrapers.yaml

@@ -1,34 +1,9 @@
+# The backend no longer touches the Kubernetes API: POST /scraper/trigger moved
+# to admin-backend, which carries the cronjobs/get + jobs/create Role now. This
+# account stays so the internet-facing pod does not fall back to the shared
+# `default` ServiceAccount, but it grants nothing.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: backend
   namespace: federated-cloud-platform
----
-# Lets the backend's admin "trigger scraper run" endpoint create a Job from the
-# scraper CronJob. Read on cronjobs (to derive the Job spec), create on jobs.
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: backend
-  namespace: federated-cloud-platform
-rules:
-  - apiGroups: ["batch"]
-    resources: ["cronjobs"]
-    verbs: ["get"]
-  - apiGroups: ["batch"]
-    resources: ["jobs"]
-    verbs: ["create"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: backend
-  namespace: federated-cloud-platform
-subjects:
-  - kind: ServiceAccount
-    name: backend
-    namespace: federated-cloud-platform
-roleRef:
-  kind: Role
-  name: backend
-  apiGroup: rbac.authorization.k8s.io
