@@ -42,6 +42,12 @@ resources:
 - deployment-trading-proxy.yaml
 - service-trading.yaml
 
+# fcp-admin.internal.thetillhoff.de
+- certificate-fcp-admin.yaml
+- configMap-fcp-admin-caddy.yaml
+- deployment-fcp-admin-proxy.yaml
+- service-fcp-admin.yaml
+
 # manga.internal.thetillhoff.de
 - certificate-manga.yaml
 - configMap-manga-caddy.yaml

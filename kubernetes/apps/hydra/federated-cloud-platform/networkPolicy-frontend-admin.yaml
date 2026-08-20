@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-admin
+  namespace: federated-cloud-platform
+# The admin UI must be reachable over the tailnet only. Its single legitimate
+# caller is the fcp-admin caddy proxy in private-endpoints, which fronts
+# fcp-admin.internal.thetillhoff.de. Everything else is denied - including the
+# shared gateway, so an httpRoute pointed here by mistake still cannot serve it.
+# This is the enforcing half of the guarantee; the absence of an admin
+# httpRoute is the other half, and this half does not depend on that one.
+spec:
+  podSelector:
+    matchLabels: { app: frontend-admin }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        # namespaceSelector AND podSelector within one rule: the fcp-admin proxy
+        # pod in private-endpoints, not any pod in it and not any proxy elsewhere.
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: private-endpoints }
+          podSelector:
+            matchLabels: { app: fcp-admin-proxy }
+      ports:
+        - { protocol: TCP, port: 8080 }
