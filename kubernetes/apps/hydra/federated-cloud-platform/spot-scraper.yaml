@@ -5,7 +5,7 @@ metadata:
   namespace: federated-cloud-platform
 spec:
   # Hourly. Spot prices move constantly; this samples them for the per-instance
-  # spot history page. Reuses the scrapers image via SCRAPER_MODE=spot.
+  # spot history page. Reuses the scraper image via SCRAPER_MODE=spot.
   schedule: "0 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
@@ -28,14 +28,14 @@ spec:
           initContainers:
             - name: wait-for-backend
               image: busybox:1.37
-              command: ["sh", "-c", "until wget -qO- http://backend.federated-cloud-platform.svc.cluster.local:8080/health; do echo waiting; sleep 2; done"]
+              command: ["sh", "-c", "until wget -qO- http://public-api.federated-cloud-platform.svc.cluster.local:8080/health; do echo waiting; sleep 2; done"]
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop: ["ALL"]
           containers:
             - name: spot-scraper
-              image: ghcr.io/thetillhoff/federated-cloud-platform/scrapers:35 # {"$imagepolicy": "federated-cloud-platform:fcp-scrapers"}
+              image: ghcr.io/thetillhoff/federated-cloud-platform/scraper:35 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper"}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
@@ -44,11 +44,11 @@ spec:
                 - name: SCRAPER_MODE
                   value: spot
                 - name: API_URL
-                  value: http://backend.federated-cloud-platform.svc.cluster.local:8080
+                  value: http://public-api.federated-cloud-platform.svc.cluster.local:8080
                 - name: AZURE_SCRAPER_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: fcp-scrapers
+                      name: fcp-scraper
                       key: azureKey
               resources:
                 # Light: pages the Azure retail API and holds ~47k small spot rows.

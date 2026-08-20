@@ -1,9 +1,9 @@
 # The backend no longer touches the Kubernetes API: POST /scraper/trigger moved
-# to admin-backend, which carries the cronjobs/get + jobs/create Role now. This
+# to admin-api, which carries the cronjobs/get + jobs/create Role now. This
 # account stays so the internet-facing pod does not fall back to the shared
 # `default` ServiceAccount, but it grants nothing.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: backend
+  name: public-api
   namespace: federated-cloud-platform

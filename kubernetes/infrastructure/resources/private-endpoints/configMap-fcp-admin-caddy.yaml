@@ -18,5 +18,5 @@ data:
     }
     https://fcp-admin.internal.thetillhoff.de {
       tls /certs/tls.crt /certs/tls.key
-      reverse_proxy frontend-admin.federated-cloud-platform.svc.cluster.local:8080
+      reverse_proxy admin-web.federated-cloud-platform.svc.cluster.local:8080
     }

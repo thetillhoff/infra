@@ -1,22 +1,22 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: scraper-backend
+  name: scraper-api
   namespace: federated-cloud-platform
 # Owns scraper_runs writes. Reached by the scraper CronJob (run lifecycle), the
-# public backend (proxies GET /scraper/runs/latest) and admin-backend (proxies
+# public backend (proxies GET /scraper/runs/latest) and admin-api (proxies
 # the admin-only /scraper/runs/latest/progress). Nothing else.
 spec:
   podSelector:
-    matchLabels: { app: scraper-backend }
+    matchLabels: { app: scraper-api }
   policyTypes: [Ingress]
   ingress:
     - from:
         - podSelector:
             matchLabels: { app: scraper }
         - podSelector:
-            matchLabels: { app: backend }
+            matchLabels: { app: public-api }
         - podSelector:
-            matchLabels: { app: admin-backend }
+            matchLabels: { app: admin-api }
       ports:
         - { protocol: TCP, port: 9090 }

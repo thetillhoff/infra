@@ -1,29 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: admin-backend
+  name: scraper-api
   namespace: federated-cloud-platform
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: admin-backend
+      app: scraper-api
   template:
     metadata:
       labels:
-        app: admin-backend
+        app: scraper-api
     spec:
-      serviceAccountName: admin-backend
       imagePullSecrets:
         - name: ghcr-creds
       containers:
-        - name: admin-backend
-          image: ghcr.io/thetillhoff/federated-cloud-platform/admin-backend:35 # {"$imagepolicy": "federated-cloud-platform:fcp-admin-backend"}
+        - name: scraper-api
+          image: ghcr.io/thetillhoff/federated-cloud-platform/scraper-api:35 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper-api"}
           env:
             - name: HOST
               value: "0.0.0.0"
             - name: PORT
-              value: "9091"
+              value: "9090"
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
@@ -40,15 +39,12 @@ spec:
               value: "5432"
             - name: POSTGRES_SCHEMA
               value: fcp
-            # Run progress lives in scraper-backend, which owns scraper_runs.
-            - name: SCRAPER_BACKEND_URL
-              value: http://scraper-backend.federated-cloud-platform.svc.cluster.local:9090
           ports:
-            - containerPort: 9091
+            - containerPort: 9090
           readinessProbe:
             httpGet:
               path: /health
-              port: 9091
+              port: 9090
             initialDelaySeconds: 5
             periodSeconds: 5
           securityContext:
@@ -70,12 +66,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: admin-backend
+  name: scraper-api
   namespace: federated-cloud-platform
 spec:
   type: ClusterIP
   selector:
-    app: admin-backend
+    app: scraper-api
   ports:
-    - port: 9091
-      targetPort: 9091
+    - port: 9090
+      targetPort: 9090

@@ -5,7 +5,7 @@ metadata:
   namespace: federated-cloud-platform
 spec:
   # Hard ceiling so the fcp namespace can't exhaust the cluster. Sized for the
-  # always-on pods (postgres, backend, scraper-backend, frontend, frontend-admin)
+  # always-on pods (postgres, public-api, scraper-api, admin-api, public-web, admin-web)
   # plus headroom for the daily scraper Job (up to 2Gi/2 CPU) and short-lived
   # migration / exchange-rate Jobs. Requires memory requests+limits on every
   # container; the LimitRange supplies defaults for those that don't set them.

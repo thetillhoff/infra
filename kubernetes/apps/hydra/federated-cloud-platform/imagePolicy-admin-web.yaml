@@ -1,11 +1,11 @@
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
-  name: fcp-backend
+  name: fcp-admin-web
   namespace: federated-cloud-platform
 spec:
   imageRepositoryRef:
-    name: fcp-backend
+    name: fcp-admin-web
   filterTags:
     pattern: '^(?P<run>[0-9]+)$'
     extract: '$run'

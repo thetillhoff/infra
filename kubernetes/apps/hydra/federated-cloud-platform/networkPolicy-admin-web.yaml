@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: frontend-admin
+  name: admin-web
   namespace: federated-cloud-platform
 # The admin UI must be reachable over the tailnet only. Its single legitimate
 # caller is the fcp-admin caddy proxy in private-endpoints, which fronts
@@ -11,7 +11,7 @@ metadata:
 # httpRoute is the other half, and this half does not depend on that one.
 spec:
   podSelector:
-    matchLabels: { app: frontend-admin }
+    matchLabels: { app: admin-web }
   policyTypes: [Ingress]
   ingress:
     - from:

@@ -13,7 +13,7 @@ spec:
       template:
         metadata:
           labels:
-            app: scraper # NetworkPolicy source selector (reaches backend + scraper-backend)
+            app: scraper # NetworkPolicy source selector (reaches backend + scraper-api)
         spec:
           # fsGroup so uid 10001 can write the /cache emptyDir; the rest satisfies
           # the namespace's restricted PodSecurity level.
@@ -29,42 +29,42 @@ spec:
           initContainers:
             - name: wait-for-backend
               image: busybox:1.37
-              command: ["sh", "-c", "until wget -qO- http://backend.federated-cloud-platform.svc.cluster.local:8080/health && wget -qO- http://scraper-backend.federated-cloud-platform.svc.cluster.local:9090/health; do echo waiting; sleep 2; done"]
+              command: ["sh", "-c", "until wget -qO- http://public-api.federated-cloud-platform.svc.cluster.local:8080/health && wget -qO- http://scraper-api.federated-cloud-platform.svc.cluster.local:9090/health; do echo waiting; sleep 2; done"]
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop: ["ALL"]
           containers:
             - name: scraper
-              image: ghcr.io/thetillhoff/federated-cloud-platform/scrapers:35 # {"$imagepolicy": "federated-cloud-platform:fcp-scrapers"}
+              image: ghcr.io/thetillhoff/federated-cloud-platform/scraper:35 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper"}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop: ["ALL"]
               env:
                 - name: API_URL
-                  value: http://backend.federated-cloud-platform.svc.cluster.local:8080
-                - name: SCRAPER_BACKEND_URL
-                  value: http://scraper-backend.federated-cloud-platform.svc.cluster.local:9090
+                  value: http://public-api.federated-cloud-platform.svc.cluster.local:8080
+                - name: SCRAPER_API_URL
+                  value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090
                 - name: HETZNER_SCRAPER_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: fcp-scrapers
+                      name: fcp-scraper
                       key: hetznerKey
                 - name: AWS_SCRAPER_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: fcp-scrapers
+                      name: fcp-scraper
                       key: awsKey
                 - name: GCP_SCRAPER_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: fcp-scrapers
+                      name: fcp-scraper
                       key: gcpKey
                 - name: AZURE_SCRAPER_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: fcp-scrapers
+                      name: fcp-scraper
                       key: azureKey
                 - name: SCRAPER_CACHE_DIR
                   value: /cache
