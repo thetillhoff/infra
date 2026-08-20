@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: public-web
   namespace: federated-cloud-platform
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend
+      app: public-web
   template:
     metadata:
       labels:
-        app: frontend
+        app: public-web
     spec:
       imagePullSecrets:
         - name: ghcr-creds
       containers:
-        - name: frontend
-          image: ghcr.io/thetillhoff/federated-cloud-platform/frontend:35 # {"$imagepolicy": "federated-cloud-platform:fcp-frontend"}
+        - name: public-web
+          image: ghcr.io/thetillhoff/federated-cloud-platform/public-web:40 # {"$imagepolicy": "federated-cloud-platform:fcp-public-web"}
           ports:
             - containerPort: 8080
           securityContext:
@@ -39,11 +39,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
+  name: public-web
   namespace: federated-cloud-platform
 spec:
   selector:
-    app: frontend
+    app: public-web
   ports:
     - port: 8080
       targetPort: 8080

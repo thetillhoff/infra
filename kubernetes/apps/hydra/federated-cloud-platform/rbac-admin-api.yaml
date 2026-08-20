@@ -1,0 +1,35 @@
+# admin-api serves POST /scraper/trigger, which creates a Job from the
+# scraper CronJob through the in-cluster API. The public backend used to hold
+# these rights; it no longer touches the Kubernetes API at all.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-api
+  namespace: federated-cloud-platform
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: admin-api
+  namespace: federated-cloud-platform
+rules:
+  - apiGroups: ["batch"]
+    resources: ["cronjobs"]
+    verbs: ["get"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: admin-api
+  namespace: federated-cloud-platform
+subjects:
+  - kind: ServiceAccount
+    name: admin-api
+    namespace: federated-cloud-platform
+roleRef:
+  kind: Role
+  name: admin-api
+  apiGroup: rbac.authorization.k8s.io

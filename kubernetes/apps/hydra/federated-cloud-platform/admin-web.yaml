@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-admin
+  name: admin-web
   namespace: federated-cloud-platform
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend-admin
+      app: admin-web
   template:
     metadata:
       labels:
-        app: frontend-admin
+        app: admin-web
     spec:
       imagePullSecrets:
         - name: ghcr-creds
       containers:
-        - name: frontend-admin
-          image: ghcr.io/thetillhoff/federated-cloud-platform/frontend-admin:35 # {"$imagepolicy": "federated-cloud-platform:fcp-frontend-admin"}
+        - name: admin-web
+          image: ghcr.io/thetillhoff/federated-cloud-platform/admin-web:40 # {"$imagepolicy": "federated-cloud-platform:fcp-admin-web"}
           ports:
             - containerPort: 8080
           securityContext:
@@ -39,11 +39,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend-admin
+  name: admin-web
   namespace: federated-cloud-platform
 spec:
   selector:
-    app: frontend-admin
+    app: admin-web
   ports:
     - port: 8080
       targetPort: 8080

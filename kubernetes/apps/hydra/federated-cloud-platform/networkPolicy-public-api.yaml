@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: public-api
+  namespace: federated-cloud-platform
+# The backend now serves only public routes: the admin endpoints moved to
+# admin-api, so the admin UI does not call this service at all. Its
+# in-cluster callers are public-web's Caddy proxy, the scraper CronJob
+# (run lifecycle + upserts), the spot-scraper CronJob (spot samples), and the
+# exchange-rate CronJob (its wait-for-backend init probes /health as a
+# migration-ready gate). Pod-scoped so no other Job can reach it.
+spec:
+  podSelector:
+    matchLabels: { app: public-api }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: public-web }
+        - podSelector:
+            matchLabels: { app: scraper }
+        - podSelector:
+            matchLabels: { app: spot-scraper }
+        - podSelector:
+            matchLabels: { app: exchange-rate }
+      ports:
+        - { protocol: TCP, port: 8080 }

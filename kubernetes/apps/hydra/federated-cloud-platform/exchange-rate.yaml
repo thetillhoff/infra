@@ -23,7 +23,7 @@ spec:
             # Backend readiness implies the schema migrations have run.
             - name: wait-for-backend
               image: busybox:1.37
-              command: ["sh", "-c", "until wget -qO- http://backend.federated-cloud-platform.svc.cluster.local:8080/health; do echo waiting; sleep 2; done"]
+              command: ["sh", "-c", "until wget -qO- http://public-api.federated-cloud-platform.svc.cluster.local:8080/health; do echo waiting; sleep 2; done"]
               securityContext:
                 runAsNonRoot: true
                 runAsUser: 10001
@@ -35,8 +35,8 @@ spec:
           containers:
             - name: exchange-rate
               # Reuses the backend image + its ImagePolicy; runs the subcommand.
-              image: ghcr.io/thetillhoff/federated-cloud-platform/backend:35 # {"$imagepolicy": "federated-cloud-platform:fcp-backend"}
-              command: ["/backend", "refresh-exchange-rate"]
+              image: ghcr.io/thetillhoff/federated-cloud-platform/public-api:40 # {"$imagepolicy": "federated-cloud-platform:fcp-public-api"}
+              command: ["/public-api", "refresh-exchange-rate"]
               env:
                 - name: POSTGRES_USER
                   valueFrom:

@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-api
+  namespace: federated-cloud-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-api
+  template:
+    metadata:
+      labels:
+        app: admin-api
+    spec:
+      serviceAccountName: admin-api
+      imagePullSecrets:
+        - name: ghcr-creds
+      containers:
+        - name: admin-api
+          image: ghcr.io/thetillhoff/federated-cloud-platform/admin-api:40 # {"$imagepolicy": "federated-cloud-platform:fcp-admin-api"}
+          env:
+            - name: HOST
+              value: "0.0.0.0"
+            - name: PORT
+              value: "9091"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fcp-postgres
+                  key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fcp-postgres
+                  key: password
+            - name: POSTGRES_HOST
+              value: postgres.federated-cloud-platform.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_SCHEMA
+              value: fcp
+            # Run progress lives in scraper-api, which owns scraper_runs.
+            - name: SCRAPER_API_URL
+              value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090
+          ports:
+            - containerPort: 9091
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9091
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-api
+  namespace: federated-cloud-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: admin-api
+  ports:
+    - port: 9091
+      targetPort: 9091

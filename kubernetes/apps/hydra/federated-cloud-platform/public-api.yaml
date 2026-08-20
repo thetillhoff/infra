@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: public-api
   namespace: federated-cloud-platform
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend
+      app: public-api
   template:
     metadata:
       labels:
-        app: backend
+        app: public-api
     spec:
-      serviceAccountName: backend
+      serviceAccountName: public-api
       imagePullSecrets:
         - name: ghcr-creds
       initContainers:
@@ -41,8 +41,8 @@ spec:
                   name: fcp-postgres
                   key: dsn
       containers:
-        - name: backend
-          image: ghcr.io/thetillhoff/federated-cloud-platform/backend:35 # {"$imagepolicy": "federated-cloud-platform:fcp-backend"}
+        - name: public-api
+          image: ghcr.io/thetillhoff/federated-cloud-platform/public-api:40 # {"$imagepolicy": "federated-cloud-platform:fcp-public-api"}
           env:
             - name: HOST
               value: "0.0.0.0"
@@ -64,8 +64,8 @@ spec:
               value: "5432"
             - name: POSTGRES_SCHEMA
               value: fcp
-            - name: SCRAPER_BACKEND_URL
-              value: http://scraper-backend.federated-cloud-platform.svc.cluster.local:9090
+            - name: SCRAPER_API_URL
+              value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090
             - name: CLERK_SECRET_KEY
               valueFrom:
                 secretKeyRef:
@@ -101,11 +101,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: public-api
   namespace: federated-cloud-platform
 spec:
   selector:
-    app: backend
+    app: public-api
   ports:
     - port: 8080
       targetPort: 8080

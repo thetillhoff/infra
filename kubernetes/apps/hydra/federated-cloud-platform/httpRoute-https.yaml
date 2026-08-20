@@ -14,8 +14,8 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        # Public marketplace only. The frontend's Caddy proxies the public API
-        # prefixes to backend in-cluster; admin prefixes live only in the
-        # frontend-admin Caddyfile, which is not routed here.
-        - name: frontend
+        # Public marketplace only. The public web app's Caddy proxies the public API
+        # prefixes to public-api in-cluster; admin prefixes live only in the
+        # admin-web Caddyfile, which is not routed here.
+        - name: public-web
           port: 8080

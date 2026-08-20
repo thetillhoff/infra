@@ -1,10 +1,10 @@
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
 metadata:
-  name: fcp-scraper-backend
+  name: fcp-admin-web
   namespace: federated-cloud-platform
 spec:
-  image: ghcr.io/thetillhoff/federated-cloud-platform/scraper-backend
+  image: ghcr.io/thetillhoff/federated-cloud-platform/admin-web
   interval: 5m0s
   secretRef:
     name: ghcr-creds

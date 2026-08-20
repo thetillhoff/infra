@@ -3,11 +3,11 @@ kind: NetworkPolicy
 metadata:
   name: postgres
   namespace: federated-cloud-platform
-# Pod-scoped, not namespace-wide: the public frontend is the exposed attack
+# Pod-scoped, not namespace-wide: public-web is the exposed attack
 # surface, so a namespace-wide `podSelector: {}` would let a compromised
-# frontend reach the DB directly - the exact pivot this gate exists to block.
-# Only the three real DB clients may connect: backend (+ its atlas init
-# containers, same pod label), scraper-backend, and the exchange-rate Job.
+# public-web reach the DB directly - the exact pivot this gate exists to block.
+# Only the real DB clients may connect: backend (+ its atlas init containers,
+# same pod label), scraper-api, admin-api, and the exchange-rate Job.
 spec:
   podSelector:
     matchLabels: { app: postgres }
@@ -15,9 +15,11 @@ spec:
   ingress:
     - from:
         - podSelector:
-            matchLabels: { app: backend }
+            matchLabels: { app: public-api }
         - podSelector:
-            matchLabels: { app: scraper-backend }
+            matchLabels: { app: scraper-api }
+        - podSelector:
+            matchLabels: { app: admin-api }
         - podSelector:
             matchLabels: { app: exchange-rate }
       ports:

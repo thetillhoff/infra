@@ -11,43 +11,49 @@ resources:
 - fcp-scrapers.secret.yaml
 
 - rbac.yaml
+- rbac-admin-api.yaml
 
 - postgres.yaml
-- backend.yaml
-- scraper-backend.yaml
+- public-api.yaml
+- scraper-api.yaml
+- admin-api.yaml
 - scraper.yaml
 - spot-scraper.yaml
 - exchange-rate.yaml
-- frontend.yaml
-# frontend-admin intentionally NOT deployed: public-only launch. Re-enable
-# (with a tailnet Service + real Clerk key) when the admin UI goes live. Its
-# imageRepository/imagePolicy below keep tracking the image, harmless until then.
-# - frontend-admin.yaml
+- public-web.yaml
+# admin-web is tailnet-only: reached through the fcp-admin caddy proxy in
+# private-endpoints (fcp-admin.internal.thetillhoff.de). It has no httpRoute, and
+# networkPolicy-admin-web below denies everything except that proxy.
+- admin-web.yaml
 
 # NetworkPolicy: data/api tiers locked to their real in-cluster callers. The
-# web tier (frontend) is intentionally unrestricted - it is the gateway
-# entrypoint. (The frontend-admin `from` entry in networkPolicy-backend is inert
+# web tier (public-web) is intentionally unrestricted - it is the gateway
+# entrypoint. (The admin-web `from` entry in networkPolicy-backend is inert
 # while admin is undeployed, and ready for when it returns.)
 - networkPolicy-postgres.yaml
-- networkPolicy-backend.yaml
-- networkPolicy-scraper-backend.yaml
+- networkPolicy-public-api.yaml
+- networkPolicy-scraper-api.yaml
+- networkPolicy-admin-web.yaml
+- networkPolicy-admin-api.yaml
 
-# Public exposure: marketplace frontend only (cloud.thetillhoff.de). The admin
+# Public exposure: marketplace public-web only (cloud.thetillhoff.de). The admin
 # UI stays unexposed (no route) until it goes tailnet-only - out of scope here.
 # TODO: rate limiting still not in place - no cluster precedent yet.
 - httpRoute-https.yaml
 - httpRoute-http.yaml
 
-- imageRepository-backend.yaml
-- imageRepository-scraper-backend.yaml
-- imageRepository-frontend.yaml
-- imageRepository-frontend-admin.yaml
-- imageRepository-scrapers.yaml
+- imageRepository-public-api.yaml
+- imageRepository-scraper-api.yaml
+- imageRepository-admin-api.yaml
+- imageRepository-public-web.yaml
+- imageRepository-admin-web.yaml
+- imageRepository-scraper.yaml
 - imageRepository-migrations.yaml
-- imagePolicy-backend.yaml
-- imagePolicy-scraper-backend.yaml
-- imagePolicy-frontend.yaml
-- imagePolicy-frontend-admin.yaml
-- imagePolicy-scrapers.yaml
+- imagePolicy-public-api.yaml
+- imagePolicy-scraper-api.yaml
+- imagePolicy-admin-api.yaml
+- imagePolicy-public-web.yaml
+- imagePolicy-admin-web.yaml
+- imagePolicy-scraper.yaml
 - imagePolicy-migrations.yaml
 - imageUpdateAutomation.yaml
