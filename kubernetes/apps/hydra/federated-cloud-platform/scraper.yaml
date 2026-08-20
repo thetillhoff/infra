@@ -36,13 +36,13 @@ spec:
                   drop: ["ALL"]
           containers:
             - name: scraper
-              image: ghcr.io/thetillhoff/federated-cloud-platform/scraper:39 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper"}
+              image: ghcr.io/thetillhoff/federated-cloud-platform/scraper:40 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper"}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop: ["ALL"]
               env:
-                - name: API_URL
+                - name: PUBLIC_API_URL
                   value: http://public-api.federated-cloud-platform.svc.cluster.local:8080
                 - name: SCRAPER_API_URL
                   value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090

@@ -35,7 +35,7 @@ spec:
           containers:
             - name: exchange-rate
               # Reuses the backend image + its ImagePolicy; runs the subcommand.
-              image: ghcr.io/thetillhoff/federated-cloud-platform/public-api:39 # {"$imagepolicy": "federated-cloud-platform:fcp-public-api"}
+              image: ghcr.io/thetillhoff/federated-cloud-platform/public-api:40 # {"$imagepolicy": "federated-cloud-platform:fcp-public-api"}
               command: ["/public-api", "refresh-exchange-rate"]
               env:
                 - name: POSTGRES_USER
