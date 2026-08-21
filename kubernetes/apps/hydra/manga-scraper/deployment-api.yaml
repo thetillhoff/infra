@@ -25,7 +25,7 @@ spec:
         # Idempotent, so running it on every pod start keeps the database in step
         # with the image without a separate Job to re-run.
         - name: migrations
-          image: ghcr.io/thetillhoff/manga-scraper-migrations:50 # {"$imagepolicy": "manga-scraper:manga-scraper-migrations"}
+          image: ghcr.io/thetillhoff/manga-scraper-migrations:51 # {"$imagepolicy": "manga-scraper:manga-scraper-migrations"}
           env:
             - name: DATABASE_URL
               valueFrom:
