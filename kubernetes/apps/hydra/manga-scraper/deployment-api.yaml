@@ -71,7 +71,7 @@ spec:
               memory: 256Mi
       containers:
         - name: api
-          image: ghcr.io/thetillhoff/manga-scraper-api:59 # {"$imagepolicy": "manga-scraper:manga-scraper-api"}
+          image: ghcr.io/thetillhoff/manga-scraper-api:61 # {"$imagepolicy": "manga-scraper:manga-scraper-api"}
           ports:
             - containerPort: 3001
           env:
