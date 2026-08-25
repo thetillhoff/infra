@@ -11,10 +11,12 @@ spec:
   hard:
     requests.cpu: "1"
     requests.memory: 1Gi
-    # Headroom for one surged pod during a rolling update on top of everything
-    # running: the api alone is allowed 2000m for Chromium, and a ui rollout adds
-    # 500m for as long as both pods exist. Memory, not CPU, is what took the
-    # cluster down before, so this ceiling is the loose one.
-    limits.cpu: "5"
-    limits.memory: 4Gi
+    # Headroom for one surged api pod on top of everything running, measured
+    # rather than estimated: the steady state is 3800m / 2880Mi, and the api is
+    # allowed 2000m / 1536Mi, so a rollout peaks at 5800m / 4416Mi. Too tight and
+    # the quota rejects the surged pod — the rollout then stalls with the old pod
+    # still serving, which is how this was found. Limits are ceilings, not
+    # reservations; the requests above are what the scheduler has to fit.
+    limits.cpu: "6"
+    limits.memory: 5Gi
     pods: "10"
