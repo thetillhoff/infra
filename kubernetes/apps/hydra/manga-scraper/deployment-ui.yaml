@@ -5,6 +5,15 @@ metadata:
   namespace: manga-scraper
 spec:
   replicas: 1
+  # Spelled out rather than left to the defaults: with one replica the default
+  # 25% maxUnavailable rounds down to zero anyway, but the reader's whole
+  # experience of a deploy depends on that rounding, which is too much to leave
+  # implicit.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: ui
@@ -35,6 +44,13 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
+          # Outlives the race between endpoint removal and SIGTERM, so a
+          # request in flight during a deploy is not answered with a closed
+          # connection. Same reasoning as the api's.
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
           # /health answers from the ui process alone. Probing a real page would
           # make this pod's life depend on api and postgres, which have health
           # checks of their own — a slow catalog query then restarts a ui that is

@@ -9,8 +9,18 @@ spec:
   # lock and rate limiter are in-process — so two replicas would each think they
   # were the only crawler of a site. Keep it at one until that lock moves into
   # the database.
+  #
+  # Surge instead of Recreate: with Recreate the reader watched every deploy as
+  # "no source serves this chapter", because the old pod was gone for as long as
+  # the new one needed to pull, migrate, start Xvfb and pass its probe. maxSurge
+  # keeps the old pod serving until the new one is ready, and the two overlap for
+  # seconds — long enough for a handover, too short to matter to the in-process
+  # crawl lock, and crawls are operator-triggered anyway (SCRAPE_INTERVAL empty).
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: api
@@ -19,6 +29,22 @@ spec:
       labels:
         app: api
     spec:
+      # The page store below is ReadWriteOnce, so a surge only works while both
+      # pods sit on one node: RWO is per node, not per pod. Preferred rather than
+      # required, because a required rule has nothing to match when no api pod
+      # exists (a scale from zero, or a lost node) and would leave the pod
+      # Pending forever. If the new pod does land elsewhere it stays
+      # ContainerCreating on a multi-attach error and the old pod keeps serving —
+      # a stalled rollout, not an outage; delete the old pod to finish it.
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app: api
       imagePullSecrets:
         - name: ghcr-creds
       initContainers:
@@ -97,6 +123,14 @@ spec:
               mountPath: /dev/shm
             - name: page-store
               mountPath: /pages
+          # Endpoint removal races SIGTERM: kube-proxy learns this pod is going
+          # away at about the same time the process starts shutting down, so a
+          # request already in flight would hit a closed listener. Outliving the
+          # race is all this has to do.
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
           livenessProbe:
             httpGet:
               path: /health
@@ -124,8 +158,9 @@ spec:
             medium: Memory
             # Counts against the container's memory limit above.
             sizeLimit: 256Mi
-        # ReadWriteOnce, which is why this Deployment is strategy: Recreate —
-        # a rolling update would leave two pods wanting the same volume.
+        # ReadWriteOnce, which is what the pod affinity above is for: a surged
+        # rollout has two pods wanting this volume, and RWO grants it to one
+        # node — so both pods have to be on that node.
         - name: page-store
           persistentVolumeClaim:
             claimName: page-store
