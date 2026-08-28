@@ -45,6 +45,8 @@ spec:
                   value: spot
                 - name: PUBLIC_API_URL
                   value: http://public-api.federated-cloud-platform.svc.cluster.local:8080
+                - name: SCRAPER_API_URL
+                  value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090
                 - name: AZURE_SCRAPER_KEY
                   valueFrom:
                     secretKeyRef:
