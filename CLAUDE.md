@@ -181,6 +181,30 @@ engine → nothing to copy), so a detached volume whose replicas sit only on the
   `pulumi up` removes them — until then public DNS round-robins to the dead node IPs (~50% failed conns).
   Run the old-nodegroup-removal `pulumi up` promptly after the nodes are gone.
 
+### Deleting a PVC leaves an orphan PV plus a Longhorn volume
+
+The `longhorn` StorageClass is the cluster default and uses `reclaimPolicy: Retain`. A deleted PVC
+therefore leaves two objects behind: a PV in phase `Released`, and the `volumes.longhorn.io` resource
+with its replicas. The replicas keep their full **scheduled** reservation on each node, even when the
+volume holds almost no data — so the cost is scheduling headroom, not disk.
+
+Cleanup needs both deletes. The PV delete alone does not remove the Longhorn volume:
+
+```sh
+kubectl delete pv <pv-name>
+kubectl -n longhorn delete volumes.longhorn.io <pv-name>
+```
+
+Find orphans with `kubectl -n longhorn get volumes.longhorn.io` — an orphan shows `STATE: detached`
+and `ROBUSTNESS: unknown`. That signature is ambiguous: a **detached but still wanted** volume looks
+identical (see the blue/green section above). Confirm the PV is `Released` with an empty claim before
+you delete anything.
+
+The `orphans.longhorn.io` CRD does **not** track these. It tracks stray replica directories on disk.
+
+Example: `default/recover-tickers` (30Gi RWX, 675MiB used) survived its PVC by 6 weeks and held
+30Gi of reservation on each of two nodes. Deleted 2026-08-29.
+
 ### Private endpoints require out-of-band Tailscale config
 
 The `private-endpoints` manifests are inert until the tailnet is set up (done in the Tailscale admin console, not this repo):
