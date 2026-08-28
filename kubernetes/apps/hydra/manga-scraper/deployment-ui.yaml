@@ -26,7 +26,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: ui
-          image: ghcr.io/thetillhoff/manga-scraper-ui:73 # {"$imagepolicy": "manga-scraper:manga-scraper-ui"}
+          image: ghcr.io/thetillhoff/manga-scraper-ui:74 # {"$imagepolicy": "manga-scraper:manga-scraper-ui"}
           ports:
             - containerPort: 3000
           env:
