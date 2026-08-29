@@ -4,7 +4,7 @@ metadata:
   name: scrape-azure
   namespace: federated-cloud-platform
 spec:
-  schedule: "10 2 * * 0" # weekly, Sunday 02:10 UTC
+  schedule: "45 2 * * 0" # weekly, Sunday 02:45 UTC (45m after scrape-aws, which is the one long enough to risk overrun)
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

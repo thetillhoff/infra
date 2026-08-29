@@ -6,9 +6,11 @@ metadata:
 spec:
   # Hard ceiling so the fcp namespace can't exhaust the cluster. Sized for the
   # always-on pods (postgres, public-api, scraper-api, admin-api, public-web, admin-web)
-  # plus headroom for the daily scraper Job (up to 2Gi/2 CPU) and short-lived
-  # migration / exchange-rate Jobs. Requires memory requests+limits on every
-  # container; the LimitRange supplies defaults for those that don't set them.
+  # plus headroom for up to 4 concurrent weekly per-provider scraper Jobs
+  # (scrape-aws up to 3Gi/1 CPU limit; scrape-azure/gcp/hetzner up to 512Mi/500m
+  # CPU limit each - see scrape-<provider>.yaml) and short-lived migration /
+  # exchange-rate Jobs. Requires memory requests+limits on every container; the
+  # LimitRange supplies defaults for those that don't set them.
   hard:
     requests.cpu: "3"
     requests.memory: 3Gi

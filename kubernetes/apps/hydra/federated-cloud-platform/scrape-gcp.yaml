@@ -4,7 +4,7 @@ metadata:
   name: scrape-gcp
   namespace: federated-cloud-platform
 spec:
-  schedule: "20 2 * * 0" # weekly, Sunday 02:20 UTC
+  schedule: "30 3 * * 0" # weekly, Sunday 03:30 UTC (45m after scrape-azure)
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
