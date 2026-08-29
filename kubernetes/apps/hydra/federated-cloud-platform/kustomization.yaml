@@ -17,8 +17,11 @@ resources:
 - public-api.yaml
 - scraper-api.yaml
 - admin-api.yaml
-- scraper.yaml
-- spot-scraper.yaml
+- scrape-aws.yaml
+- scrape-azure.yaml
+- scrape-gcp.yaml
+- scrape-hetzner.yaml
+- spot-azure.yaml
 - exchange-rate.yaml
 - public-web.yaml
 # admin-web is tailnet-only: reached through the fcp-admin caddy proxy in
@@ -47,13 +50,21 @@ resources:
 - imageRepository-admin-api.yaml
 - imageRepository-public-web.yaml
 - imageRepository-admin-web.yaml
-- imageRepository-scraper.yaml
+- imageRepository-scrape-aws.yaml
+- imageRepository-scrape-azure.yaml
+- imageRepository-scrape-gcp.yaml
+- imageRepository-scrape-hetzner.yaml
+- imageRepository-spot-azure.yaml
 - imageRepository-migrations.yaml
 - imagePolicy-public-api.yaml
 - imagePolicy-scraper-api.yaml
 - imagePolicy-admin-api.yaml
 - imagePolicy-public-web.yaml
 - imagePolicy-admin-web.yaml
-- imagePolicy-scraper.yaml
+- imagePolicy-scrape-aws.yaml
+- imagePolicy-scrape-azure.yaml
+- imagePolicy-scrape-gcp.yaml
+- imagePolicy-scrape-hetzner.yaml
+- imagePolicy-spot-azure.yaml
 - imagePolicy-migrations.yaml
 - imageUpdateAutomation.yaml

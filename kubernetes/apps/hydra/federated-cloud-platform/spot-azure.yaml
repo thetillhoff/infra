@@ -1,11 +1,11 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: spot-scraper
+  name: spot-azure
   namespace: federated-cloud-platform
 spec:
   # Hourly. Spot prices move constantly; this samples them for the per-instance
-  # spot history page. Reuses the scraper image via SCRAPER_MODE=spot.
+  # spot history page.
   schedule: "0 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
@@ -15,7 +15,7 @@ spec:
       template:
         metadata:
           labels:
-            app: spot-scraper # NetworkPolicy source selector (reaches backend)
+            app: spot-azure # NetworkPolicy source selector (reaches backend)
         spec:
           securityContext:
             runAsNonRoot: true
@@ -34,19 +34,15 @@ spec:
                 capabilities:
                   drop: ["ALL"]
           containers:
-            - name: spot-scraper
-              image: ghcr.io/thetillhoff/federated-cloud-platform/scraper:40 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper"}
+            - name: spot-azure
+              image: ghcr.io/thetillhoff/federated-cloud-platform/spot-azure:40 # {"$imagepolicy": "federated-cloud-platform:fcp-spot-azure"}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop: ["ALL"]
               env:
-                - name: SCRAPER_MODE
-                  value: spot
                 - name: PUBLIC_API_URL
                   value: http://public-api.federated-cloud-platform.svc.cluster.local:8080
-                - name: SCRAPER_API_URL
-                  value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090
                 - name: AZURE_SCRAPER_KEY
                   valueFrom:
                     secretKeyRef:

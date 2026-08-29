@@ -4,8 +4,10 @@ metadata:
   name: exchange-rate
   namespace: federated-cloud-platform
 spec:
-  # Daily, offset from the scraper (02:00). ECB publishes once per business day.
-  schedule: "30 2 * * *"
+  # Daily. Runs after all 4 weekly scraper CronJobs' Sunday window
+  # (02:00-04:15 UTC, see scrape-<provider>.yaml) so it never starts alongside
+  # one of them. ECB publishes once per business day.
+  schedule: "0 5 * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
