@@ -4,10 +4,10 @@ metadata:
   name: scraper-api
   namespace: federated-cloud-platform
 # Owns scraper_runs writes. Reached by the four per-provider scrape CronJobs
-# (run lifecycle), the public backend (proxies GET /scraper/runs/latest) and
-# admin-api (proxies the admin-only /scraper/runs/latest/progress). spot-azure
-# never touches scraper_runs, so it is intentionally not in this list. Nothing
-# else.
+# (run lifecycle) and admin-api (proxies the admin-only GET
+# /scraper/runs/active). public-api no longer proxies anything from
+# scraper-api. spot-azure never touches scraper_runs, so it is intentionally
+# not in this list. Nothing else.
 spec:
   podSelector:
     matchLabels: { app: scraper-api }
