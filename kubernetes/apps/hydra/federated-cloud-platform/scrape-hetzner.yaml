@@ -1,10 +1,10 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: scraper
+  name: scrape-hetzner
   namespace: federated-cloud-platform
 spec:
-  schedule: "0 2 * * 0" # weekly, Sunday 02:00 UTC
+  schedule: "30 2 * * 0" # weekly, Sunday 02:30 UTC
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -13,7 +13,7 @@ spec:
       template:
         metadata:
           labels:
-            app: scraper # NetworkPolicy source selector (reaches backend + scraper-api)
+            app: scrape-hetzner # NetworkPolicy source selector (reaches backend + scraper-api)
         spec:
           # fsGroup so uid 10001 can write the /cache emptyDir; the rest satisfies
           # the namespace's restricted PodSecurity level.
@@ -35,8 +35,8 @@ spec:
                 capabilities:
                   drop: ["ALL"]
           containers:
-            - name: scraper
-              image: ghcr.io/thetillhoff/federated-cloud-platform/scraper:40 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper"}
+            - name: scrape-hetzner
+              image: ghcr.io/thetillhoff/federated-cloud-platform/scrape-hetzner:40 # {"$imagepolicy": "federated-cloud-platform:fcp-scrape-hetzner"}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
@@ -51,21 +51,6 @@ spec:
                     secretKeyRef:
                       name: fcp-scraper
                       key: hetznerKey
-                - name: AWS_SCRAPER_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: fcp-scraper
-                      key: awsKey
-                - name: GCP_SCRAPER_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: fcp-scraper
-                      key: gcpKey
-                - name: AZURE_SCRAPER_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: fcp-scraper
-                      key: azureKey
                 - name: SCRAPER_CACHE_DIR
                   value: /cache
                 - name: SCRAPER_CACHE_REFRESH
@@ -74,25 +59,18 @@ spec:
                 - name: cache
                   mountPath: /cache
               resources:
-                # The adapter buffers each provider's full offer slice in memory
-                # (adapter.Scrape returns []Offer), and AWS's set is large — 512Mi
-                # OOM-killed the run before it could report stats. Burstable: keep
-                # the request modest (fits the namespace ResourceQuota) but allow a
-                # 3Gi ceiling so the AWS pass completes.
-                # ponytail: 3Gi is a measured jump from the 512Mi OOM, not a proven
-                # peak — raise further if AWS still OOMs.
+                # Light: never held AWS's ~400MB payload.
                 requests:
-                  cpu: 250m
-                  memory: 1Gi
-                  ephemeral-storage: 1Gi
+                  cpu: 50m
+                  memory: 128Mi
+                  ephemeral-storage: 256Mi
                 limits:
-                  cpu: "1"
-                  memory: 3Gi
-                  ephemeral-storage: 2Gi
+                  cpu: 500m
+                  memory: 512Mi
+                  ephemeral-storage: 512Mi
           volumes:
             # Ephemeral working cache — only holds parsed offers + small HTML
-            # pages (raw AWS responses are streamed, not stored). Re-downloadable,
-            # wiped when the Job pod ends.
+            # pages. Re-downloadable, wiped when the Job pod ends.
             - name: cache
               emptyDir:
                 sizeLimit: 2Gi
