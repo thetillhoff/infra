@@ -42,7 +42,7 @@ spec:
                   key: dsn
       containers:
         - name: public-api
-          image: ghcr.io/thetillhoff/federated-cloud-platform/public-api:42 # {"$imagepolicy": "federated-cloud-platform:fcp-public-api"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/public-api:43 # {"$imagepolicy": "federated-cloud-platform:fcp-public-api"}
           env:
             - name: HOST
               value: "0.0.0.0"
