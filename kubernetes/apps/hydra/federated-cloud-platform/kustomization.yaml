@@ -7,7 +7,6 @@ resources:
 - limitRange-fcp.yaml
 - ghcr-creds.secret.yaml
 - fcp-postgres.secret.yaml
-- fcp-clerk.secret.yaml
 - fcp-scrapers.secret.yaml
 
 - rbac.yaml

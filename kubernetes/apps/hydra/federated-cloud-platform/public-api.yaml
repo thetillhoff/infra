@@ -66,12 +66,6 @@ spec:
               value: fcp
             - name: SCRAPER_API_URL
               value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090
-            - name: CLERK_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: fcp-clerk
-                  key: secretKey
-            # Admin tier is the Clerk `role` claim; no allowlist env needed.
             - name: ENVIRONMENT
               value: production
           ports:
