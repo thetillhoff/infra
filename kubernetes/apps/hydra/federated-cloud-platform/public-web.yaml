@@ -17,7 +17,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: public-web
-          image: ghcr.io/thetillhoff/federated-cloud-platform/public-web:45 # {"$imagepolicy": "federated-cloud-platform:fcp-public-web"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/public-web:46 # {"$imagepolicy": "federated-cloud-platform:fcp-public-web"}
           ports:
             - containerPort: 8080
           securityContext:
