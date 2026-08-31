@@ -17,7 +17,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: scraper-api
-          image: ghcr.io/thetillhoff/federated-cloud-platform/scraper-api:43 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper-api"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/scraper-api:44 # {"$imagepolicy": "federated-cloud-platform:fcp-scraper-api"}
           env:
             - name: HOST
               value: "0.0.0.0"
