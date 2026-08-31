@@ -44,11 +44,12 @@ spec:
             periodSeconds: 5
           resources:
             # Pure cache, no persistence: losing the pod just means the next
-            # request repopulates it. 64Mi comfortably covers one cached
-            # offers-list JSON blob (a few hundred KB).
+            # request repopulates it. The one cached key (the full unfiltered
+            # offers list) measured ~25MB of JSON at ~20k offers - size with
+            # real headroom for that to grow as more providers/regions land.
             requests:
               cpu: 10m
-              memory: 32Mi
+              memory: 64Mi
             limits:
               cpu: 100m
-              memory: 64Mi
+              memory: 256Mi
