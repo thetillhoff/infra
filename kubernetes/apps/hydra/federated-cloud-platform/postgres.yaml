@@ -63,5 +63,6 @@ spec:
         storageClassName: longhorn
         resources:
           requests:
-            # ~17k offers + reference data is a few hundred MB; 5Gi is ample headroom.
-            storage: 5Gi
+            # Bumped from 5Gi after the spot-price time series (unfiltered instance
+            # types) filled the disk; 10Gi gives real headroom for WAL/vacuum.
+            storage: 10Gi
