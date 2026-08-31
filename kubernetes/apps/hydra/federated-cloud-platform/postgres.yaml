@@ -63,6 +63,11 @@ spec:
         storageClassName: longhorn
         resources:
           requests:
-            # Bumped from 5Gi after the spot-price time series (unfiltered instance
-            # types) filled the disk; 10Gi gives real headroom for WAL/vacuum.
-            storage: 10Gi
+            # This must stay 5Gi to match the live StatefulSet: volumeClaimTemplates
+            # storage is immutable on an existing StatefulSet, so Flux's dry-run
+            # rejects any other value here and blocks the whole Kustomization. The
+            # real PVC was grown to 10Gi out-of-band with `kubectl patch pvc` after
+            # unfiltered spot-price sampling filled the original 5Gi disk - k8s never
+            # shrinks an existing PVC to match this template, so the drift is safe.
+            # Only relevant again if the StatefulSet is ever recreated from scratch.
+            storage: 5Gi
