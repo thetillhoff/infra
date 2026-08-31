@@ -14,6 +14,7 @@ resources:
 - rbac-admin-api.yaml
 
 - postgres.yaml
+- redis.yaml
 - public-api.yaml
 - scraper-api.yaml
 - admin-api.yaml
@@ -35,6 +36,7 @@ resources:
 # entrypoint. (The admin-web `from` entry in networkPolicy-backend is inert
 # while admin is undeployed, and ready for when it returns.)
 - networkPolicy-postgres.yaml
+- networkPolicy-redis.yaml
 - networkPolicy-public-api.yaml
 - networkPolicy-scraper-api.yaml
 - networkPolicy-admin-web.yaml

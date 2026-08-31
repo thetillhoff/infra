@@ -66,6 +66,8 @@ spec:
               value: fcp
             - name: SCRAPER_API_URL
               value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090
+            - name: REDIS_ADDR
+              value: redis.federated-cloud-platform.svc.cluster.local:6379
             - name: ENVIRONMENT
               value: production
           ports:

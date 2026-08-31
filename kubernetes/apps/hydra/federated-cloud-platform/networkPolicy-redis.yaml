@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis
+  namespace: federated-cloud-platform
+# Only public-api reads/writes the offers-list cache - nothing else has a
+# reason to reach it.
+spec:
+  podSelector:
+    matchLabels: { app: redis }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: public-api }
+      ports:
+        - { protocol: TCP, port: 6379 }
