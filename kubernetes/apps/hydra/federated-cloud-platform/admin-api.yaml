@@ -18,7 +18,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: admin-api
-          image: ghcr.io/thetillhoff/federated-cloud-platform/admin-api:46 # {"$imagepolicy": "federated-cloud-platform:fcp-admin-api"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/admin-api:47 # {"$imagepolicy": "federated-cloud-platform:fcp-admin-api"}
           env:
             - name: HOST
               value: "0.0.0.0"
