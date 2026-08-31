@@ -51,6 +51,16 @@ spec:
                     secretKeyRef:
                       name: fcp-scraper
                       key: awsKey
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-aws-spot
+                      key: accessKey
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-aws-spot
+                      key: secretAccessKey
                 - name: SCRAPER_CACHE_DIR
                   value: /cache
                 - name: SCRAPER_CACHE_REFRESH

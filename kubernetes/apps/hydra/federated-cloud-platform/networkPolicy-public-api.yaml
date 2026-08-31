@@ -6,9 +6,10 @@ metadata:
 # The backend now serves only public routes: the admin endpoints moved to
 # admin-api, so the admin UI does not call this service at all. Its
 # in-cluster callers are public-web's Caddy proxy, the four per-provider
-# scrape CronJobs (run lifecycle + upserts), the spot-azure CronJob (spot
-# samples), and the exchange-rate CronJob (its wait-for-backend init probes
-# /health as a migration-ready gate). Pod-scoped so no other Job can reach it.
+# scrape CronJobs (run lifecycle + upserts), the spot-azure and spot-aws
+# CronJobs (spot samples), and the exchange-rate CronJob (its wait-for-backend
+# init probes /health as a migration-ready gate). Pod-scoped so no other Job
+# can reach it.
 spec:
   podSelector:
     matchLabels: { app: public-api }
@@ -21,7 +22,7 @@ spec:
             matchExpressions:
               - key: app
                 operator: In
-                values: [scrape-aws, scrape-azure, scrape-gcp, scrape-hetzner, spot-azure]
+                values: [scrape-aws, scrape-azure, scrape-gcp, scrape-hetzner, spot-azure, spot-aws]
         - podSelector:
             matchLabels: { app: exchange-rate }
       ports:

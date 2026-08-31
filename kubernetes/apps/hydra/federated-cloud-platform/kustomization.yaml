@@ -8,6 +8,7 @@ resources:
 - ghcr-creds.secret.yaml
 - fcp-postgres.secret.yaml
 - fcp-scrapers.secret.yaml
+- fcp-aws-spot.secret.yaml
 
 - rbac.yaml
 - rbac-admin-api.yaml
@@ -21,6 +22,7 @@ resources:
 - scrape-gcp.yaml
 - scrape-hetzner.yaml
 - spot-azure.yaml
+- spot-aws.yaml
 - exchange-rate.yaml
 - public-web.yaml
 # admin-web is tailnet-only: reached through the fcp-admin caddy proxy in
@@ -54,6 +56,7 @@ resources:
 - imageRepository-scrape-gcp.yaml
 - imageRepository-scrape-hetzner.yaml
 - imageRepository-spot-azure.yaml
+- imageRepository-spot-aws.yaml
 - imageRepository-migrations.yaml
 - imagePolicy-public-api.yaml
 - imagePolicy-scraper-api.yaml
@@ -65,5 +68,6 @@ resources:
 - imagePolicy-scrape-gcp.yaml
 - imagePolicy-scrape-hetzner.yaml
 - imagePolicy-spot-azure.yaml
+- imagePolicy-spot-aws.yaml
 - imagePolicy-migrations.yaml
 - imageUpdateAutomation.yaml

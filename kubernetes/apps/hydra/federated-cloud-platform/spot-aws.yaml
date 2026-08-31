@@ -1,0 +1,69 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: spot-aws
+  namespace: federated-cloud-platform
+spec:
+  # Hourly. Spot prices move constantly; this samples them for the per-instance
+  # spot history page.
+  schedule: "5 * * * *" # offset from spot-azure to avoid both hitting public-api at once
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: spot-aws # NetworkPolicy source selector (reaches backend)
+        spec:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          imagePullSecrets:
+            - name: ghcr-creds
+          restartPolicy: OnFailure
+          initContainers:
+            - name: wait-for-backend
+              image: busybox:1.37
+              command: ["sh", "-c", "until wget -qO- http://public-api.federated-cloud-platform.svc.cluster.local:8080/health; do echo waiting; sleep 2; done"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+          containers:
+            - name: spot-aws
+              image: ghcr.io/thetillhoff/federated-cloud-platform/spot-aws:1 # {"$imagepolicy": "federated-cloud-platform:fcp-spot-aws"}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              env:
+                - name: PUBLIC_API_URL
+                  value: http://public-api.federated-cloud-platform.svc.cluster.local:8080
+                - name: AWS_SCRAPER_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-scraper
+                      key: awsKey
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-aws-spot
+                      key: accessKey
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-aws-spot
+                      key: secretAccessKey
+              resources:
+                # Light: pages EC2 DescribeSpotPriceHistory across regions, filtered
+                # to instance types we already offer - not the full AWS catalog.
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
