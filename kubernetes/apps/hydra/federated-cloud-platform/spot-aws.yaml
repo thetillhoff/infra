@@ -12,6 +12,11 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      # No retries at the k8s level: a failed run should wait for next hour's
+      # schedule, not immediately retry. See spot-azure.yaml for why - the
+      # default backoffLimit (6) plus restartPolicy: OnFailure compound into
+      # a retry storm against the failing dependency.
+      backoffLimit: 0
       template:
         metadata:
           labels:
@@ -24,7 +29,7 @@ spec:
               type: RuntimeDefault
           imagePullSecrets:
             - name: ghcr-creds
-          restartPolicy: OnFailure
+          restartPolicy: Never
           initContainers:
             - name: wait-for-backend
               image: busybox:1.37

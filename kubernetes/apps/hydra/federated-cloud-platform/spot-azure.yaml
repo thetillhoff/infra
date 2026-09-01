@@ -12,6 +12,14 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      # No retries at the k8s level: a failed run (e.g. Azure rate-limiting the
+      # whole fetch) should wait for next hour's schedule, not immediately
+      # hammer Azure again. restartPolicy: OnFailure + the Job's default
+      # backoffLimit (6) used to compound: kubelet restarted the container
+      # in-place AND the Job controller could spin up entirely new pods on
+      # top of that - one throttled run could retry Azure ~6-7x in minutes,
+      # which plausibly made the throttling worse, not better.
+      backoffLimit: 0
       template:
         metadata:
           labels:
@@ -24,7 +32,7 @@ spec:
               type: RuntimeDefault
           imagePullSecrets:
             - name: ghcr-creds
-          restartPolicy: OnFailure
+          restartPolicy: Never
           initContainers:
             - name: wait-for-backend
               image: busybox:1.37
