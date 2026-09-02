@@ -1,5 +1,6 @@
 import { machine } from "@pulumiverse/talos";
 import * as tailscale from "@pulumi/tailscale";
+import * as cloudflare from "@pulumi/cloudflare";
 import { readFileSync } from "fs";
 import { join } from "path";
 
@@ -34,6 +35,12 @@ const clusterDnsNames = [
 
 const k8sClusterEndpointDomain = `${k8sClusterName}.k8s.${domain}`;
 
+// Proxied (orange-cloud) through Cloudflare's edge, unlike every other clusterDnsNames
+// entry: gets Cloudflare's rate limiting (see the http_ratelimit Ruleset below) and WAF.
+// Never add the k8s API endpoint here - Cloudflare proxying only speaks HTTP(S), and
+// port 6443 isn't that.
+const cloudflareProxiedDnsNames = [`cloud.${domain}`];
+
 new Dns(
   "dns",
   {
@@ -42,6 +49,41 @@ new Dns(
     m365Dns: enableM365Dns,
     googleSiteVerification: enableGoogleSiteVerification,
     blueskyVerification: enableBlueskyVerification,
+  },
+  {},
+);
+
+// Rate limit every proxied hostname at Cloudflare's edge with one shared policy:
+// no in-cluster rate limiting exists (Cilium Gateway API, no CiliumEnvoyConfig for it).
+// Free-plan zones get exactly 1 http_ratelimit rule, so all proxied hostnames share it -
+// add a hostname to cloudflareProxiedDnsNames above and it's covered here too.
+const rateLimitHostExpression = cloudflareProxiedDnsNames
+  .map((h) => `"${h}"`)
+  .join(" ");
+new cloudflare.Ruleset(
+  "cloud-marketplace-rate-limit",
+  {
+    zoneId: cloudflareZoneId,
+    name: "proxied hostnames rate limit",
+    description:
+      "Block an IP for 10s after 50 requests/10s to a proxied hostname.",
+    kind: "zone",
+    phase: "http_ratelimit",
+    rules: [
+      {
+        description: "Per-IP rate limit for proxied hostnames",
+        expression: `http.host in {${rateLimitHostExpression}}`,
+        action: "block",
+        ratelimit: {
+          // cf.colo.id is required by Cloudflare: rate-limit counting happens per edge
+          // colocation, so requests to the same IP via different colos count separately.
+          characteristics: ["cf.colo.id", "ip.src"],
+          period: 10, // free-plan zones are only entitled to a 10s period and matching timeout
+          requestsPerPeriod: 50,
+          mitigationTimeout: 10,
+        },
+      },
+    ],
   },
   {},
 );
@@ -91,6 +133,7 @@ const nodegroups = new HcloudTalosNodegroups(
       // hcloudServerType: "cax21", // arm64
       hcloudServerType: "cx43", // amd64
       cloudflareZoneId: cloudflareZoneId,
+      cloudflareProxiedDnsNames: cloudflareProxiedDnsNames,
     },
   },
   {},

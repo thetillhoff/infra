@@ -17,6 +17,9 @@ export interface HcloudTalosNodegroupArgs {
   hcloudServerType: pulumi.Input<string>;
   nodeCount: number;
   cloudflareZoneId: string;
+  // DNS names (must also be in clusterDnsNames/clusterEndpointDomain) to proxy through
+  // Cloudflare (orange-cloud) instead of plain DNS-only records.
+  cloudflareProxiedDnsNames?: string[];
 }
 
 export class HcloudTalosNodegroup extends pulumi.ComponentResource {
@@ -61,12 +64,19 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
 
       for (const dnsName of [props.clusterEndpointDomain, ...props.clusterDnsNames]) {
 
+      // ponytail: only plain-string dnsNames can be checked here; every entry passed
+      // in today is a literal string, never a deferred pulumi.Output.
+      const proxied =
+        typeof dnsName === "string" &&
+        (props.cloudflareProxiedDnsNames ?? []).includes(dnsName);
+
       const dnsARecord = new cloudflare.DnsRecord(
         `${name}-aRecord-${dnsName}-node-${i}`,
         {
           name: dnsName,
           type: "A",
-          ttl: 60,
+          ttl: proxied ? 1 : 60, // 1 = "automatic", required by Cloudflare for proxied records
+          proxied,
           content: this.nodes[i].ipv4Address,
           zoneId: props.cloudflareZoneId,
         },
@@ -90,7 +100,8 @@ export class HcloudTalosNodegroup extends pulumi.ComponentResource {
         {
           name: dnsName,
           type: "AAAA",
-          ttl: 60,
+          ttl: proxied ? 1 : 60,
+          proxied,
           content: this.nodes[i].ipv6Address,
           zoneId: props.cloudflareZoneId,
         },
