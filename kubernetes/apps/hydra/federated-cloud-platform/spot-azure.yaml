@@ -43,7 +43,7 @@ spec:
                   drop: ["ALL"]
           containers:
             - name: spot-azure
-              image: ghcr.io/thetillhoff/federated-cloud-platform/spot-azure:49 # {"$imagepolicy": "federated-cloud-platform:fcp-spot-azure"}
+              image: ghcr.io/thetillhoff/federated-cloud-platform/spot-azure:50 # {"$imagepolicy": "federated-cloud-platform:fcp-spot-azure"}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:

@@ -36,7 +36,7 @@ spec:
                   drop: ["ALL"]
           containers:
             - name: scrape-hetzner
-              image: ghcr.io/thetillhoff/federated-cloud-platform/scrape-hetzner:49 # {"$imagepolicy": "federated-cloud-platform:fcp-scrape-hetzner"}
+              image: ghcr.io/thetillhoff/federated-cloud-platform/scrape-hetzner:50 # {"$imagepolicy": "federated-cloud-platform:fcp-scrape-hetzner"}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
