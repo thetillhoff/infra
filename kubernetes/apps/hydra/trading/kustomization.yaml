@@ -81,4 +81,5 @@ resources:
   # CR stays only to keep its mirror row and paper-trading history addressable.
   - strategyConfig-ew-champion.yaml
   - strategyConfig-macd-only.yaml
+  - strategyConfig-adx-long.yaml
   - autotrade-baseline.yaml

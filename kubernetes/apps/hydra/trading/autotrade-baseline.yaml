@@ -4,11 +4,12 @@ metadata:
   name: autotrade
   namespace: trading
 spec:
-  # PAPER ONLY, and macd-only does not clear the deploy bar either - it is 2-of-4 windows on a
-  # held-out universe and below cash. It runs because it is the best-RANKED arm (MIN alphaCash -6.4
-  # vs ew-champion's -25.5 on the same basket and windows), and live evidence is worth more accruing
-  # on that than on a config whose recorded edge turned out to be look-ahead. No real capital follows
-  # until an arm clears the bar.
-  strategyConfig: macd-only
+  # PAPER ONLY. adx-long is the first arm to clear the DEPLOY BAR: 4/4 positive per-trade
+  # expectancy on the held-out 50-name universe, MIN alphaCash +17.69, worst-window annualized
+  # return 19.69%. It does NOT beat buy-and-hold - it wins 2 of 4 held-out windows and ties just
+  # under in the other two. The larger half of the win is direction, not the indicator: dropping
+  # the short side (signal_types buy) is worth +30..+104 points of active alpha in EVERY held-out
+  # window, for the adx and the macd generator alike. Real capital still waits on live evidence.
+  strategyConfig: adx-long
   enabled: true
   preloadOnDeploy: false   # data already loaded; set true to trigger a fresh full-universe refresh on next deploy
