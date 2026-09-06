@@ -26,6 +26,7 @@ spec:
           imagePullSecrets:
             - name: ghcr-creds
           restartPolicy: OnFailure
+          serviceAccountName: scraper-gcp
           initContainers:
             - name: wait-for-backend
               image: busybox:1.37
@@ -46,11 +47,6 @@ spec:
                   value: http://public-api.federated-cloud-platform.svc.cluster.local:8080
                 - name: SCRAPER_API_URL
                   value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090
-                - name: GCP_SCRAPER_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: fcp-scraper
-                      key: gcpKey
                 - name: SCRAPER_CACHE_DIR
                   value: /cache
                 - name: SCRAPER_CACHE_REFRESH

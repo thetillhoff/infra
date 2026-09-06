@@ -13,6 +13,7 @@ spec:
       labels:
         app: scraper-api
     spec:
+      serviceAccountName: scraper-api
       imagePullSecrets:
         - name: ghcr-creds
       containers:

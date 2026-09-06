@@ -7,11 +7,18 @@ resources:
 - limitRange-fcp.yaml
 - ghcr-creds.secret.yaml
 - fcp-postgres.secret.yaml
-- fcp-scrapers.secret.yaml
 - fcp-aws-spot.secret.yaml
 
 - rbac.yaml
 - rbac-admin-api.yaml
+- clusterRole-serviceaccount-token-reviewer.yaml
+- clusterRoleBinding-public-api-token-reviewer.yaml
+- clusterRoleBinding-scraper-api-token-reviewer.yaml
+- serviceAccount-scraper-aws.yaml
+- serviceAccount-scraper-azure.yaml
+- serviceAccount-scraper-gcp.yaml
+- serviceAccount-scraper-hetzner.yaml
+- serviceAccount-scraper-api.yaml
 
 - postgres.yaml
 - redis.yaml

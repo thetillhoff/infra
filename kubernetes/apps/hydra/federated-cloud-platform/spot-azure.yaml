@@ -33,6 +33,7 @@ spec:
           imagePullSecrets:
             - name: ghcr-creds
           restartPolicy: Never
+          serviceAccountName: scraper-azure
           initContainers:
             - name: wait-for-backend
               image: busybox:1.37
@@ -51,11 +52,6 @@ spec:
               env:
                 - name: PUBLIC_API_URL
                   value: http://public-api.federated-cloud-platform.svc.cluster.local:8080
-                - name: AZURE_SCRAPER_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: fcp-scraper
-                      key: azureKey
               resources:
                 # Light: pages the Azure retail API and holds ~47k small spot rows.
                 requests:

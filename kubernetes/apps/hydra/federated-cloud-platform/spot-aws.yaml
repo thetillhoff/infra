@@ -30,6 +30,7 @@ spec:
           imagePullSecrets:
             - name: ghcr-creds
           restartPolicy: Never
+          serviceAccountName: scraper-aws
           initContainers:
             - name: wait-for-backend
               image: busybox:1.37
@@ -48,11 +49,6 @@ spec:
               env:
                 - name: PUBLIC_API_URL
                   value: http://public-api.federated-cloud-platform.svc.cluster.local:8080
-                - name: AWS_SCRAPER_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: fcp-scraper
-                      key: awsKey
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
