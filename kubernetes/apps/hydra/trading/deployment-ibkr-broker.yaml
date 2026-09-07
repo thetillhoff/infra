@@ -5,12 +5,20 @@ metadata:
   namespace: trading
 spec:
   replicas: 1
-  # Recreate, not RollingUpdate: this pod holds an exclusive IBKR connection keyed by
-  # IBKR_CLIENT_ID. Under a rolling update the new pod starts while the old one still holds
-  # client id 2, the gateway refuses it with "Error 326: client id already in use", and the
-  # broker comes up with no connection while /health still answers 200.
+  # maxSurge 0: the old pod must be GONE before the new one starts. This pod holds an
+  # exclusive IBKR connection keyed by IBKR_CLIENT_ID, so an overlapping replica is refused
+  # by the gateway with "Error 326: client id already in use" and the broker then comes up
+  # with no connection at all while /health still answers 200.
+  #
+  # `type: Recreate` expresses the same thing and is what the intent is, but it cannot be
+  # applied to a Deployment that already exists: the API server has defaulted
+  # spec.strategy.rollingUpdate, server-side apply does not remove a subfield another manager
+  # owns, and the merged object is then rejected as invalid on every retry forever.
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: ibkr-broker
