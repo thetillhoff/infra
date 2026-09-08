@@ -53,6 +53,22 @@ new Dns(
   {},
 );
 
+// Cloudflare must reach the origin over HTTPS and verify the certificate of the
+// origin. Every proxied hostname redirects port 80 to port 443 at the Gateway API,
+// so an edge that fetches the origin over cleartext HTTP gets that redirect back
+// and the browser loops until it gives up. "strict" also refuses an origin whose
+// certificate expires, instead of a silent downgrade of the second hop.
+// Needs "Zone Settings: Edit" on cloudflare:apiToken.
+new cloudflare.ZoneSetting(
+  "ssl-mode",
+  {
+    zoneId: cloudflareZoneId,
+    settingId: "ssl",
+    value: "strict",
+  },
+  {},
+);
+
 // Rate limit every proxied hostname at Cloudflare's edge with one shared policy:
 // no in-cluster rate limiting exists (Cilium Gateway API, no CiliumEnvoyConfig for it).
 // Free-plan zones get exactly 1 http_ratelimit rule, so all proxied hostnames share it -

@@ -114,7 +114,7 @@ Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}
 
 That host policy is also **inert**: host policy enforcement needs `hostFirewall.enabled` in `pulumi/cilium-values.yaml`, which is unset (`kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.enable-host-firewall}'` → `false`). Nothing world→node is actually filtered today. Before switching it on, note its `toPorts` entries carry no `protocol:`, and Cilium defaults that to TCP — so UDP/443 (QUIC) would start being dropped.
 
-Public ingress is TCP-only: Envoy advertises h2/h1.1 via `gatewayAPI.enableAlpn` and no `alt-svc`, and Cilium 1.20 has no HTTP/3 knob (nothing matching `quic|http3` in the chart values). Gateway API's `protocol: HTTPS` is TLS-over-TCP by spec, so h3 would mean a hand-written `CiliumEnvoyConfig` UDP listener — or letting Cloudflare's edge serve h3 (records are currently unproxied, straight to node IPs).
+Public ingress is TCP-only: Envoy advertises h2/h1.1 via `gatewayAPI.enableAlpn` and no `alt-svc`, and Cilium 1.20 has no HTTP/3 knob (nothing matching `quic|http3` in the chart values). Gateway API's `protocol: HTTPS` is TLS-over-TCP by spec, so h3 would mean a hand-written `CiliumEnvoyConfig` UDP listener — or letting Cloudflare's edge serve h3 (only `cloud.thetillhoff.de` is proxied - see `cloudflareProxiedDnsNames` in `pulumi/index.ts`; every other record points straight at the node IPs).
 
 ### Private endpoints (tailnet-only)
 
@@ -238,6 +238,25 @@ kubectl -n private-endpoints rollout restart deployment --all
 ### Cilium Gateway API — PROGRAMMED: False is normal
 
 Gateways always show `PROGRAMMED: False / AddressNotAssigned` — expected, not a bug. Cilium runs in host-network mode (`pulumi/cilium-values.yaml`): Envoy daemonset binds directly to node IPs; no LoadBalancer IP is ever written to `.status.addresses`. Verify health via Envoy daemonset pods + actual HTTP response, not gateway status.
+
+### Cloudflare-proxied hostnames need SSL mode Full (strict)
+
+A hostname in `cloudflareProxiedDnsNames` (`pulumi/index.ts`) gets its traffic through Cloudflare's edge. The edge then makes a second hop to the origin, and the zone-wide SSL/TLS mode decides the scheme of that hop. `flexible` makes the edge fetch the origin over cleartext port 80, where the `*-http` HTTPRoute answers `301 https://<host>:443/`. The browser follows the redirect back to the edge, which fetches port 80 again: an endless loop, which Firefox reports as "The page isn't redirecting properly".
+
+`cloudflare.ZoneSetting` `ssl-mode` in `pulumi/index.ts` pins the mode to `strict`. The zone setting only governs proxied traffic, so the unproxied records are unaffected.
+
+`strict` needs a publicly-trusted origin certificate per proxied hostname. cert-manager already issues one per Gateway listener, so nothing extra is needed - but a proxied hostname whose listener has no valid certificate returns 526 instead of the page.
+
+The `cloudflare:apiToken` stack secret needs `Zone › Zone Settings › Edit` on top of its DNS scope. Without it the create fails with `9109 Unauthorized to access requested resource`.
+
+Diagnose the loop by comparing the edge with the origin directly:
+
+```sh
+curl -sSI https://cloud.thetillhoff.de/                                            # via Cloudflare
+curl -sSI --resolve cloud.thetillhoff.de:443:<node-ip> https://cloud.thetillhoff.de/  # origin
+```
+
+An origin that answers 200 while the edge answers 301 to the same URL confirms it.
 
 ### cert-manager Gateway TLS mechanics
 
