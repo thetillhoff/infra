@@ -55,14 +55,22 @@ spec:
                 - name: cache
                   mountPath: /cache
               resources:
-                # Light: never held AWS's ~400MB payload.
+                # "Light" was wrong: every weekly run since the per-provider
+                # split was OOMKilled (exit 137) at 512Mi, and it died before
+                # logging anything, so the CronJob just showed no successful run.
+                # The adapter buffers the provider's whole offer slice in memory
+                # (adapter.Scrape returns []Offer), which is the same reason AWS
+                # needed its ceiling raised.
+                # ponytail: 2Gi is a jump from the 512Mi OOM, not a measured
+                # peak. The weekly scrapers are staggered so only one runs at a
+                # time; check actual usage on the next run and tighten.
                 requests:
-                  cpu: 50m
-                  memory: 128Mi
+                  cpu: 100m
+                  memory: 512Mi
                   ephemeral-storage: 256Mi
                 limits:
                   cpu: 500m
-                  memory: 512Mi
+                  memory: 2Gi
                   ephemeral-storage: 512Mi
           volumes:
             # Ephemeral working cache — only holds parsed offers + small HTML
