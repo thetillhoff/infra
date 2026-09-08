@@ -346,6 +346,58 @@ alerting:
             intervalMs: 60000
             maxDataPoints: 43200
             refId: B
+      # A CronJob that fails silently stays broken for as long as nobody looks.
+      # scrape-azure, scrape-gcp and scrape-hetzner each failed every weekly run
+      # for nine days, and spot-azure failed every hour for six, before anyone
+      # noticed - all four were visible the whole time in kube_job_status_failed.
+      #
+      # "unless succeeded" is what keeps this quiet for a Job that failed a pod
+      # and then passed on retry: the failed count stays above zero for the life
+      # of the Job object, so on its own it would alert on a run that recovered.
+      #
+      # Scoped to federated-cloud-platform on purpose. trading has a job that has
+      # not succeeded in 52 days, and a cluster-wide version would fire on that
+      # immediately and teach everyone to ignore the channel. Widen it once that
+      # backlog is clear.
+      - uid: fcp-cronjob-job-failed
+        title: A federated-cloud-platform job failed
+        condition: B
+        for: 15m
+        execErrState: KeepLast
+        noDataState: OK
+        annotations:
+          summary: "Job {{ `{{ $labels.job_name }}` }} in federated-cloud-platform failed and has not succeeded — check `kubectl logs -n federated-cloud-platform job/{{ `{{ $labels.job_name }}` }}`"
+        data:
+        - refId: A
+          queryType: ''
+          relativeTimeRange: { from: 600, to: 0 }
+          datasourceUid: prometheus
+          model:
+            datasource: { type: prometheus, uid: prometheus }
+            editorMode: code
+            expr: max by (namespace, job_name) (kube_job_status_failed{namespace="federated-cloud-platform"} > 0) unless on (namespace, job_name) (kube_job_status_succeeded{namespace="federated-cloud-platform"} > 0)
+            instant: true
+            range: false
+            intervalMs: 60000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          queryType: ''
+          relativeTimeRange: { from: 0, to: 0 }
+          datasourceUid: __expr__
+          model:
+            datasource: { type: __expr__, uid: __expr__, name: Expression }
+            type: threshold
+            expression: A
+            conditions:
+            - evaluator: { type: gt, params: [0, 0] }
+              operator: { type: and }
+              query: { params: [] }
+              reducer: { type: last, params: [] }
+              type: query
+            intervalMs: 60000
+            maxDataPoints: 43200
+            refId: B
       # Canary: the ONE rule that intentionally alerts on query error. When Grafana can't
       # reach Prometheus, every other rule holds state (KeepLast) and stays quiet — this
       # fires instead, so a monitoring outage is a single clear alert, not a 40-alert storm.
