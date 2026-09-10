@@ -41,7 +41,7 @@ spec:
           containers:
             - name: prune-spot-history
               # Reuses the backend image + its ImagePolicy; runs the subcommand.
-              image: ghcr.io/thetillhoff/federated-cloud-platform/public-api:53 # {"$imagepolicy": "federated-cloud-platform:fcp-public-api"}
+              image: ghcr.io/thetillhoff/federated-cloud-platform/public-api:54 # {"$imagepolicy": "federated-cloud-platform:fcp-public-api"}
               command: ["/public-api", "prune-spot-history"]
               env:
                 - name: POSTGRES_USER
