@@ -351,9 +351,15 @@ alerting:
       # for nine days, and spot-azure failed every hour for six, before anyone
       # noticed - all four were visible the whole time in kube_job_status_failed.
       #
-      # "unless succeeded" is what keeps this quiet for a Job that failed a pod
-      # and then passed on retry: the failed count stays above zero for the life
-      # of the Job object, so on its own it would alert on a run that recovered.
+      # "unless succeeded" keeps this quiet for a Job that failed a pod and then
+      # passed on retry: the failed count stays above zero for the life of the
+      # Job object, so on its own it would alert on a run that recovered.
+      #
+      # The 24h bound is what keeps it quiet about history. failedJobsHistoryLimit
+      # keeps up to three failed Job objects per CronJob and a later success does
+      # not evict them, so without it the twelve failures behind this week's
+      # incidents would have alerted forever - every cause fixed, the alert still
+      # firing. Measured: 12 series without the bound, 1 with it.
       #
       # Scoped to federated-cloud-platform on purpose. trading has a job that has
       # not succeeded in 52 days, and a cluster-wide version would fire on that
@@ -375,7 +381,7 @@ alerting:
           model:
             datasource: { type: prometheus, uid: prometheus }
             editorMode: code
-            expr: max by (namespace, job_name) (kube_job_status_failed{namespace="federated-cloud-platform"} > 0) unless on (namespace, job_name) (kube_job_status_succeeded{namespace="federated-cloud-platform"} > 0)
+            expr: max by (namespace, job_name) (kube_job_status_failed{namespace="federated-cloud-platform"} > 0) unless on (namespace, job_name) (kube_job_status_succeeded{namespace="federated-cloud-platform"} > 0) and on (namespace, job_name) ((time() - max by (namespace, job_name) (kube_job_status_start_time{namespace="federated-cloud-platform"})) < 86400)
             instant: true
             range: false
             intervalMs: 60000
