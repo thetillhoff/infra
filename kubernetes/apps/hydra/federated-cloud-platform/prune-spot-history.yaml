@@ -1,0 +1,70 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prune-spot-history
+  namespace: federated-cloud-platform
+spec:
+  # Daily, and clear of everything else: after the weekly scrapers' Sunday
+  # window (02:00-04:15 UTC) and the exchange-rate job at 05:00, and on the
+  # half hour so it never coincides with an hourly spot sampler (:00 and :05).
+  #
+  # Retention only has to keep up with two samples an hour, so daily is ample -
+  # a day's drift on a 14-day window is invisible. Running it more often would
+  # just mean more passes finding nothing to do.
+  schedule: "30 5 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: prune-spot-history # NetworkPolicy source selector (reaches postgres)
+        spec:
+          imagePullSecrets:
+            - name: ghcr-creds
+          restartPolicy: OnFailure
+          initContainers:
+            # Backend readiness implies the schema migrations have run.
+            - name: wait-for-backend
+              image: busybox:1.37
+              command: ["sh", "-c", "until wget -qO- http://public-api.federated-cloud-platform.svc.cluster.local:8080/health; do echo waiting; sleep 2; done"]
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 10001
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+                seccompProfile:
+                  type: RuntimeDefault
+          containers:
+            - name: prune-spot-history
+              # Reuses the backend image + its ImagePolicy; runs the subcommand.
+              image: ghcr.io/thetillhoff/federated-cloud-platform/public-api:53 # {"$imagepolicy": "federated-cloud-platform:fcp-public-api"}
+              command: ["/public-api", "prune-spot-history"]
+              env:
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-postgres
+                      key: user
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: fcp-postgres
+                      key: password
+                - name: POSTGRES_HOST
+                  value: postgres.federated-cloud-platform.svc.cluster.local
+                - name: POSTGRES_PORT
+                  value: "5432"
+                - name: POSTGRES_SCHEMA
+                  value: fcp
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 10001
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+                seccompProfile:
+                  type: RuntimeDefault

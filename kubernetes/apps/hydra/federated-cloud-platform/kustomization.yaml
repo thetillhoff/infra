@@ -32,6 +32,7 @@ resources:
 - spot-azure.yaml
 - spot-aws.yaml
 - exchange-rate.yaml
+- prune-spot-history.yaml
 - public-web.yaml
 # admin-web is tailnet-only: reached through the fcp-admin caddy proxy in
 # private-endpoints (fcp-admin.internal.thetillhoff.de). It has no httpRoute, and
