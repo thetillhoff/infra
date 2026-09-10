@@ -7,7 +7,8 @@ metadata:
 # surface, so a namespace-wide `podSelector: {}` would let a compromised
 # public-web reach the DB directly - the exact pivot this gate exists to block.
 # Only the real DB clients may connect: backend (+ its atlas init containers,
-# same pod label), scraper-api, admin-api, and the exchange-rate Job.
+# same pod label), scraper-api, admin-api, and the exchange-rate and
+# prune-spot-history Jobs.
 spec:
   podSelector:
     matchLabels: { app: postgres }
@@ -22,5 +23,7 @@ spec:
             matchLabels: { app: admin-api }
         - podSelector:
             matchLabels: { app: exchange-rate }
+        - podSelector:
+            matchLabels: { app: prune-spot-history }
       ports:
         - { protocol: TCP, port: 5432 }

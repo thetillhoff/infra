@@ -7,7 +7,8 @@ metadata:
 # admin-api, so the admin UI does not call this service at all. Its
 # in-cluster callers are public-web's Caddy proxy, the four per-provider
 # scrape CronJobs (run lifecycle + upserts), the spot-azure and spot-aws
-# CronJobs (spot samples), and the exchange-rate CronJob (its wait-for-backend
+# CronJobs (spot samples), and the exchange-rate and prune-spot-history
+# CronJobs (their wait-for-backend
 # init probes /health as a migration-ready gate). Pod-scoped so no other Job
 # can reach it.
 spec:
@@ -25,5 +26,7 @@ spec:
                 values: [scrape-aws, scrape-azure, scrape-gcp, scrape-hetzner, spot-azure, spot-aws]
         - podSelector:
             matchLabels: { app: exchange-rate }
+        - podSelector:
+            matchLabels: { app: prune-spot-history }
       ports:
         - { protocol: TCP, port: 8080 }
