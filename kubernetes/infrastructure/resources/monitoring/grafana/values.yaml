@@ -404,6 +404,68 @@ alerting:
             intervalMs: 60000
             maxDataPoints: 43200
             refId: B
+      # The rule above catches a Job that ran and failed. It cannot catch a
+      # CronJob that stops being scheduled at all: no Job is created, so there
+      # is no kube_job_status_failed series to alert on.
+      #
+      # kube-state-metrics derives next_schedule_time as
+      # schedule.Next(status.lastScheduleTime), so it advances only when the
+      # controller actually creates a Job. When scheduling stops the value
+      # freezes in the past and time() minus it grows without bound. That makes
+      # one threshold work for every cadence - hourly and weekly alike - instead
+      # of the per-schedule thresholds a last_successful_time rule would need.
+      # It also has no hole for a CronJob that has never succeeded, which is the
+      # worst case and the one with no last_successful_time series at all.
+      #
+      # 900s is measured, not guessed. Over 30 days the healthy value never rose
+      # above -103s for any of the eight CronJobs in the namespace, so a positive
+      # 15 minutes is already far outside normal. The one exception is the fault
+      # this rule exists for: spot-azure skips its 01:00 and 02:00 UTC slots most
+      # nights after the 00:00 run dies on Azure 429s, and the value climbs to
+      # +797s within 13 minutes and on to +5297s. That cost 17 hourly samples in
+      # the last 7 days with nothing alerting.
+      #
+      # A suspended CronJob stops reporting this series rather than reporting a
+      # stale one, so suspending a job silences this instead of alerting forever.
+      - uid: fcp-cronjob-not-scheduled
+        title: A federated-cloud-platform CronJob stopped being scheduled
+        condition: B
+        for: 15m
+        execErrState: KeepLast
+        noDataState: OK
+        annotations:
+          summary: "CronJob {{ `{{ $labels.cronjob }}` }} in federated-cloud-platform missed its schedule — no Job was created when it was due. Check `kubectl describe cronjob -n federated-cloud-platform {{ `{{ $labels.cronjob }}` }}`"
+        data:
+        - refId: A
+          queryType: ''
+          relativeTimeRange: { from: 600, to: 0 }
+          datasourceUid: prometheus
+          model:
+            datasource: { type: prometheus, uid: prometheus }
+            editorMode: code
+            expr: max by (namespace, cronjob) (time() - kube_cronjob_next_schedule_time{namespace="federated-cloud-platform"})
+            instant: true
+            range: false
+            intervalMs: 60000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          queryType: ''
+          relativeTimeRange: { from: 0, to: 0 }
+          datasourceUid: __expr__
+          model:
+            datasource: { type: __expr__, uid: __expr__, name: Expression }
+            type: threshold
+            expression: A
+            conditions:
+            - evaluator: { type: gt, params: [900, 0] }
+              operator: { type: and }
+              query: { params: [] }
+              reducer: { type: last, params: [] }
+              type: query
+            intervalMs: 60000
+            maxDataPoints: 43200
+            refId: B
       # Canary: the ONE rule that intentionally alerts on query error. When Grafana can't
       # reach Prometheus, every other rule holds state (KeepLast) and stays quiet — this
       # fires instead, so a monitoring outage is a single clear alert, not a 40-alert storm.
