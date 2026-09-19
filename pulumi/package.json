@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@types/node": "24.13.5",
-    "prettier": "3.9.6",
+    "prettier": "3.9.7",
     "typescript": "6.0.3"
   },
   "dependencies": {
