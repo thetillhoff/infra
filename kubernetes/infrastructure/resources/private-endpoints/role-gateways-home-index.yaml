@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: home-index
+  namespace: gateways
+rules:
+  # The external section of the index is generated from this Gateway's listener
+  # hostnames — the single source of truth for which external domains are
+  # served by this cluster.
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["gateways"]
+    resourceNames: ["https-gateway-thetillhoff-de"]
+    verbs: ["get"]

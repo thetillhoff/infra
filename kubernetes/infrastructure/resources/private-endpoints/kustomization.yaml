@@ -8,13 +8,16 @@ resources:
 - imagePolicy-caddy.yaml
 - imageUpdateAutomation.yaml
 
-# home.internal.thetillhoff.de — index of all the endpoints below, generated from
-# their external-dns hostname annotations
+# home.internal.thetillhoff.de — index of all the endpoints below (generated from
+# their external-dns hostname annotations) plus the external hostnames this cluster
+# serves (generated from the public Gateway's listeners)
 - certificate-home.yaml
 - configMap-home-caddy.yaml
 - serviceAccount-home-index.yaml
 - role-home-index.yaml
 - roleBinding-home-index.yaml
+- role-gateways-home-index.yaml
+- roleBinding-gateways-home-index.yaml
 - deployment-home-proxy.yaml
 - service-home.yaml
 

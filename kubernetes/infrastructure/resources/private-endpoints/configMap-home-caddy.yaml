@@ -22,13 +22,21 @@ data:
       file_server
     }
 
-  # Regenerates /srv/index.html from the external-dns hostname annotations on this
-  # namespace's Services. Those annotations already are the source of truth for which
-  # private endpoints exist, so the page cannot drift from reality.
+  # Regenerates /srv/index.html from two live sources: the external-dns hostname
+  # annotations on this namespace's Services (private endpoints), and the public
+  # Gateway's listener hostnames (external domains this cluster serves). Both are
+  # already the source of truth for what exists, so the page cannot drift from reality.
   index.sh: |
     #!/bin/sh
     set -eu
     SELF=home.internal.thetillhoff.de
+
+    list_links() {
+      while read -r host; do
+        [ -z "$host" ] && continue
+        printf '<a href="https://%s"><b>%s</b><span>%s</span></a>\n' "$host" "${host%%.*}" "$host"
+      done
+    }
 
     render() {
       cat <<'HEAD'
@@ -45,7 +53,8 @@ data:
              font: 16px/1.5 ui-sans-serif, system-ui, sans-serif; }
       main { max-width: 40rem; margin: 0 auto; }
       h1 { font-size: 1rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
-           opacity: .5; margin: 0 0 1.25rem; }
+           opacity: .5; margin: 1.75rem 0 1.25rem; }
+      h1:first-child { margin-top: 0; }
       a { display: flex; align-items: baseline; gap: .75rem; text-decoration: none; color: inherit;
           background: var(--card); border: 1px solid var(--line); border-radius: .5rem;
           padding: .9rem 1.1rem; margin-bottom: .5rem; }
@@ -58,10 +67,13 @@ data:
     HEAD
       kubectl get services -n private-endpoints \
         -o jsonpath='{range .items[*]}{.metadata.annotations.external-dns\.alpha\.kubernetes\.io/hostname}{"\n"}{end}' \
-        | grep -v '^$' | grep -vx "$SELF" | sort \
-        | while read -r host; do
-            printf '<a href="https://%s"><b>%s</b><span>%s</span></a>\n' "$host" "${host%%.*}" "$host"
-          done
+        | grep -v '^$' | grep -vx "$SELF" | sort | list_links
+
+      echo '<h1>external</h1>'
+      kubectl get gateway https-gateway-thetillhoff-de -n gateways \
+        -o jsonpath='{range .spec.listeners[*]}{.hostname}{"\n"}{end}' \
+        | grep -v '^$' | sort | list_links
+
       echo '</main>'
     }
 
