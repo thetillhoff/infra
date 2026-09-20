@@ -12,7 +12,6 @@ resources:
 # their external-dns hostname annotations) plus the external hostnames this cluster
 # serves (generated from the public Gateway's listeners)
 - certificate-home.yaml
-- configMap-home-caddy.yaml
 - serviceAccount-home-index.yaml
 - role-home-index.yaml
 - roleBinding-home-index.yaml
@@ -23,36 +22,65 @@ resources:
 
 # grafana.internal.thetillhoff.de
 - certificate-grafana.yaml
-- configMap-grafana-caddy.yaml
 - deployment-grafana-proxy.yaml
 - service-grafana.yaml
 
 # longhorn.internal.thetillhoff.de
 - certificate-longhorn.yaml
-- configMap-longhorn-caddy.yaml
 - deployment-longhorn-proxy.yaml
 - service-longhorn.yaml
 
 # hubble.internal.thetillhoff.de
 - certificate-hubble.yaml
-- configMap-hubble-caddy.yaml
 - deployment-hubble-proxy.yaml
 - service-hubble.yaml
 
 # trading.internal.thetillhoff.de
 - certificate-trading.yaml
-- configMap-trading-caddy.yaml
 - deployment-trading-proxy.yaml
 - service-trading.yaml
 
 # fcp-admin.internal.thetillhoff.de
 - certificate-fcp-admin.yaml
-- configMap-fcp-admin-caddy.yaml
 - deployment-fcp-admin-proxy.yaml
 - service-fcp-admin.yaml
 
 # manga.internal.thetillhoff.de
 - certificate-manga.yaml
-- configMap-manga-caddy.yaml
 - deployment-manga-proxy.yaml
 - service-manga.yaml
+
+# Caddy config ConfigMaps: generated (not plain resources) so an edit to any
+# Caddyfile/index.sh changes the ConfigMap's name hash, which forces the
+# owning Deployment to roll — Caddy/the index sidecar don't watch their
+# mounted files, so a plain ConfigMap update alone would never redeploy.
+configMapGenerator:
+- name: home-caddy
+  namespace: private-endpoints
+  files:
+  - Caddyfile=caddy-config/home.Caddyfile
+  - index.sh=caddy-config/home.index.sh
+- name: grafana-caddy
+  namespace: private-endpoints
+  files:
+  - Caddyfile=caddy-config/grafana.Caddyfile
+- name: longhorn-caddy
+  namespace: private-endpoints
+  files:
+  - Caddyfile=caddy-config/longhorn.Caddyfile
+- name: hubble-caddy
+  namespace: private-endpoints
+  files:
+  - Caddyfile=caddy-config/hubble.Caddyfile
+- name: trading-caddy
+  namespace: private-endpoints
+  files:
+  - Caddyfile=caddy-config/trading.Caddyfile
+- name: fcp-admin-caddy
+  namespace: private-endpoints
+  files:
+  - Caddyfile=caddy-config/fcp-admin.Caddyfile
+- name: manga-caddy
+  namespace: private-endpoints
+  files:
+  - Caddyfile=caddy-config/manga.Caddyfile

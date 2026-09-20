@@ -122,7 +122,7 @@ Admin UIs (grafana, longhorn, hubble) and the two app UIs that must not be publi
 
 Per app: a small **Caddy** reverse-proxy (non-root, binds `:8443`) terminates a real LetsEncrypt cert (cert-manager DNS-01, per-name `Certificate`) and proxies to the in-cluster app Service. A `Service` `type: LoadBalancer, loadBalancerClass: tailscale` makes the tailscale operator join a proxy to the tailnet and write the private `100.x` (CGNAT) IP into the Service's LB status. **external-dns** (in the `cert-manager` namespace, reusing that namespace's `cloudflare-api-token`) reads the LB IP and creates the `A` record. Security is the WireGuard mesh + tailnet ACLs — the public resolves the DNS but cannot route to `100.64.0.0/10`.
 
-All proxies share the same caddy image automation (`imageRepository`/`imagePolicy`/`imageUpdateAutomation` in that dir). Adding an endpoint = copy a `certificate`/`configMap`/`deployment`/`service` quartet + wire into `kustomization.yaml`.
+All proxies share the same caddy image automation (`imageRepository`/`imagePolicy`/`imageUpdateAutomation` in that dir). Adding an endpoint = copy a `certificate`/`deployment`/`service` trio + a `caddy-config/<name>.Caddyfile` + a `configMapGenerator` entry in `kustomization.yaml`.
 
 `home.internal.thetillhoff.de` is the index of all the others. Its pod runs a kubectl sidecar that lists the namespace's Services every 60s and renders one link per `external-dns.alpha.kubernetes.io/hostname` annotation, so a new endpoint appears there with no extra step — that annotation is the only source of truth.
 
@@ -218,9 +218,9 @@ The proxies bind `https_port 8443` and the tailscale `Service` forwards **TCP/44
 support then advertises `alt-svc: h3=":8443"` — a port that is neither what the client dialled nor forwarded
 at all, so QUIC black-holes. Chrome/Firefox race QUIC against TCP and fall back in milliseconds; **WebKit
 (every iOS browser) sticks with the cached Alt-Svc and just spins**, which is why a page loads on mac/linux
-and hangs on iPhone. Every `configMap-*-caddy.yaml` therefore sets `servers { protocols h1 h2 }`.
+and hangs on iPhone. Every `caddy-config/*.Caddyfile` therefore sets `servers { protocols h1 h2 }`.
 
-Those Caddyfiles are 6 independent copies — nothing enforces the line. Copy an existing configMap when
+Those Caddyfiles are 7 independent copies — nothing enforces the line. Copy an existing one when
 adding an endpoint; a hand-written one silently brings h3 back. Public ingress is unaffected (Envoy sends
 no `alt-svc` at all).
 
@@ -228,12 +228,12 @@ WebKit persists the Alt-Svc entry for the advertised `ma` (30d), so after fixing
 already-poisoned iPhone needs *Settings → Safari → Clear History and Website Data* (a Private tab uses an
 ephemeral store, which makes it the cheap test).
 
-Caddy does **not** watch its Caddyfile, and these are plain ConfigMaps (no `configMapGenerator` hash), so
-Flux applying a Caddyfile change restarts nothing:
-
-```sh
-kubectl -n private-endpoints rollout restart deployment --all
-```
+Caddy does **not** watch its Caddyfile, so a plain ConfigMap update would restart nothing. The
+`Caddyfile`/`index.sh` sources live under `caddy-config/` and are wired through `configMapGenerator`
+in `kustomization.yaml` (not plain `ConfigMap` resources) — kustomize hashes the generated ConfigMap's
+name into its content, so any edit produces a new name, which the owning Deployment's volume ref picks
+up automatically and Flux rolls it out. No manual restart needed. Edit the files under `caddy-config/`,
+never a `ConfigMap` manifest directly (there isn't one anymore).
 
 ### Cilium Gateway API — PROGRAMMED: False is normal
 
