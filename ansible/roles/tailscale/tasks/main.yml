@@ -5,8 +5,15 @@
 - apt_key:
     url: "https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}.noarmor.gpg"
     state: present
+- file:
+    # ponytail: one-time migration cleanup for the auto-named file from
+    # a prior apt_repository run without `filename:`. Remove this task
+    # once every host has run it once.
+    path: /etc/apt/sources.list.d/pkgs_tailscale_com_stable_ubuntu.list
+    state: absent
 - apt_repository:
     repo: "deb https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
+    filename: tailscale
     update_cache: yes
 - apt:
     pkg:
