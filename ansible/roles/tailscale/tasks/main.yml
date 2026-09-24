@@ -2,17 +2,22 @@
 - apt:
     pkg:
       - gnupg
-- apt_key:
+- get_url:
+    # noarmor.gpg is already a binary keyring, no `gpg --dearmor` needed.
     url: "https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}.noarmor.gpg"
-    state: present
+    dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    mode: "0644"
 - file:
-    # ponytail: one-time migration cleanup for the auto-named file from
-    # a prior apt_repository run without `filename:`. Remove this task
-    # once every host has run it once.
-    path: /etc/apt/sources.list.d/pkgs_tailscale_com_stable_ubuntu.list
+    # ponytail: one-time migration cleanup for stale/conflicting entries left
+    # by earlier apt_key-based setups (manual install + prior ansible runs).
+    # Remove these two tasks once every host has run them once.
+    path: "{{ item }}"
     state: absent
+  loop:
+    - /etc/apt/sources.list.d/pkgs_tailscale_com_stable_ubuntu.list
+    - /etc/apt/sources.list.d/tailscale.list
 - apt_repository:
-    repo: "deb https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
     filename: tailscale
     update_cache: yes
 - apt:
