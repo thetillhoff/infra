@@ -46,7 +46,7 @@ services:
       - /mnt/hot/stash/backups:/backups
 
   caddy:
-    image: caddy:2.11.4@sha256:df7f1c2fb114453b951de51a98efc010db1655a92c2e86be6706714e2417a78d
+    image: caddy:2.11.4@sha256:14a9c00d4e833ebc2b65d36515b37bde3b73f0b323a2663aaafc88953d8c4e3f
     restart: always
     logging:
       driver: "json-file"
