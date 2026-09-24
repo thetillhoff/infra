@@ -3,10 +3,10 @@
     pkg:
       - gnupg
 - apt_key:
-    url: https://pkgs.tailscale.com/stable/debian/{{ ansible_distribution_release }}.noarmor.gpg
+    url: "https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}.noarmor.gpg"
     state: present
 - apt_repository:
-    repo: deb https://pkgs.tailscale.com/stable/debian {{ ansible_distribution_release }} main
+    repo: "deb https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
     update_cache: yes
 - apt:
     pkg:
