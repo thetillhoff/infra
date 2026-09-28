@@ -25,7 +25,7 @@ spec:
         - --redis-addr=redis:6379
         - --max-concurrent-scans=2
         - --max-queue-size=50
-        - --scan-timeout=30s
+        - --stale-timeout=30s
         - --timeout=5s
         env:
         - name: DOMAIN_BLOCKLIST
