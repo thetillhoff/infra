@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: link-shortener
-        image: caddy:2.11.6 # {"$imagepolicy": "link-shortener:link-shortener"}
+        image: caddy:2.11.7 # {"$imagepolicy": "link-shortener:link-shortener"}
         ports:
         - containerPort: 80
         livenessProbe:
