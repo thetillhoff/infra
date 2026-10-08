@@ -44,10 +44,13 @@
     insertafter: '^#SystemMaxUse'
     line: 'SystemMaxUse=1G'
 
-- ansible.posix.sysctl: # BBR keeps throughput up on lossy links where cubic backs off
-    name: net.ipv4.tcp_congestion_control
-    value: bbr
+- ansible.posix.sysctl: # BBR keeps throughput up on lossy links where cubic backs off; fq paces it cheaper than TCP's fallback
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
     sysctl_file: /etc/sysctl.d/99-bbr.conf
+  loop:
+    - { name: net.core.default_qdisc, value: fq }
+    - { name: net.ipv4.tcp_congestion_control, value: bbr }
 
 # Add current user to sudoers
 - user:
