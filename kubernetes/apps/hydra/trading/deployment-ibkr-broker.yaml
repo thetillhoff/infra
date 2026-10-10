@@ -64,6 +64,14 @@ spec:
             httpGet:
               path: /health
               port: 8002
+          # /livez fails when the worker loop stops, the one state only a restart recovers.
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
           securityContext:
             runAsNonRoot: true
             runAsUser: 10001
