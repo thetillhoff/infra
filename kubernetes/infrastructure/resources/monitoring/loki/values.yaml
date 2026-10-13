@@ -18,7 +18,7 @@ loki:
   pattern_ingester:
       enabled: true
   # Without this, chunks are never deleted: the PVC was 35% full after 36 days (~48Mi/day) and
-  # would have hit ENOSPC in ~67 more. SingleBinary runs the compactor in-process, so the
+  # would have hit ENOSPC in ~67 more. The monolithic mode runs the compactor in-process, so the
   # top-level `compactor.replicas: 0` below does not disable it.
   compactor:
     retention_enabled: true
@@ -38,7 +38,7 @@ loki:
   ruler:
     enable_api: true
 
-deploymentMode: SingleBinary
+deploymentMode: Monolithic
 
 singleBinary:
   replicas: 1
