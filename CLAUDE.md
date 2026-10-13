@@ -314,9 +314,28 @@ Consequences: the Hubble UI **service map** always draws "ingress" (it groups by
 
 ### Loki retention is required, not optional
 
-Retention is off by default in this chart and the 5Gi PVC filled at ~48Mi/day. `loki.compactor.retention_enabled` + `limits_config.retention_period` are set in `monitoring/loki/values.yaml`. SingleBinary runs the compactor in-process — the top-level `compactor.replicas: 0` does **not** disable it. Validate config changes before pushing: render with `helm template` and run `loki -verify-config` against the rendered `config.yaml` in Docker.
+Retention is off by default in this chart and the 5Gi PVC filled at ~48Mi/day. `loki.compactor.retention_enabled` + `limits_config.retention_period` are set in `monitoring/loki/values.yaml`. `deploymentMode: Monolithic` runs the compactor in-process — the top-level `compactor.replicas: 0` does **not** disable it. Validate config changes before pushing: render with `helm template` and run `loki -verify-config` against the rendered `config.yaml` in Docker.
 
 Alloy already tails every pod's logs, `kube-system/cilium-agent` included — anything a cluster component writes to stdout lands in Loki with no alloy change.
+
+### external-dns deletes records when an annotation changes meaning
+
+external-dns runs with `policy: sync` and a TXT registry. A chart bump that changes what it reads (chart 1.15 to 1.23 moved the default annotation prefix from `external-dns.alpha.kubernetes.io/` to `external-dns.kubernetes.io/`) makes it delete every record it no longer sees. All 7 private endpoint records vanished that way on 2026-10-13. Read the app changelog before any external-dns bump, and compare `dig` of the `*.internal` names before and after.
+
+### Longhorn upgrades
+
+- Upgrade one minor at a time. Create a Longhorn system backup first, and confirm all volumes are `healthy`.
+- A manager upgrade does not upgrade volume engines. `defaultSettings.concurrentAutomaticEngineUpgradePerNodeLimit: 1` upgrades them by itself, one per node.
+- `networkPolicies.restrictInternalTraffic: false` is deliberate. The default policies (rendered since chart 1.12.1, enforced by Cilium) block Prometheus from scraping longhorn-manager on `:9500`.
+- Longhorn never prunes the backups of a deleted volume. List `backupvolumes.longhorn.io` and delete the stale ones by hand.
+
+### Grafana dashboards download at pod start
+
+An init container downloads each `dashboards:` entry from grafana.com (`gnetId` + `revision`). Since chart 13 the script runs with `pipefail`, so an entry with a missing revision crashes the init container and blocks the rollout. Check `https://grafana.com/api/dashboards/<id>/revisions/<rev>/download` returns 200 before you add one.
+
+### Prometheus scrapes the pod IP
+
+Scrape annotations (`prometheus.io/port`) on a Service must name the container port, not the Service port. The `kubernetes-service-endpoints-by-port-name` job in `monitoring/prometheus/values.yaml` uses the `endpointslice` role.
 
 ## Known Pulumi Pitfalls
 
