@@ -66,10 +66,6 @@ dashboards:
       gnetId: 1860
       revision: 37
       datasource: Prometheus
-    kubernetes-cluster:
-      gnetId: 15520
-      revision: 2
-      datasource: Prometheus
     loki-logs:
       gnetId: 13639
       revision: 2
