@@ -20,12 +20,12 @@ grafana.ini:
     root_url: https://grafana.internal.thetillhoff.de/
 
 # Grafana's service port is named `service` (not something our port-name auto-discovery
-# matches), so annotate the Service explicitly. Grafana exposes /metrics on the same
-# port as the UI by default.
+# matches), so annotate the Service explicitly. Prometheus scrapes the pod IP, so the
+# port is the container port (3000), not the Service port (80).
 service:
   annotations:
     prometheus.io/scrape: "true"
-    prometheus.io/port: "80"
+    prometheus.io/port: "3000"
 
 datasources:
   datasources.yaml:
