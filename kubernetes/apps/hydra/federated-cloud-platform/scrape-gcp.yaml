@@ -30,7 +30,7 @@ spec:
           serviceAccountName: scraper-gcp
           initContainers:
             - name: wait-for-backend
-              image: busybox:1.37
+              image: busybox:1.38
               command: ["sh", "-c", "until wget -qO- http://public-api.federated-cloud-platform.svc.cluster.local:8080/health && wget -qO- http://scraper-api.federated-cloud-platform.svc.cluster.local:9090/health; do echo waiting; sleep 2; done"]
               securityContext:
                 allowPrivilegeEscalation: false
