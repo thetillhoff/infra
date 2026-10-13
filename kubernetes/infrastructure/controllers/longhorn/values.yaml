@@ -36,6 +36,8 @@ defaultSettings:
   defaultReplicaCount: 2 # needs to be 1 if data-locality is strict-local
   replicaAutoBalance: best-effort
   nodeDrainPolicy: block-for-eviction
+  # Upgrade volume engines to the new engine image after each Longhorn upgrade, one per node.
+  concurrentAutomaticEngineUpgradePerNodeLimit: 1
   storageReservedPercentageForDefaultDisk: 10 # default value of 25% is rather high
 # -- Setting that allows you to update the default backupstore.
 defaultBackupStore:
