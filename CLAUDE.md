@@ -94,7 +94,7 @@ block unrelated deploys. Names match the entrypoint filenames in `kubernetes/clu
 kubernetes/
   clusters/hydra/          # FluxCD Kustomization entrypoints
   infrastructure/
-    controllers/           # HelmReleases: cert-manager, external-dns, longhorn, tailscale operator, kubelet-csr-approver
+    controllers/           # HelmReleases: cert-manager, external-dns, longhorn, tailscale operator (kubelet-csr-approver exists but is disabled in `controllers/kustomization.yaml`)
     resources/             # Cluster resources: cert-manager issuers, gateways, firewall policies, monitoring, discord alerts, private-endpoints
   apps/
     hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, tailscale, trading, federated-cloud-platform, manga-scraper
