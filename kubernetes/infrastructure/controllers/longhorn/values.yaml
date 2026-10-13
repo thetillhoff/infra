@@ -14,16 +14,6 @@ persistence: # default storage class
   reclaimPolicy: Retain
   dataEngine: v1
   defaultDataLocality: best-effort
-  encrypted: "true"
-  # global secret that contains the encryption key that will be used for all volumes
-  csi.storage.k8s.io/provisioner-secret-name: "crypt-secret"
-  csi.storage.k8s.io/provisioner-secret-namespace: "longhorn"
-  csi.storage.k8s.io/node-publish-secret-name: "crypt-secret"
-  csi.storage.k8s.io/node-publish-secret-namespace: "longhorn"
-  csi.storage.k8s.io/node-stage-secret-name: "crypt-secret"
-  csi.storage.k8s.io/node-stage-secret-namespace: "longhorn"
-  csi.storage.k8s.io/node-expand-secret-name: "crypt-secret"
-  csi.storage.k8s.io/node-expand-secret-namespace: "longhorn"
 csi:
   # 2 replicas required: single-replica + minAvailable PDB causes deadlock during node drain
   attacherReplicaCount: 2

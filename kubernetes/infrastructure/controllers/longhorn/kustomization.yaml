@@ -6,7 +6,6 @@ resources:
 - helmRepository.yaml
 - helmRelease.yaml
 - backup-secret.yaml
-- crypt-secret.yaml
 - recurringJob-daily.yaml
 
 configMapGenerator:
