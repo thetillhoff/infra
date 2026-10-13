@@ -9,7 +9,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: external-dns
-      version: 1.15.2 # From https://artifacthub.io/packages/helm/external-dns/external-dns
+      version: 1.23.0 # From https://artifacthub.io/packages/helm/external-dns/external-dns
   interval: 10m
 
   valuesFrom:
