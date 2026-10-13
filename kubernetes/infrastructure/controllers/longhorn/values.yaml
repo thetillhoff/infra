@@ -5,6 +5,10 @@ longhornManager:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9500"
 
+# The internal ingress policies would block Prometheus from scraping longhorn-manager (:9500).
+networkPolicies:
+  restrictInternalTraffic: false
+
 persistence: # default storage class
   defaultClassReplicaCount: 2
   reclaimPolicy: Retain
