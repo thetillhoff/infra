@@ -17,10 +17,16 @@ Standalone Raspberry Pis (not in the cluster) have their own root-level setup do
 
 ### Pulumi (run from `pulumi/`)
 
+State lives in **Pulumi Cloud** (`https://api.pulumi.com`, stack `infra`), no AWS credentials needed. The machine's
+current `pulumi login` is global per user and may point at another project's S3 backend. So run Pulumi through the
+tasks below: they set `PULUMI_BACKEND_URL` and `--stack` on the command and leave the login alone. A bare `pulumi`
+command works only if the current login is Pulumi Cloud.
+
 ```sh
-pulumi preview          # dry-run
-pulumi up               # deploy
-npm run format          # prettier — see caution below
+task preview                    # dry-run (npm install first)
+task deploy                     # npm install, then pulumi up
+task pulumi -- stack output     # any other pulumi command on the stack
+npm run format                  # prettier — see caution below
 ```
 
 > **`npm run format` = `prettier --write .`** — reformats the *whole tree*, including `cilium-values.yaml`
@@ -33,7 +39,9 @@ npm run format          # prettier — see caution below
 ```sh
 task configure-env | source /dev/stdin   # set TALOSCONFIG, KUBECONFIG, SOPS_AGE_KEY_FILE env vars
 task configure-files                     # write talosconfig + kubeconfig files to pulumi/
+task preview                             # pulumi preview --diff
 task deploy                              # pulumi up
+task pulumi -- <args>                    # pulumi <args> on the Pulumi Cloud stack
 task build ARCH=amd64                    # build packer image (token auto-sourced from pulumi config)
 task reconcile                           # force-reconcile all flux kustomizations (--with-source)
 task delete-nodes -- <node1> <node2>    # drain + remove nodes before server deletion
