@@ -12,6 +12,7 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 604800
       # No retries at the k8s level: a failed run should wait for next hour's
       # schedule, not immediately retry. See spot-azure.yaml for why - the
       # default backoffLimit (6) plus restartPolicy: OnFailure compound into

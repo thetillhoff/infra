@@ -12,6 +12,7 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 604800
       # No retries at the k8s level: a failed run (e.g. Azure rate-limiting the
       # whole fetch) should wait for next hour's schedule, not immediately
       # hammer Azure again. restartPolicy: OnFailure + the Job's default

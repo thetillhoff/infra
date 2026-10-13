@@ -11,6 +11,7 @@ spec:
   suspend: false   # always-on; refreshes full universe after market close regardless of AutoTrade state
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 604800
       backoffLimit: 2
       template:
         spec:
