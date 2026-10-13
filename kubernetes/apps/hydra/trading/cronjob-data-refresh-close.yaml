@@ -27,7 +27,7 @@ spec:
               # refresh silently StartError'd for days with no logs and no DataUpdate CR ever created.
               # alpine/k8s carries a shell AND kubectl on the CLUSTER's minor (1.36): kubectl supports
               # one minor of skew either way.
-              image: alpine/k8s:1.36.2
+              image: alpine/k8s:1.36.5
               imagePullPolicy: IfNotPresent
               command:
                 - sh

@@ -63,7 +63,7 @@ spec:
         # Same image rationale as the trading cronjobs: alpine/k8s ships a shell AND
         # kubectl on the cluster's minor; the distroless kubectl image has no /bin/sh.
         - name: index
-          image: alpine/k8s:1.36.2
+          image: alpine/k8s:1.36.5
           command: ["sh", "/scripts/index.sh"]
           env:
             - name: HOME # kubectl writes its discovery cache under $HOME
