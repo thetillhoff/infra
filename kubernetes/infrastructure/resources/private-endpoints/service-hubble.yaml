@@ -6,7 +6,7 @@ metadata:
   annotations:
     tailscale.com/hostname: hubble-internal
     tailscale.com/tags: tag:service
-    external-dns.alpha.kubernetes.io/hostname: hubble.internal.thetillhoff.de
+    external-dns.kubernetes.io/hostname: hubble.internal.thetillhoff.de
 spec:
   type: LoadBalancer
   loadBalancerClass: tailscale

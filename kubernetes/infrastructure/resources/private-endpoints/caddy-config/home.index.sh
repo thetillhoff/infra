@@ -37,7 +37,7 @@ render() {
 <h1>internal</h1>
 HEAD
   kubectl get services -n private-endpoints \
-    -o jsonpath='{range .items[*]}{.metadata.annotations.external-dns\.alpha\.kubernetes\.io/hostname}{"\n"}{end}' \
+    -o jsonpath='{range .items[*]}{.metadata.annotations.external-dns\.kubernetes\.io/hostname}{"\n"}{end}' \
     | grep -v '^$' | grep -vx "$SELF" | sort | list_links
 
   echo '<h1>external</h1>'

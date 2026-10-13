@@ -124,7 +124,7 @@ Per app: a small **Caddy** reverse-proxy (non-root, binds `:8443`) terminates a 
 
 All proxies share the same caddy image automation (`imageRepository`/`imagePolicy`/`imageUpdateAutomation` in that dir). Adding an endpoint = copy a `certificate`/`deployment`/`service` trio + a `caddy-config/<name>.Caddyfile` + a `configMapGenerator` entry in `kustomization.yaml`.
 
-`home.internal.thetillhoff.de` is the index of all the others. Its pod runs a kubectl sidecar that lists the namespace's Services every 60s and renders one link per `external-dns.alpha.kubernetes.io/hostname` annotation, so a new endpoint appears there with no extra step — that annotation is the only source of truth.
+`home.internal.thetillhoff.de` is the index of all the others. Its pod runs a kubectl sidecar that lists the namespace's Services every 60s and renders one link per `external-dns.kubernetes.io/hostname` annotation, so a new endpoint appears there with no extra step — that annotation is the only source of truth.
 
 ### Storage
 
