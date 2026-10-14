@@ -355,3 +355,7 @@ talosSecrets update [diff: ]          ← provider re-registers resource (values
 The deletes are real — Cilium, FluxOperator, Gateway CRDs get removed from the cluster. FluxCD reconciles them back within minutes, but there is a networking gap while Cilium restarts.
 
 **Before deploying after a talos provider bump:** confirm you understand the cascade and have a window for brief cluster disruption. The cluster itself (Talos nodes, etcd) is unaffected.
+
+### npm install scripts need approval
+
+npm 11 skips install scripts that `allowScripts` in `pulumi/package.json` does not list, and warns `install-scripts ... not yet covered`. Run `npm install-scripts approve <pkg>` for `@pulumi/kubernetes` and `protobufjs`. A version bump of either needs a new approval, because the entry pins the exact version.
