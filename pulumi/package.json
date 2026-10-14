@@ -20,5 +20,9 @@
     "@pulumi/tailscale": "^0.29.2",
     "@pulumiverse/talos": "^0.8.0",
     "@pulumiverse/time": "^0.1.1"
+  },
+  "allowScripts": {
+    "@pulumi/kubernetes@4.34.2": true,
+    "protobufjs@7.6.6": true
   }
 }

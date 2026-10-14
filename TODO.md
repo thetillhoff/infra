@@ -1,6 +1,6 @@
 # TODO
 
-- Upgrade Kubernetes (v1.36.2 in `pulumi/index.ts`, `alpine/k8s:1.36.2` in 3 manifests) and Talos (`packer/common.pkrvars.hcl`) after `UPGRADE-K8S-AND-OTHERS.md` and `UPGRADE-TALOS.md`. Build the Talos image with the new Packer first.
+- Upgrade Talos v1.13.8 -> v1.14.2 by blue/green nodegroup swap (`UPGRADE-TALOS.md`), then Kubernetes v1.36.5 -> v1.37.1. The Packer image exists (snapshot `talos-v1.14.2-amd64`, ID 443210363). Postponed: Hetzner had no cx43 servers available on 2026-10-14. Retry later; the plan is a new nodegroup `hcloud-talos-v1-14-2-controlplane` with that image ID and a copy of the v1.13.8 patch.
 - Hold TypeScript 7: `@pulumi/pulumi` rejects it in its peer range. Retry when the SDK allows it.
 - Hold `@types/node` at 24 until Node 26 is LTS.
 - Delete the unwired directories `kubernetes/apps/hydra/tailscale` and `kubernetes/apps/base/rook-ceph`. No Kustomization in `clusters/hydra/` references them, and their image tags are stale.
