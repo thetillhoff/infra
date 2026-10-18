@@ -104,6 +104,14 @@ tasks:
     cmds:
       - flux status # ?
 
+  pod-psql:
+    desc: 'Read-only SQL in a postgres pod. Usage: task pod-psql NS=trading POD=postgres-0 SQL="SELECT 1"'
+    requires:
+      vars: [NS, POD, SQL]
+    cmds:
+      # The read-only session rejects writes, but a client can still send `SET default_transaction_read_only=off`.
+      - KUBECONFIG='{{.ROOT_DIR}}/pulumi/kubeconfig' kubectl exec -i -n '{{.NS}}' '{{.POD}}' -- env PGOPTIONS='-c default_transaction_read_only=on' sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "$0"' {{shellQuote .SQL}}
+
   delete-nodes:
     desc: |
       Delete nodes from k8s prior to deleting servers. Example usage: `task delete-nodes --dry -- <nodename1> <nodename2>`
