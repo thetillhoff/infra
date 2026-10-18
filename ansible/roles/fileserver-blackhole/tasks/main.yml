@@ -44,6 +44,33 @@
       # Since compression is enabled by default for zfs, and the default is either lzjb or lz4 (if this feature is enabled) the latter makes more sense, since it is way faster on both compressable and non-compressable data.
       #-o casesensitivity=mixed -o nbmand=on
 
+# Without this every file read also writes its access time to the disks.
+- community.general.zfs:
+    name: "{{ item }}"
+    state: present
+    extra_zfs_properties:
+      atime: "off"
+  loop:
+    - hot
+    - cold
+
+# Disabled until the extra SSD is installed. Read cache for `cold`, safe to lose.
+# Replace <ssd-id> with the name from `ls -l /dev/disk/by-id/`, then remove the `#`.
+# l2arc_mfuonly keeps blocks that were read once out of the cache. The default
+# l2arc_noprefetch=1 already keeps sequential streaming reads out.
+# First check that /sys/module/zfs/parameters/l2arc_mfuonly exists on the host.
+# If not, the ZFS version is too old: leave out the last two tasks.
+# - command: zpool status cold
+#   register: cold_status
+#   changed_when: false
+# - command: zpool add cold cache /dev/disk/by-id/<ssd-id>
+#   when: "'<ssd-id>' not in cold_status.stdout"
+# - copy:
+#     dest: /etc/modprobe.d/zfs-l2arc.conf
+#     content: "options zfs l2arc_mfuonly=1\n"
+# - shell: echo 1 > /sys/module/zfs/parameters/l2arc_mfuonly
+#   changed_when: false
+
 # Weekly ZFS snapshots (keep last 8)
 - copy:
     src: zfs-weekly-snapshot.sh
