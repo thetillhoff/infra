@@ -514,8 +514,10 @@ alerting:
             refId: B
       # The fcp scrapers skip data for a datacenter missing from the reference
       # data and still exit 0, so no Job-based rule sees it. Each run logs
-      # "unknown datacenter(s)" once per region. A weekly scraper fires once
-      # after its run; spot-azure fires hourly until the region is added.
+      # "unknown datacenter(s) ... likely" once per region. The healthy spot
+      # summary line also says "N unknown datacenters" with N = 0, so the match
+      # needs "likely". A weekly scraper fires once after its run; spot-azure
+      # fires hourly until the region is added.
       - uid: fcp-scraper-unknown-datacenter
         title: A federated-cloud-platform scraper met an unknown datacenter
         condition: B
@@ -523,7 +525,7 @@ alerting:
         execErrState: KeepLast
         noDataState: OK
         annotations:
-          summary: "{{ `{{ $labels.container }}` }} skipped data for a datacenter missing from the reference data. Find the name in its logs (`grep 'unknown datacenter'`), then add it under services/backend/db/dummy-data."
+          summary: "{{ `{{ $labels.container }}` }} skipped data for a datacenter missing from the reference data. Find the name in its logs (`grep likely`), then add it under services/backend/db/dummy-data."
         data:
         - refId: A
           queryType: instant
@@ -532,7 +534,7 @@ alerting:
           model:
             datasource: { type: loki, uid: loki }
             editorMode: code
-            expr: sum by (container) (count_over_time({namespace="federated-cloud-platform"} |~ "unknown datacenters?" [1h]))
+            expr: sum by (container) (count_over_time({namespace="federated-cloud-platform"} |~ "unknown datacenters?.*likely" [1h]))
             queryType: instant
             intervalMs: 60000
             maxDataPoints: 43200
