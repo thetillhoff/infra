@@ -13,9 +13,17 @@ spec:
       labels:
         app: db
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: postgres
-        image: postgres:17.11 # No image policy set, to prevent major updates from breaking things
+        image: postgres:17.11-alpine # No image policy set, to prevent major updates from breaking things
         ports:
         - containerPort: 5432
           livenessProbe:

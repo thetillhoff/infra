@@ -12,9 +12,15 @@ spec:
       labels:
         app: redis
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: redis
-        image: redis:8.10.2 # {"$imagepolicy": "webscan:redis"}
+        image: redis:8.10.2-alpine # {"$imagepolicy": "webscan:redis"}
         ports:
         - containerPort: 6379
         livenessProbe:

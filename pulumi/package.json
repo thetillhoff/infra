@@ -8,15 +8,15 @@
     "configure": "pulumi stack output --show-secrets kubeconfig > kubeconfig && echo export KUBECONFIG=\"$(pwd)/kubeconfig\" && pulumi stack output --show-secrets talosconfig > talosconfig && echo export TALOSCONFIG=\"$(pwd)/talosconfig\""
   },
   "devDependencies": {
-    "@types/node": "24.19.2",
+    "@types/node": "^24.19.2",
     "prettier": "3.9.10",
     "typescript": "6.0.3"
   },
   "dependencies": {
-    "@pulumi/cloudflare": "^6.22.1",
+    "@pulumi/cloudflare": "^6.23.1",
     "@pulumi/hcloud": "^1.43.1",
     "@pulumi/kubernetes": "^4.23.0",
-    "@pulumi/pulumi": "^3.181.0",
+    "@pulumi/pulumi": "^3.271.0",
     "@pulumi/tailscale": "^0.29.2",
     "@pulumiverse/talos": "^0.8.0",
     "@pulumiverse/time": "^0.1.1"
