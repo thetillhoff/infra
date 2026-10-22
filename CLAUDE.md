@@ -341,6 +341,14 @@ An init container downloads each `dashboards:` entry from grafana.com (`gnetId` 
 
 Scrape annotations (`prometheus.io/port`) on a Service must name the container port, not the Service port. The `kubernetes-service-endpoints-by-port-name` job in `monitoring/prometheus/values.yaml` uses the `endpointslice` role.
 
+### Alert mail has two paths
+
+Grafana alerts mail through its own SMTP settings. Flux events mail through the Prometheus Alertmanager (`monitoring/prometheus/values.yaml`), which reuses the `grafana-smtp` secret. Flux has no email provider, and the built-in Alertmanager of Grafana rejects the array payload of the Flux `alertmanager` provider with 400 (grafana/grafana#50150). Reopen this when that issue closes.
+
+- Alertmanager has no authentication. A NetworkPolicy admits only the Flux notification-controller and the Prometheus server on `:9093`. Add any new sender there.
+- A Kustomization that stays broken mails once, then again after 4 hours (default `repeat_interval`). Silence after the first mail is not a fault.
+- Test the path with a throwaway Kustomization on `path: ./does-not-exist`. Delete it afterwards.
+
 ## Known Pulumi Pitfalls
 
 ### @pulumiverse/talos provider bump triggers kubernetes cascade
