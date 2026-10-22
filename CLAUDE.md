@@ -236,6 +236,10 @@ WebKit persists the Alt-Svc entry for the advertised `ma` (30d), so after fixing
 already-poisoned iPhone needs *Settings → Safari → Clear History and Website Data* (a Private tab uses an
 ephemeral store, which makes it the cheap test).
 
+A different iOS symptom: every `*.internal.thetillhoff.de` name fails on the phone while the proxies answer
+on the desktop (pods, certificates, DNS and ACL all fine). The Tailscale tunnel on the phone is stale, often
+after a Wi-Fi/mobile switch. Toggling the VPN off and on fixes it; a restart of the Tailscale app does not.
+
 Caddy does **not** watch its Caddyfile, so a plain ConfigMap update would restart nothing. The
 `Caddyfile`/`index.sh` sources live under `caddy-config/` and are wired through `configMapGenerator`
 in `kustomization.yaml` (not plain `ConfigMap` resources) — kustomize hashes the generated ConfigMap's
