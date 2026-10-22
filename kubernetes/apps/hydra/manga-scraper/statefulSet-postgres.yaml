@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:17-alpine
+          image: postgres:17.11-alpine
           env:
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata # subdir: mount root holds lost+found
