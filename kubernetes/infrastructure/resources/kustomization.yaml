@@ -4,6 +4,6 @@ resources:
 - firewall
 - gateways
 - cert-manager
-- discord-notifications
+- flux-notifications
 - monitoring
 - private-endpoints

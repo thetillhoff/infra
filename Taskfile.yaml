@@ -84,7 +84,7 @@ tasks:
       - flux reconcile kustomization infrastructure-controllers --with-source
       # resources (depend on controllers)
       - flux reconcile kustomization resource-cert-manager --with-source
-      - flux reconcile kustomization resource-discord-notifications --with-source
+      - flux reconcile kustomization resource-flux-notifications --with-source
       - flux reconcile kustomization resource-firewall --with-source
       - flux reconcile kustomization resource-gateways --with-source
       - flux reconcile kustomization resource-monitoring --with-source
