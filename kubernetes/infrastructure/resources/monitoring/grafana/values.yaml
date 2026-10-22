@@ -501,6 +501,48 @@ alerting:
             intervalMs: 60000
             maxDataPoints: 43200
             refId: B
+      # The fcp scrapers skip data for a datacenter missing from the reference
+      # data and still exit 0, so no Job-based rule sees it. Each run logs
+      # "unknown datacenter(s)" once per region. A weekly scraper fires once
+      # after its run; spot-azure fires hourly until the region is added.
+      - uid: fcp-scraper-unknown-datacenter
+        title: A federated-cloud-platform scraper met an unknown datacenter
+        condition: B
+        for: 0s
+        execErrState: KeepLast
+        noDataState: OK
+        annotations:
+          summary: "{{ `{{ $labels.container }}` }} skipped data for a datacenter missing from the reference data. Find the name in its logs (`grep 'unknown datacenter'`), then add it under services/backend/db/dummy-data."
+        data:
+        - refId: A
+          queryType: instant
+          relativeTimeRange: { from: 3600, to: 0 }
+          datasourceUid: loki
+          model:
+            datasource: { type: loki, uid: loki }
+            editorMode: code
+            expr: sum by (container) (count_over_time({namespace="federated-cloud-platform"} |~ "unknown datacenters?" [1h]))
+            queryType: instant
+            intervalMs: 60000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          queryType: ''
+          relativeTimeRange: { from: 0, to: 0 }
+          datasourceUid: __expr__
+          model:
+            datasource: { type: __expr__, uid: __expr__, name: Expression }
+            type: threshold
+            expression: A
+            conditions:
+            - evaluator: { type: gt, params: [0, 0] }
+              operator: { type: and }
+              query: { params: [] }
+              reducer: { type: last, params: [] }
+              type: query
+            intervalMs: 60000
+            maxDataPoints: 43200
+            refId: B
       # Canary: the ONE rule that intentionally alerts on query error. When Grafana can't
       # reach Prometheus, every other rule holds state (KeepLast) and stays quiet — this
       # fires instead, so a monitoring outage is a single clear alert, not a 40-alert storm.
