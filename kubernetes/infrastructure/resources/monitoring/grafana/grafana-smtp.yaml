@@ -3,7 +3,7 @@ kind: Secret
 metadata:
     name: grafana-smtp
 stringData:
-    GF_SMTP_PASSWORD: ENC[AES256_GCM,data:Pl58aiie/Kw=,iv:uSBPaSbdzuvyhr/aopQ1KXKeeJcOOfSFIWLKp8Jkam4=,tag:M9WR1vhvoLXi78+xtKSRXQ==,type:str]
+    GF_SMTP_PASSWORD: ENC[AES256_GCM,data:L4Vo3EtlBYBnY7rp58Dag0GVFw==,iv:VoxdaTBk7aF+bJi7mzRnzrtFWKdSzFp94puH+a4D2AQ=,tag:Us7Y0TpCQxFN1iCRdGfn2A==,type:str]
 sops:
     age:
         - enc: |
@@ -25,6 +25,6 @@ sops:
             -----END AGE ENCRYPTED FILE-----
           recipient: age1jmznk7lwandq9d7mm6fq69uwpa7hf79p6h6qztz0e20wj2yw2a8qylelvw
     encrypted_regex: ^(data|stringData)$
-    lastmodified: "2026-10-22T13:33:49Z"
-    mac: ENC[AES256_GCM,data:uFb6H0mSKuJX5x8pcZ4QMxn/EONAMKnPB1s5EN8l03Kdg98FS8Bczdg1RegOGYh1t2UkJUYNLp9miNzq2NAmamVK6PnebuoNBtAxfhW2sBPoV9itWKlIXOcUbdd8xv5QrMjGicVXVDwmVawcjQnXEvM9I4JyQbmj+zDxl0mThjk=,iv:BE1c8dDh4PSa9IkUF121HfVF4icbHrQhrIDCvpguydY=,tag:raTPdfO5yNDyCgPUv7MNjA==,type:str]
+    lastmodified: "2026-10-22T13:53:43Z"
+    mac: ENC[AES256_GCM,data:5T9vp8H1OBIiObgITn2BhYieOu6LjMTTrm6CnDaUoYNSoMEbGmtLaiy1fkz9hzxLFkIuvn/Z84kj2SkHx40AcC2MfF2xEeaGGdFSfw3uADB0r/3XV4cN+q+ZhMegLVYPRKgHYbtFHUGE1Y3sl787IN5zcU/7N1vCrhGrdE9vsRc=,iv:ALSUKvipKtGAipi2x39r3ZvUvKKkmbpHfOJZLSJIhVQ=,tag:Lhb+1a2yQ+NtNjQju4Zc1A==,type:str]
     version: 3.13.3
