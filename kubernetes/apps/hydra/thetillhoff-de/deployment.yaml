@@ -17,6 +17,9 @@ spec:
         image: ghcr.io/thetillhoff/thetillhoff.de:v1.4.4 # {"$imagepolicy": "thetillhoff-de:thetillhoff-de"}
         ports:
         - containerPort: 80
+        env:
+        - name: UMAMI_WEBSITE_ID
+          value: b231247b-1848-45f0-a1a8-4745d7b84d3d
         livenessProbe:
           httpGet:
             port: 8080
