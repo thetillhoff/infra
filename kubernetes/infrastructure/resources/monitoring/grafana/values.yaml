@@ -5,7 +5,7 @@ admin:
   userKey: admin-user
   passwordKey: admin-password
 
-envFromSecret: grafana-discord-webhook
+envFromSecret: grafana-smtp
 
 # Served behind the Caddy proxy at grafana.internal.thetillhoff.de (TLS terminated
 # at the proxy, HTTP to grafana). root_url makes grafana build correct absolute URLs
@@ -18,6 +18,14 @@ grafana.ini:
   server:
     domain: grafana.internal.thetillhoff.de
     root_url: https://grafana.internal.thetillhoff.de/
+  # Alert mail. The password comes from the grafana-smtp secret as GF_SMTP_PASSWORD.
+  # Gmail only accepts the account's own address as sender.
+  smtp:
+    enabled: true
+    host: smtp.gmail.com:587
+    user: thetillhoff@gmail.com
+    from_address: thetillhoff@gmail.com
+    startTLS_policy: MandatoryStartTLS
 
 # Grafana's service port is named `service` (not something our port-name auto-discovery
 # matches), so annotate the Service explicitly. Prometheus scrapes the pod IP, so the
@@ -78,18 +86,21 @@ alerting:
     apiVersion: 1
     contactPoints:
     - orgId: 1
-      name: discord
+      name: email
       receivers:
-      - uid: discord
-        type: discord
+      - uid: email
+        type: email
         settings:
-          url: $__env{DISCORD_WEBHOOK_URL}
+          addresses: thetillhoff@gmail.com
+    deleteContactPoints:
+    - orgId: 1
+      uid: discord
 
   policies.yaml:
     apiVersion: 1
     policies:
     - orgId: 1
-      receiver: discord
+      receiver: email
       group_by:
       - grafana_folder
       - alertname
