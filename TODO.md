@@ -8,4 +8,4 @@
 - Enable the Longhorn NetworkPolicies again (`networkPolicies.restrictInternalTraffic: true`) with `networkPolicies.metricsScrapeSources` set so Prometheus can still scrape.
 - Set `upgrade.crds: CreateReplace` on the tailscale HelmRelease. Helm does not update CRDs from a chart's `crds/` directory on upgrade, so the existing CRDs keep their old schema.
 - Decide on the PostgreSQL majors: trading runs 16, manga and umami 17, federated-cloud-platform 18. Each major needs a dump and restore.
-- Add a Grafana check that a Discord alert arrives. The contact point exists, but no upgrade step sends a test message.
+- Add a Grafana check that an alert mail arrives. The contact point exists, but no upgrade step sends a test message.
