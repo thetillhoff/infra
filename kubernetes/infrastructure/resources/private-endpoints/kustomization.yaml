@@ -50,6 +50,11 @@ resources:
 - deployment-manga-proxy.yaml
 - service-manga.yaml
 
+# analytics.internal.thetillhoff.de (umami UI; the public host serves only the tracker script and /api/send)
+- certificate-analytics.yaml
+- deployment-analytics-proxy.yaml
+- service-analytics.yaml
+
 # Caddy config ConfigMaps: generated (not plain resources) so an edit to any
 # Caddyfile/index.sh changes the ConfigMap's name hash, which forces the
 # owning Deployment to roll — Caddy/the index sidecar don't watch their
@@ -84,3 +89,7 @@ configMapGenerator:
   namespace: private-endpoints
   files:
   - Caddyfile=caddy-config/manga.Caddyfile
+- name: analytics-caddy
+  namespace: private-endpoints
+  files:
+  - Caddyfile=caddy-config/analytics.Caddyfile

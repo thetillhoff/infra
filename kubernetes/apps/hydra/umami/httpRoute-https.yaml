@@ -9,10 +9,14 @@ spec:
   hostnames:
   - analytics.thetillhoff.de
   rules:
+  # Public: only what the tracker script on the websites needs. The UI is internal.
   - matches:
     - path:
-        type: PathPrefix
-        value: /
+        type: Exact
+        value: /script.js
+    - path:
+        type: Exact
+        value: /api/send
     backendRefs:
     - name: umami
       port: 80

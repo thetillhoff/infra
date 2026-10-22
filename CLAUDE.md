@@ -126,7 +126,9 @@ Public ingress is TCP-only: Envoy advertises h2/h1.1 via `gatewayAPI.enableAlpn`
 
 ### Private endpoints (tailnet-only)
 
-Admin UIs (grafana, longhorn, hubble) and the two app UIs that must not be public (trading, manga) are exposed privately at `<name>.internal.thetillhoff.de` — reachable only over the Tailscale tailnet, not the public internet. Defined in `kubernetes/infrastructure/resources/private-endpoints/`.
+Admin UIs (grafana, longhorn, hubble) and the app UIs that must not be public (trading, manga, analytics) are exposed privately at `<name>.internal.thetillhoff.de` — reachable only over the Tailscale tailnet, not the public internet. Defined in `kubernetes/infrastructure/resources/private-endpoints/`.
+
+The umami UI is internal at `analytics.internal.thetillhoff.de`. The public `analytics.thetillhoff.de` route (`apps/hydra/umami/httpRoute-https.yaml`) serves only `/script.js` and `/api/send`, which the tracker script on the websites needs.
 
 Per app: a small **Caddy** reverse-proxy (non-root, binds `:8443`) terminates a real LetsEncrypt cert (cert-manager DNS-01, per-name `Certificate`) and proxies to the in-cluster app Service. A `Service` `type: LoadBalancer, loadBalancerClass: tailscale` makes the tailscale operator join a proxy to the tailnet and write the private `100.x` (CGNAT) IP into the Service's LB status. **external-dns** (in the `cert-manager` namespace, reusing that namespace's `cloudflare-api-token`) reads the LB IP and creates the `A` record. Security is the WireGuard mesh + tailnet ACLs — the public resolves the DNS but cannot route to `100.64.0.0/10`.
 
@@ -228,7 +230,7 @@ at all, so QUIC black-holes. Chrome/Firefox race QUIC against TCP and fall back 
 (every iOS browser) sticks with the cached Alt-Svc and just spins**, which is why a page loads on mac/linux
 and hangs on iPhone. Every `caddy-config/*.Caddyfile` therefore sets `servers { protocols h1 h2 }`.
 
-Those Caddyfiles are 7 independent copies — nothing enforces the line. Copy an existing one when
+Those Caddyfiles are 8 independent copies — nothing enforces the line. Copy an existing one when
 adding an endpoint; a hand-written one silently brings h3 back. Public ingress is unaffected (Envoy sends
 no `alt-svc` at all).
 

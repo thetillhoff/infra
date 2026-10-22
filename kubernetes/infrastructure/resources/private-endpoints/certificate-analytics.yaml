@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: analytics-internal
+  namespace: private-endpoints
+spec:
+  secretName: analytics-internal-tls
+  dnsNames:
+    - analytics.internal.thetillhoff.de
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
