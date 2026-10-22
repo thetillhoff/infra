@@ -1,13 +1,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: resource-discord-notifications
+  name: resource-flux-notifications
   namespace: flux-system
 spec:
   dependsOn:
     - name: infrastructure-controllers
   interval: 10m0s
-  path: ./kubernetes/infrastructure/resources/discord-notifications
+  path: ./kubernetes/infrastructure/resources/flux-notifications
   prune: true
   wait: true
   sourceRef:

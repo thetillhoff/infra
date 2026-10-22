@@ -93,7 +93,7 @@ The hostpath provider could be used to integrate ZFS with k8s if needed.
 - Loki (logs)
 - Grafana Alloy (metrics/logs collection)
 - metrics-server
-- Discord notifications via an Alertmanager provider for Flux/k8s alerts.
+- Email notifications for Flux events, through the Alertmanager provider into Grafana.
 
 ### VPN
 - Tailscale (operator in-cluster + bare-metal hosts via Ansible)
