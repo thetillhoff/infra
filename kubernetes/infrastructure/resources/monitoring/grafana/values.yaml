@@ -92,9 +92,6 @@ alerting:
         type: email
         settings:
           addresses: thetillhoff@gmail.com
-    deleteContactPoints:
-    - orgId: 1
-      uid: discord
 
   policies.yaml:
     apiVersion: 1
