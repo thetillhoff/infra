@@ -1,11 +1,9 @@
 apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Provider
 metadata:
-  name: grafana-alertmanager
+  name: alertmanager
   namespace: flux-system
 spec:
   type: alertmanager
-  # Grafana's built-in Alertmanager: its notification policy routes these events to the email contact point.
-  address: http://grafana.monitoring.svc.cluster.local/api/alertmanager/grafana/api/v2/alerts/
-  secretRef:
-    name: grafana-alertmanager-token
+  # Prometheus Alertmanager mails the events (the one of Grafana rejects this payload).
+  address: http://prometheus-alertmanager.monitoring.svc.cluster.local:9093/api/v2/alerts/

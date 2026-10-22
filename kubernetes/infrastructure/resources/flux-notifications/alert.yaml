@@ -1,12 +1,12 @@
 apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Alert
 metadata:
-  name: grafana-alertmanager
+  name: alertmanager
   namespace: flux-system
 spec:
   summary: "hydra"
   providerRef:
-    name: grafana-alertmanager
+    name: alertmanager
   eventSeverity: error
   eventSources:
     - kind: GitRepository
