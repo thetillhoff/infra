@@ -21,21 +21,6 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
-      initContainers:
-      # Data from the old Debian image belongs to uid 999; postgres refuses other owners. Remove once the volume is owned by 70.
-      - name: chown-data
-        image: busybox:1.38
-        command: ["chown", "-R", "70:70", "/var/lib/postgresql/data"]
-        securityContext:
-          runAsNonRoot: false
-          runAsUser: 0
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-            add: ["CHOWN", "DAC_OVERRIDE"]
-        volumeMounts:
-        - name: db-data
-          mountPath: /var/lib/postgresql/data
       containers:
       - name: postgres
         image: postgres:17.11-alpine # No image policy set, to prevent major updates from breaking things
