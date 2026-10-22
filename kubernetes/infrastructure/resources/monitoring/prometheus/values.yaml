@@ -24,8 +24,31 @@ prometheus-node-exporter:
   extraArgs:
     - --no-collector.kernel_hung
 
+# Only Flux notification-controller posts here, because Grafana's built-in
+# Alertmanager rejects the standard array payload. It mails through the SMTP
+# account of Grafana, so the password is mounted from the grafana-smtp secret.
 alertmanager:
-  enabled: false
+  enabled: true
+  persistence:
+    enabled: false
+  extraSecretMounts:
+    - name: smtp
+      mountPath: /etc/alertmanager/smtp
+      secretName: grafana-smtp
+      readOnly: true
+  config:
+    global:
+      smtp_smarthost: smtp.gmail.com:587
+      smtp_from: thetillhoff@gmail.com
+      smtp_auth_username: thetillhoff@gmail.com
+      smtp_auth_password_file: /etc/alertmanager/smtp/GF_SMTP_PASSWORD
+      smtp_require_tls: true
+    route:
+      receiver: email
+    receivers:
+      - name: email
+        email_configs:
+          - to: thetillhoff@gmail.com
 
 prometheus-pushgateway:
   enabled: false
