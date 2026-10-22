@@ -1,4 +1,4 @@
-FROM python:alpine3.22@sha256:6b91e66ab2a880ce9ca5a1b91c70f45963ff71ff68268df056336e1a657d5efd
+FROM python:alpine3.24@sha256:d44b1254cb92329418d164b22b20d86bbd3869d48e80e09e476531a409a728bb
 
 # openssh: remote connection; sops: decrypt community.sops vars (age key)
 RUN apk add --no-cache openssh sops
