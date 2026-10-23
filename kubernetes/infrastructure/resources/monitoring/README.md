@@ -3,7 +3,7 @@
 - `prometheus/` deploys the standalone Prometheus chart (metrics collection, kube-state-metrics, node-exporter).
 - `grafana/` deploys Grafana with provisioned datasources for Prometheus and Loki.
 - `loki/` deploys Loki in single-binary mode (log aggregation).
-- `alloy/` deploys Grafana Alloy as a log collector (pod logs + cluster events) forwarding to Loki, with metrics forwarding to Prometheus.
+- `alloy/` deploys Grafana Alloy as a log collector (pod logs + cluster events) forwarding to Loki.
 - `metrics-server/` provides the Kubernetes metrics API (`kubectl top`).
 
 ## Hubble flows
@@ -51,7 +51,7 @@ Grafana alerts use the SMTP settings of Grafana. The Prometheus rules (`serverFi
 
 ## Prometheus hardening
 
-- Prometheus has no authentication. `networkPolicy-prometheus.yaml` admits only Grafana and Alloy on `:9090`, because `web.enable-lifecycle` exposes `/-/quit` and the remote-write receiver accepts samples from any caller. Add any new client there. The chart's own `networkPolicy.enabled` allows `:9090` from every source, so it is not used.
+- Prometheus has no authentication. `networkPolicy-prometheus.yaml` admits only Grafana on `:9090`, because `web.enable-lifecycle` exposes `/-/quit`. The remote-write receiver is off: nothing pushes metrics to Prometheus. Add any new client there. The chart's own `networkPolicy.enabled` allows `:9090` from every source, so it is not used.
 - The policy blocks `kubectl get --raw .../services/prometheus-server:80/proxy/...` (the API server is not an allowed client). Use `kubectl port-forward` instead.
 - The server and the reload sidecar run with a read-only root filesystem and no capabilities. Only `/data` is writable. A new flag or feature that writes elsewhere needs its own `emptyDir`.
 - The Alertmanager chart sets the same restrictions by default.

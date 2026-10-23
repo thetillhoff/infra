@@ -9,12 +9,6 @@ loki.write "default" {
   }
 }
 
-prometheus.remote_write "default" {
-  endpoint {
-    url = "http://prometheus-server/api/v1/write"
-  }
-}
-
 // POD LOGS
 
 // discovery.kubernetes allows you to find scrape targets from Kubernetes resources.

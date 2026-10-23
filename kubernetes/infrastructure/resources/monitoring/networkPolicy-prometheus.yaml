@@ -1,6 +1,6 @@
 # Prometheus has no authentication, and web.enable-lifecycle exposes /-/quit. Only
-# Grafana (queries) and Alloy (remote write) may connect. The reload sidecar uses
-# 127.0.0.1 in the same pod, so the policy does not affect it.
+# Grafana may connect. The reload sidecar uses 127.0.0.1 in the same pod, so the
+# policy does not affect it.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -17,8 +17,5 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: grafana
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: alloy
       ports:
         - port: 9090

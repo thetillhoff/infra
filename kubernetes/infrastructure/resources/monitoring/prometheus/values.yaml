@@ -29,7 +29,6 @@ server:
   # Replaces the chart default, so the flag for the config reload must be listed.
   extraFlags:
     - web.enable-lifecycle
-    - web.enable-remote-write-receiver
 
 # One place for all alert rules; add a rule for a new app here. Every alert
 # mails through the Alertmanager below. `max by` drops pod and instance labels,
