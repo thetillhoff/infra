@@ -18,9 +18,19 @@ spec:
       labels:
         app: ibkr-gateway
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: gateway
           image: ghcr.io/gnzsnz/ib-gateway:stable
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           envFrom:
             - secretRef:
                 name: trading-ibkr

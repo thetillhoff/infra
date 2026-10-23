@@ -29,6 +29,14 @@ spec:
               # one minor of skew either way.
               image: alpine/k8s:1.36.5
               imagePullPolicy: IfNotPresent
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 65534
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+                seccompProfile:
+                  type: RuntimeDefault
               command:
                 - sh
                 - -c

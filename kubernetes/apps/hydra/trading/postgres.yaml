@@ -38,6 +38,11 @@ spec:
       containers:
         - name: postgres
           image: postgres:16.15-alpine
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
           env:
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata # subdir: mount root holds lost+found
@@ -58,6 +63,11 @@ spec:
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+            # The unix socket and temporary files.
+            - name: run
+              mountPath: /var/run/postgresql
+            - name: tmp
+              mountPath: /tmp
           resources:
             requests:
               cpu: 200m
@@ -65,6 +75,11 @@ spec:
             limits:
               cpu: 1000m
               memory: 512Mi
+      volumes:
+        - name: run
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
   volumeClaimTemplates:
     - metadata:
         name: postgres-data

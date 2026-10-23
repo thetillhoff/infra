@@ -32,6 +32,14 @@ spec:
             - name: livetrade
               image: ghcr.io/thetillhoff/trading-livetrade:183 # {"$imagepolicy": "trading:trading-livetrade"}
               imagePullPolicy: IfNotPresent
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 10001
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+                seccompProfile:
+                  type: RuntimeDefault
               env:
                 - name: TRIGGER
                   value: close
