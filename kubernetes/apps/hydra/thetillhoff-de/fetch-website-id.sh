@@ -1,7 +1,10 @@
 #!/bin/bash
 # Writes the umami website id into an env file for the site container.
 # Fails open: on any error the pod starts without the id, so the page loads without tracking.
+# kubelet rejects a missing or empty env file even with optional: true, so a placeholder file always exists.
 set -o pipefail
+echo "UMAMI_UNAVAILABLE='1'" > /config/config.env
+
 api=http://umami.umami.svc.cluster.local
 domain=thetillhoff.de
 
