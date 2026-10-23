@@ -17,5 +17,6 @@ for team in $(curl -sf -H "$auth" "$api/api/users/$user_id/teams" | jq -r '.data
 done
 [ -n "${id:-}" ] || { echo "website $domain not found"; exit 0; }
 
-echo "UMAMI_WEBSITE_ID=$id" > /config/config.env
+# fileKeyRef accepts only single-quoted values.
+echo "UMAMI_WEBSITE_ID='$id'" > /config/config.env
 echo "wrote id for $domain"
