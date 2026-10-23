@@ -26,15 +26,25 @@ spec:
         app: redis
     spec:
       securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
         seccompProfile:
           type: RuntimeDefault
+      volumes:
+        - name: data
+          emptyDir: {}
       containers:
         - name: redis
           image: redis:8.10.2-alpine
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
           ports:
             - containerPort: 6379
           readinessProbe:
