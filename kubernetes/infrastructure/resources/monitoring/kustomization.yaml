@@ -4,6 +4,7 @@ namespace: monitoring
 resources:
 - namespace.yaml
 - networkPolicy-alertmanager.yaml
+- networkPolicy-prometheus.yaml
 - metrics-server
 
 - helmRepository-prometheus-community.yaml

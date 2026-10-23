@@ -48,3 +48,10 @@ Grafana alerts use the SMTP settings of Grafana. The Prometheus rules (`serverFi
 - The chart default `extraFlags` holds `web.enable-lifecycle`. Our override must keep it, or the reload sidecar gets 403 and a change of a rule needs a pod restart.
 - Check a change of a rule before you push: render the chart with `helm template` and run `promtool check rules` on the rendered `alerting_rules.yml` in Docker. A wrong key (`serverFiles` is top-level, not under `server:`) renders an empty `{}` without an error. After the rollout, `/api/v1/rules` of Prometheus must list the rule.
 - Test the path with a throwaway Kustomization (`interval: 1m`, `path: ./does-not-exist`, `prune: false`). The alert fires after about 5 minutes. Delete the Kustomization afterwards: the resolved mail follows within about 2 minutes. The counter `alertmanager_notifications_total{integration="email"}` on `:9093/metrics` rises by one per mail. Through the API-server proxy this call can time out because of the NetworkPolicy: retry.
+
+## Prometheus hardening
+
+- Prometheus has no authentication. `networkPolicy-prometheus.yaml` admits only Grafana and Alloy on `:9090`, because `web.enable-lifecycle` exposes `/-/quit` and the remote-write receiver accepts samples from any caller. Add any new client there. The chart's own `networkPolicy.enabled` allows `:9090` from every source, so it is not used.
+- The policy blocks `kubectl get --raw .../services/prometheus-server:80/proxy/...` (the API server is not an allowed client). Use `kubectl port-forward` instead.
+- The server and the reload sidecar run with a read-only root filesystem and no capabilities. Only `/data` is writable. A new flag or feature that writes elsewhere needs its own `emptyDir`.
+- The Alertmanager chart sets the same restrictions by default.

@@ -12,6 +12,15 @@ server:
       memory: 3Gi
   global:
     scrape_interval: 60s
+  # Only /data (the volume) is writable; the config comes from a read-only ConfigMap.
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  containerSecurityContext: &containerSecurityContext
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+    readOnlyRootFilesystem: true
   persistentVolume:
     enabled: true
     size: 10Gi
@@ -60,6 +69,10 @@ serverFiles:
               severity: error
             annotations:
               summary: "{{ $labels.pod }} ({{ $labels.container }}) in {{ $labels.namespace }} is crash looping"
+
+configmapReload:
+  prometheus:
+    containerSecurityContext: *containerSecurityContext
 
 prometheus-node-exporter:
   extraArgs:
