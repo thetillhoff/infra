@@ -45,6 +45,14 @@ spec:
                 labelSelector:
                   matchLabels:
                     app: api
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
       imagePullSecrets:
         - name: ghcr-creds
       initContainers:
@@ -52,6 +60,10 @@ spec:
         # with the image without a separate Job to re-run.
         - name: migrations
           image: ghcr.io/thetillhoff/manga-scraper-migrations:85 # {"$imagepolicy": "manga-scraper:manga-scraper-migrations"}
+          # Root until the image makes /schema writable for a non-root user.
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
           env:
             - name: DATABASE_URL
               valueFrom:
@@ -104,13 +116,16 @@ spec:
             # it fetches from the sources at crawl pace, so depth stays small.
             - name: PAGE_STORE_DIR
               value: /pages
+            # Chrome and Xvfb write their config and cache under HOME.
+            - name: HOME
+              value: /tmp
             - name: PRELOAD_CHAPTERS_AHEAD
               value: "1"
-          # No readOnlyRootFilesystem and no runAsNonRoot: the image starts Xvfb
-          # and a headed Chromium, which want a writable /tmp and their own
-          # sandbox handling (the scraper already passes --no-sandbox).
+          # Writable only where Xvfb and Chrome need it: /tmp, the Chrome profile and
+          # the page store. The scraper already passes --no-sandbox to Chrome.
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
@@ -121,6 +136,10 @@ spec:
             # 64MB default that containers get.
             - name: dev-shm
               mountPath: /dev/shm
+            - name: tmp
+              mountPath: /tmp
+            - name: chrome-profile
+              mountPath: /chrome-profile
             - name: page-store
               mountPath: /pages
           # Endpoint removal races SIGTERM: kube-proxy learns this pod is going
@@ -153,6 +172,10 @@ spec:
               cpu: 2000m
               memory: 1536Mi
       volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: chrome-profile
+          emptyDir: {}
         - name: dev-shm
           emptyDir:
             medium: Memory

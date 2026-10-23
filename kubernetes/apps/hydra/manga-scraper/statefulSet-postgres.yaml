@@ -25,6 +25,11 @@ spec:
       containers:
         - name: postgres
           image: postgres:17.11-alpine
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
           env:
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata # subdir: mount root holds lost+found
@@ -48,6 +53,11 @@ spec:
             - name: init
               mountPath: /docker-entrypoint-initdb.d
               readOnly: true
+            # The unix socket and temporary files.
+            - name: run
+              mountPath: /var/run/postgresql
+            - name: tmp
+              mountPath: /tmp
           resources:
             requests:
               cpu: 100m
@@ -59,6 +69,10 @@ spec:
         - name: init
           configMap:
             name: postgres-init
+        - name: run
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
   volumeClaimTemplates:
     - metadata:
         name: postgres-data
