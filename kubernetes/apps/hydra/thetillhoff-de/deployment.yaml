@@ -35,7 +35,7 @@ spec:
           mountPath: /config
       containers:
       - name: thetillhoff-de
-        image: ghcr.io/thetillhoff/thetillhoff.de:v1.4.4 # {"$imagepolicy": "thetillhoff-de:thetillhoff-de"}
+        image: ghcr.io/thetillhoff/thetillhoff.de:v1.5.0 # {"$imagepolicy": "thetillhoff-de:thetillhoff-de"}
         ports:
         - containerPort: 80
         env:
