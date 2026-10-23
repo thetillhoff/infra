@@ -1,9 +1,0 @@
-apiVersion: notification.toolkit.fluxcd.io/v1beta3
-kind: Provider
-metadata:
-  name: alertmanager
-  namespace: flux-system
-spec:
-  type: alertmanager
-  # Prometheus Alertmanager mails the events (the one of Grafana rejects this payload).
-  address: http://prometheus-alertmanager.monitoring.svc.cluster.local:9093/api/v2/alerts/

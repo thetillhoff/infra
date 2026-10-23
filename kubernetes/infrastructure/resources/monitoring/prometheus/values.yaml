@@ -19,13 +19,29 @@ server:
   retentionSize: "9GB"
   extraFlags:
     - web.enable-remote-write-receiver
+  # flux_resource_info comes from the Flux Operator. `!= "True"` also covers
+  # Unknown, so a slow reconcile does not reset the `for` timer; `max by` drops
+  # the pod label, so a restart of the operator does not create a new alert.
+  # A resource that waits on a failed dependency is skipped: the dependency alerts.
+  serverFiles:
+    alerting_rules.yml:
+      groups:
+        - name: flux
+          rules:
+            - alert: FluxResourceNotReady
+              expr: max by (kind, name) (flux_resource_info{kind=~"Kustomization|GitRepository", ready!="True", reason!="DependencyNotReady", suspended="False"})
+              for: 5m
+              labels:
+                severity: error
+              annotations:
+                summary: "{{ $labels.kind }} {{ $labels.name }} is not ready"
+                description: "Run `flux get {{ $labels.kind | toLower }}s -A` for the reason."
 
 prometheus-node-exporter:
   extraArgs:
     - --no-collector.kernel_hung
 
-# Only Flux notification-controller posts here, because Grafana's built-in
-# Alertmanager rejects the standard array payload. It mails through the SMTP
+# Receives the alerts of the Prometheus rules above. It mails through the SMTP
 # account of Grafana, so the password is mounted from the grafana-smtp secret.
 alertmanager:
   enabled: true
@@ -45,10 +61,13 @@ alertmanager:
       smtp_require_tls: true
     route:
       receiver: email
+      group_by: [alertname, name]
+      repeat_interval: 24h
     receivers:
       - name: email
         email_configs:
           - to: thetillhoff@gmail.com
+            send_resolved: true
 
 prometheus-pushgateway:
   enabled: false

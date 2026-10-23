@@ -33,8 +33,9 @@ An init container downloads each `dashboards:` entry from grafana.com (`gnetId` 
 
 ## Alert mail has two paths
 
-Grafana alerts use the SMTP settings of Grafana. Flux events go through the Prometheus Alertmanager (`prometheus/values.yaml`), which reuses the `grafana-smtp` secret. Flux has no email provider, and the Alertmanager inside Grafana rejects the array payload of the Flux `alertmanager` provider with 400 (grafana/grafana#50150). Reopen this when that issue closes.
+Grafana alerts use the SMTP settings of Grafana. The Prometheus rule `FluxResourceNotReady` (`prometheus/values.yaml`) goes through the Prometheus Alertmanager, which reuses the `grafana-smtp` secret. The rule reads `flux_resource_info` of the Flux Operator, so Prometheus holds the alert state. Flux events are not used: they carry no end time, so the alert expired and fired again at every reconcile.
 
-- Alertmanager has no authentication. A NetworkPolicy admits only the Flux notification-controller and the Prometheus server on `:9093`. Add any new sender there.
-- A Kustomization that stays broken sends one mail, then another after 4 hours (default `repeat_interval`). No mail in between is normal.
+- Alertmanager has no authentication. A NetworkPolicy admits only the Prometheus server on `:9093`. Add any new sender there.
+- A Kustomization or GitRepository that stays not ready for 5 minutes sends one mail, then a reminder every 24 hours, then one mail when it is ready again.
+- A resource that waits on a failed dependency does not alert. The dependency does.
 - Test the path with a throwaway Kustomization on `path: ./does-not-exist`. Delete it afterwards.

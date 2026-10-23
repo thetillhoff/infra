@@ -4,6 +4,5 @@ resources:
 - firewall
 - gateways
 - cert-manager
-- flux-notifications
 - monitoring
 - private-endpoints
