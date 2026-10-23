@@ -118,7 +118,9 @@ Each app dir typically contains: namespace, a `default` ServiceAccount without A
 
 Cilium is both the CNI and the Gateway API implementation (no separate ingress controller). Apps expose themselves via `HTTPRoute` resources referencing Gateways in `kubernetes/infrastructure/resources/gateways/`. Network policies use `CiliumClusterwideNetworkPolicy` in `kubernetes/infrastructure/resources/firewall/`.
 
-Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}` — it is a **node/host** firewall, not a pod-to-pod policy. There is no pod-level default-deny, so cross-namespace pod traffic is unrestricted.
+Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}` — it is a **node/host** firewall, not a pod-to-pod policy. The app namespaces `trading`, `manga-scraper`, `federated-cloud-platform`, `vaultwarden`, `umami`, `webscan`, `link-shortener`, `thetillhoff-de` and `wedding-website` have a `default-deny-ingress` policy; other namespaces are open.
+
+The Cilium Gateway reaches a backend as the entity `ingress`, which a `NetworkPolicy` cannot select. Allow it with a `CiliumNetworkPolicy` and `fromEntities: [ingress]` (example: `apps/hydra/vaultwarden/ciliumNetworkPolicy-vaultwarden-from-gateway.yaml`). To test a block, run `curl --max-time 5` from a pod of another namespace that has curl (a caddy pod in `private-endpoints`): a blocked call times out with exit 28.
 
 The host policy is inert today: see `kubernetes/infrastructure/resources/firewall/README.md` before you turn it on.
 
