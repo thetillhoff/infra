@@ -12,6 +12,27 @@ spec:
       labels:
         app: thetillhoff-de
     spec:
+      initContainers:
+      # Fetches the website id from umami; the site container reads it through fileKeyRef.
+      - name: fetch-website-id
+        image: alpine/k8s:1.36.5
+        command: ["bash", "/scripts/fetch-website-id.sh"]
+        envFrom:
+        - secretRef:
+            name: umami-reader
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65534
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+        - name: config
+          mountPath: /config
       containers:
       - name: thetillhoff-de
         image: ghcr.io/thetillhoff/thetillhoff.de:v1.4.4 # {"$imagepolicy": "thetillhoff-de:thetillhoff-de"}
@@ -19,8 +40,19 @@ spec:
         - containerPort: 80
         env:
         - name: UMAMI_WEBSITE_ID
-          value: b231247b-1848-45f0-a1a8-4745d7b84d3d
+          valueFrom:
+            fileKeyRef:
+              volumeName: config
+              path: config.env
+              key: UMAMI_WEBSITE_ID
+              optional: true
         livenessProbe:
           httpGet:
             port: 8080
           initialDelaySeconds: 5
+      volumes:
+      - name: scripts
+        configMap:
+          name: fetch-website-id
+      - name: config
+        emptyDir: {}

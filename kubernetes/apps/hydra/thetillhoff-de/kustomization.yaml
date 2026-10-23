@@ -7,7 +7,14 @@ resources:
 - service.yaml
 - httpRoute-http.yaml
 - httpRoute-https.yaml
+- umami-reader.secret.yaml
 
 - imageRepository.yaml
 - imagePolicy.yaml
 - imageUpdateAutomation.yaml
+
+# Generated so an edit to the script changes the ConfigMap name and rolls the Deployment.
+configMapGenerator:
+- name: fetch-website-id
+  files:
+  - fetch-website-id.sh
