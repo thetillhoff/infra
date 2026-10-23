@@ -17,25 +17,49 @@ server:
     size: 10Gi
   retention: "15d"
   retentionSize: "9GB"
+  # Replaces the chart default, so the flag for the config reload must be listed.
   extraFlags:
+    - web.enable-lifecycle
     - web.enable-remote-write-receiver
-  # flux_resource_info comes from the Flux Operator. `!= "True"` also covers
-  # Unknown, so a slow reconcile does not reset the `for` timer; `max by` drops
-  # the pod label, so a restart of the operator does not create a new alert.
-  # A resource that waits on a failed dependency is skipped: the dependency alerts.
-  serverFiles:
-    alerting_rules.yml:
-      groups:
-        - name: flux
-          rules:
-            - alert: FluxResourceNotReady
-              expr: max by (kind, name) (flux_resource_info{kind=~"Kustomization|GitRepository", ready!="True", reason!="DependencyNotReady", suspended="False"})
-              for: 5m
-              labels:
-                severity: error
-              annotations:
-                summary: "{{ $labels.kind }} {{ $labels.name }} is not ready"
-                description: "Run `flux get {{ $labels.kind | toLower }}s -A` for the reason."
+
+# One place for all alert rules; add a rule for a new app here. Every alert
+# mails through the Alertmanager below. `max by` drops pod and instance labels,
+# so a restart does not create a new alert.
+serverFiles:
+  alerting_rules.yml:
+    groups:
+      - name: flux
+        rules:
+          # flux_resource_info comes from the Flux Operator. `!= "True"` also
+          # covers Unknown, so a slow reconcile does not reset the `for` timer.
+          # A resource that waits on a failed dependency is skipped: the dependency alerts.
+          - alert: FluxResourceNotReady
+            expr: max by (kind, exported_namespace, name) (flux_resource_info{ready!="True", reason!="DependencyNotReady", suspended="False"})
+            for: 5m
+            labels:
+              severity: error
+            annotations:
+              summary: "{{ $labels.kind }} {{ $labels.name }} is not ready"
+              description: "Run `flux get {{ $labels.kind | toLower }}s -A` for the reason."
+      - name: workloads
+        rules:
+          - alert: WorkloadUnavailable
+            expr: |
+              max by (namespace, deployment) (kube_deployment_status_replicas_unavailable > 0)
+              or max by (namespace, statefulset) (kube_statefulset_status_replicas_ready < kube_statefulset_replicas)
+              or max by (namespace, daemonset) (kube_daemonset_status_number_unavailable > 0)
+            for: 15m
+            labels:
+              severity: error
+            annotations:
+              summary: "{{ $labels.deployment }}{{ $labels.statefulset }}{{ $labels.daemonset }} in {{ $labels.namespace }} has unavailable replicas"
+          - alert: PodCrashLooping
+            expr: max by (namespace, pod, container) (kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"}) == 1
+            for: 10m
+            labels:
+              severity: error
+            annotations:
+              summary: "{{ $labels.pod }} ({{ $labels.container }}) in {{ $labels.namespace }} is crash looping"
 
 prometheus-node-exporter:
   extraArgs:
@@ -61,7 +85,7 @@ alertmanager:
       smtp_require_tls: true
     route:
       receiver: email
-      group_by: [alertname, name]
+      group_by: ["..."]
       repeat_interval: 24h
     receivers:
       - name: email

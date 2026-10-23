@@ -33,9 +33,17 @@ An init container downloads each `dashboards:` entry from grafana.com (`gnetId` 
 
 ## Alert mail has two paths
 
-Grafana alerts use the SMTP settings of Grafana. The Prometheus rule `FluxResourceNotReady` (`prometheus/values.yaml`) goes through the Prometheus Alertmanager, which reuses the `grafana-smtp` secret. The rule reads `flux_resource_info` of the Flux Operator, so Prometheus holds the alert state. Flux events are not used: they carry no end time, so the alert expired and fired again at every reconcile.
+Grafana alerts use the SMTP settings of Grafana. The Prometheus rules (`serverFiles` in `prometheus/values.yaml`) go through the Prometheus Alertmanager, which reuses the `grafana-smtp` secret. To alert on a new app, add a rule there. Prometheus holds the alert state. Flux events are not used: they carry no end time, so the alert expired and fired again at every reconcile.
+
+| Rule | Fires when | After |
+| ---- | ---------- | ----- |
+| `FluxResourceNotReady` | Any Flux resource is not ready (reads `flux_resource_info` of the Flux Operator) | 5m |
+| `WorkloadUnavailable` | A Deployment, StatefulSet or DaemonSet has unavailable replicas | 15m |
+| `PodCrashLooping` | A container is in `CrashLoopBackOff` | 10m |
 
 - Alertmanager has no authentication. A NetworkPolicy admits only the Prometheus server on `:9093`. Add any new sender there.
-- A Kustomization or GitRepository that stays not ready for 5 minutes sends one mail, then a reminder every 24 hours, then one mail when it is ready again.
-- A resource that waits on a failed dependency does not alert. The dependency does.
+- An alert sends one mail, then a reminder every 24 hours, then one mail when it resolves. Each alert is its own mail.
+- A Flux resource that waits on a failed dependency does not alert. The dependency does.
+- Failed Jobs have no rule: `kube_job_failed` keeps old failed Jobs, so a rule would mail about them at once.
+- The chart default `extraFlags` holds `web.enable-lifecycle`. Our override must keep it, or the reload sidecar gets 403 and a change of a rule needs a pod restart.
 - Test the path with a throwaway Kustomization on `path: ./does-not-exist`. Delete it afterwards.

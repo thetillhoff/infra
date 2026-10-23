@@ -93,7 +93,7 @@ The hostpath provider could be used to integrate ZFS with k8s if needed.
 - Loki (logs)
 - Grafana Alloy (metrics/logs collection)
 - metrics-server
-- Email notifications for Flux resources that stay not ready, through a Prometheus rule into Prometheus Alertmanager.
+- Email notifications for Flux resources that stay not ready, unavailable workloads and crash loops, through Prometheus rules into Prometheus Alertmanager.
 
 ### VPN
 - Tailscale (operator in-cluster + bare-metal hosts via Ansible)
