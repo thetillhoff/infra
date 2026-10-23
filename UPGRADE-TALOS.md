@@ -74,6 +74,7 @@ Check compatibility with Kubernetes versions: <https://docs.siderolabs.com/talos
 
 - Remove the old nodegroup from `pulumi/index.ts`.
 - Run `task deploy` — Pulumi deletes the HCloud servers and DNS records. No manual deletion in Hetzner console needed.
+- Do it soon after the nodes are gone: until then the public DNS still has the A and AAAA records of the old nodes, and about half of the connections fail.
 
 ## 6. Cleanup
 

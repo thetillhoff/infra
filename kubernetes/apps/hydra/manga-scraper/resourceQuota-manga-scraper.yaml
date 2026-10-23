@@ -5,7 +5,7 @@ metadata:
   namespace: manga-scraper
 # The api runs a real headed Chromium, whose memory use depends on the pages it
 # is asked to render. This cluster has been taken down by a global OOM before
-# (see the repo's CLAUDE.md), so the namespace gets a hard ceiling rather than
+# (see AGENTS.md, Memory pressure), so the namespace gets a hard ceiling rather than
 # trusting per-pod limits to be complete.
 spec:
   hard:
