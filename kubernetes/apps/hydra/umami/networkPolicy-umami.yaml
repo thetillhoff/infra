@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: umami
+# The tailnet proxy of the analytics UI, and the init container of thetillhoff-de
+# that fetches the website id.
+spec:
+  podSelector:
+    matchLabels:
+      app: umami
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: private-endpoints}
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: thetillhoff-de}
+          podSelector:
+            matchLabels: {app: thetillhoff-de}
+      ports:
+        - {protocol: TCP, port: 3000}

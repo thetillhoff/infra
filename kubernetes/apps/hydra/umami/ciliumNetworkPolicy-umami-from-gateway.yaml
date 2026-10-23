@@ -1,0 +1,15 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: umami-from-gateway
+# The Cilium Gateway reaches the pod as the entity `ingress`, which a NetworkPolicy cannot select.
+spec:
+  endpointSelector:
+    matchLabels:
+      app: umami
+  ingress:
+    - fromEntities: [ingress]
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP

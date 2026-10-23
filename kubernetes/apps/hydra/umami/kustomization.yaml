@@ -3,6 +3,10 @@ kind: Kustomization
 namespace: umami
 resources:
 - namespace.yaml
+- networkPolicy-default-deny-ingress.yaml
+- networkPolicy-db.yaml
+- networkPolicy-umami.yaml
+- ciliumNetworkPolicy-umami-from-gateway.yaml
 - limitRange-default-memory.yaml
 - serviceAccount-default.yaml
 - statefulset-db.yaml
