@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: thetillhoff-de
 resources:
 - namespace.yaml
+- serviceAccount-default.yaml
 - deployment.yaml
 - service.yaml
 - httpRoute-http.yaml

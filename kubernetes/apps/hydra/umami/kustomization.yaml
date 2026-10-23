@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: umami
 resources:
 - namespace.yaml
+- serviceAccount-default.yaml
 - statefulset-db.yaml
 - service-db.yaml
 - statefulset-umami.yaml

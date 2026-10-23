@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: manga-scraper
 resources:
   - namespace.yaml
+  - serviceAccount-default.yaml
   - resourceQuota-manga-scraper.yaml
   - limitRange-manga-scraper.yaml
   - ghcr-creds.secret.yaml

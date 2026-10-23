@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: trading
 resources:
   - namespace.yaml
+  - serviceAccount-default.yaml
   - resourceQuota-trading.yaml
   - limitRange-trading.yaml
   - ghcr-creds.secret.yaml

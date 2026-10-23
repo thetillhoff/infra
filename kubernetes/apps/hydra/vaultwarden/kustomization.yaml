@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: vaultwarden
 resources:
 - namespace.yaml
+- serviceAccount-default.yaml
 - statefulset.yaml
 - service.yaml
 - httpRoute-http.yaml

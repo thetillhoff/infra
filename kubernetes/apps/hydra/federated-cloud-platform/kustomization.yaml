@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: federated-cloud-platform
 resources:
 - namespace.yaml
+- serviceAccount-default.yaml
 - resourceQuota-fcp.yaml
 - limitRange-fcp.yaml
 - ghcr-creds.secret.yaml

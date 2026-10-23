@@ -112,7 +112,7 @@ kubernetes/
 
 Notes about one app or one component are in a `README.md` next to it (for example `manga-scraper`, `thetillhoff-de`, `private-endpoints`, `monitoring`, `firewall`, `cert-manager`, `pulumi`).
 
-Each app dir typically contains: namespace, deployment/statefulset, service, HTTPRoutes (http+https), imagePolicy + imageRepository + imageUpdateAutomation (for FluxCD image automation), and optionally `*.secret.yaml` (SOPS-encrypted).
+Each app dir typically contains: namespace, a `default` ServiceAccount without API token (`serviceAccount-default.yaml`), deployment/statefulset, service, HTTPRoutes (http+https), imagePolicy + imageRepository + imageUpdateAutomation (for FluxCD image automation), and optionally `*.secret.yaml` (SOPS-encrypted).
 
 ### Networking / Ingress
 

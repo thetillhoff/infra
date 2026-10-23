@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: webscan
 resources:
 - namespace.yaml
+- serviceAccount-default.yaml
 - deployment-webscan.yaml
 - deployment-redis.yaml
 - service-webscan.yaml

@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: link-shortener
 resources:
 - namespace.yaml
+- serviceAccount-default.yaml
 - deployment.yaml
 - service.yaml
 - httpRoute-http.yaml
