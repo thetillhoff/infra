@@ -11,5 +11,6 @@
 }
 https://hubble.internal.thetillhoff.de {
   tls /certs/tls.crt /certs/tls.key
+  header Strict-Transport-Security "max-age=31536000"
   reverse_proxy hubble-ui.kube-system.svc.cluster.local:80
 }

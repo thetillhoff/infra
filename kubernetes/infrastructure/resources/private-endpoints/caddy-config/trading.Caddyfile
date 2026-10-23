@@ -11,5 +11,6 @@
 }
 https://trading.internal.thetillhoff.de {
   tls /certs/tls.crt /certs/tls.key
+  header Strict-Transport-Security "max-age=31536000"
   reverse_proxy frontend.trading.svc.cluster.local:80
 }

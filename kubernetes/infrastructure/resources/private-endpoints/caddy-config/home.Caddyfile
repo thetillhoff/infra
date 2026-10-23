@@ -11,6 +11,7 @@
 }
 https://home.internal.thetillhoff.de {
   tls /certs/tls.crt /certs/tls.key
+  header Strict-Transport-Security "max-age=31536000"
   root * /srv
   file_server
 }

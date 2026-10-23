@@ -20,6 +20,5 @@
 - Hardening H6: Set `automountServiceAccountToken: false` on the default ServiceAccount of every app namespace. Check first that no pod uses the default account with the API.
 - Hardening H7: Add a `LimitRange` with a default memory limit to the namespaces whose pods have none (cert-manager, link-shortener, longhorn, monitoring, tailscale, thetillhoff-de, umami, vaultwarden, webscan, wedding-website). Add an admission rule that rejects a pod without a memory limit.
 - Hardening H8: Tailscale proxy pods (10) run `privileged`. Find out with a ProxyClass whether the main container can run without it.
-- Hardening H9: Send `Strict-Transport-Security` on every HTTP path, also the tailnet ones. `pw.thetillhoff.de` lacks it. Set it as a response header filter on the HTTPRoute, or on the app side where the route cannot do it.
 - Hardening H10: Pin images by digest and verify signatures where the image supports it (166 of 186 containers use a mutable tag today). Sort the images into: pin by digest, verify the signature, ask upstream to sign.
 - Hardening H11: Check the Talos disk encryption (`systemDiskEncryption`), the audit policy and the other Talos settings of the machine config. The etcd secrets are encrypted (secretbox) already.

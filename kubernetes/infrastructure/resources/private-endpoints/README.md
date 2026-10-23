@@ -29,3 +29,7 @@ Public ingress is TCP-only too: Envoy sends no `alt-svc`, Cilium 1.20 has no HTT
 ## Every name fails on the phone
 
 If all `*.internal.thetillhoff.de` names fail on the phone while they work on the desktop, the Tailscale tunnel of the phone is stale. It often happens after a switch between Wi-Fi and mobile data. Turn the VPN off and on. A restart of the Tailscale app does not help.
+
+## HSTS
+
+Every `caddy-config/*.Caddyfile` sets `Strict-Transport-Security` with `header`. The public routes set it with a `ResponseHeaderModifier` filter on the rule of the HTTPS `HTTPRoute`; `thetillhoff.de` sends it from its own Caddy. Copy the line for a new endpoint or route.

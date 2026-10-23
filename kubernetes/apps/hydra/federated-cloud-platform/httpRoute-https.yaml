@@ -13,6 +13,12 @@ spec:
         - path:
             type: PathPrefix
             value: /
+      filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set:
+              - name: Strict-Transport-Security
+                value: max-age=31536000
       backendRefs:
         # Public marketplace only. The public web app's Caddy proxies the public API
         # prefixes to public-api in-cluster; admin prefixes live only in the
