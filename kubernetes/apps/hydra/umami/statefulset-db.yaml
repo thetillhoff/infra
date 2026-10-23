@@ -31,10 +31,11 @@ spec:
             drop: [ALL]
         ports:
         - containerPort: 5432
-          livenessProbe:
-            initialDelaySeconds: 30
-            exec:
-              command: ["pg_isready"]
+        livenessProbe:
+          initialDelaySeconds: 30
+          failureThreshold: 6
+          exec:
+            command: ["pg_isready"]
 
         env:
         - name: POSTGRES_PASSWORD

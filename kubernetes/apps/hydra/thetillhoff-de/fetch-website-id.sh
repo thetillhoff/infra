@@ -5,18 +5,23 @@ set -o pipefail
 api=http://umami.umami.svc.cluster.local
 domain=thetillhoff.de
 
+# A request that hangs (umami down, a policy that drops the call) must not block the pod start.
+api_curl() { curl -sf --connect-timeout 3 --max-time 5 "$@"; }
+
 body=$(jq -n --arg u "$USERNAME" --arg p "$PASSWORD" '{username: $u, password: $p}')
-token=$(curl -sf -X POST "$api/api/auth/login" -H 'Content-Type: application/json' -d "$body" | jq -er .token) || { echo "umami login failed"; exit 0; }
+token=$(api_curl -X POST "$api/api/auth/login" -H 'Content-Type: application/json' -d "$body" | jq -er .token) || { echo "umami login failed"; exit 0; }
 auth="Authorization: Bearer $token"
 
 # A view-only user sees websites through its teams, not through /api/websites.
-user_id=$(curl -sf -H "$auth" "$api/api/me" | jq -er .user.id) || { echo "umami user lookup failed"; exit 0; }
-for team in $(curl -sf -H "$auth" "$api/api/users/$user_id/teams" | jq -r '.data[].id'); do
-  id=$(curl -sf -H "$auth" "$api/api/teams/$team/websites" | jq -r --arg d "$domain" '.data[] | select(.domain == $d) | .id' | head -n 1)
+user_id=$(api_curl -H "$auth" "$api/api/me" | jq -er .user.id) || { echo "umami user lookup failed"; exit 0; }
+for team in $(api_curl -H "$auth" "$api/api/users/$user_id/teams" | jq -r '.data[].id'); do
+  id=$(api_curl -H "$auth" "$api/api/teams/$team/websites" | jq -r --arg d "$domain" '.data[] | select(.domain == $d) | .id' | head -n 1)
   [ -n "$id" ] && break
 done
 [ -n "${id:-}" ] || { echo "website $domain not found"; exit 0; }
+[[ "$id" =~ ^[0-9a-f-]{36}$ ]] || { echo "website id has an unexpected format"; exit 0; }
 
-# fileKeyRef accepts only single-quoted values.
-echo "UMAMI_WEBSITE_ID='$id'" > /config/config.env
+# fileKeyRef accepts only single-quoted values. The rename keeps a half-written file from being read.
+echo "UMAMI_WEBSITE_ID='$id'" > /config/config.env.tmp
+mv /config/config.env.tmp /config/config.env
 echo "wrote id for $domain"
