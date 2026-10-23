@@ -3,6 +3,9 @@ kind: Kustomization
 namespace: webscan
 resources:
 - namespace.yaml
+- networkPolicy-default-deny-ingress.yaml
+- networkPolicy-redis.yaml
+- ciliumNetworkPolicy-webscan-from-gateway.yaml
 - limitRange-default-memory.yaml
 - serviceAccount-default.yaml
 - deployment-webscan.yaml
