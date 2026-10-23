@@ -20,6 +20,11 @@ spec:
       containers:
       - name: umami
         image: ghcr.io/umami-software/umami:postgresql-v2.20.2 # {"$imagepolicy": "umami:umami"}
+        resources:
+          requests:
+            memory: 128Mi
+          limits:
+            memory: 512Mi
         ports:
         - containerPort: 3000
           livenessProbe:

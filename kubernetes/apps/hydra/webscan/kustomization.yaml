@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: webscan
 resources:
 - namespace.yaml
+- limitRange-default-memory.yaml
 - serviceAccount-default.yaml
 - deployment-webscan.yaml
 - deployment-redis.yaml

@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: tailscale
 resources:
 - namespace.yaml
+- limitRange-default-memory.yaml
 - operator-oauth.secret.yaml
 - helmRepository.yaml
 - helmRelease.yaml

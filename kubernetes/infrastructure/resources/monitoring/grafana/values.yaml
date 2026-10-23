@@ -595,3 +595,9 @@ alerting:
             intervalMs: 60000
             maxDataPoints: 43200
             refId: B
+
+resources:
+  requests:
+    memory: 256Mi
+  limits:
+    memory: 1Gi

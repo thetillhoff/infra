@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: vaultwarden
 resources:
 - namespace.yaml
+- limitRange-default-memory.yaml
 - serviceAccount-default.yaml
 - statefulset.yaml
 - service.yaml

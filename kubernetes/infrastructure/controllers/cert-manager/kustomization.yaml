@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: cert-manager
 resources:
 - namespace.yaml
+- limitRange-default-memory.yaml
 - helmRepository.yaml
 - helmRelease.yaml
 

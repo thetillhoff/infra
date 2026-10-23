@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: monitoring
 resources:
 - namespace.yaml
+- limitRange-default-memory.yaml
 - networkPolicy-alertmanager.yaml
 - networkPolicy-prometheus.yaml
 - metrics-server

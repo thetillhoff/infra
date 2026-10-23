@@ -148,7 +148,7 @@ Default kubeconfig context may be a local kind cluster, not hydra. Always run `e
 
 ### Memory pressure
 
-3 control-plane nodes (cx43, 8 vCPU / 16 GB), no workers. The baseline is heavy: prometheus about 2.75GB, 3x kube-apiserver up to 3.9GB, Longhorn, Cilium. A large batch burst can still hit the kernel OOM-killer and take the nodes down. The `trading` namespace has a ResourceQuota.
+3 control-plane nodes (cx43, 8 vCPU / 16 GB), no workers. The baseline is heavy: prometheus about 2.75GB, 3x kube-apiserver up to 3.9GB, Longhorn, Cilium. A large batch burst can still hit the kernel OOM-killer and take the nodes down. The `trading` namespace has a ResourceQuota. Every app namespace, `monitoring`, `cert-manager` and `tailscale` has a `LimitRange` (`limitRange-default-memory.yaml`) that gives a container without limits a 256Mi memory limit. A container that peaks above about 150Mi needs its own `resources`.
 
 Recover an unresponsive Talos node with a Hetzner hard reset (console or `hcloud server reset`). If `apid` is dead, `talosctl reboot` cannot reach it.
 

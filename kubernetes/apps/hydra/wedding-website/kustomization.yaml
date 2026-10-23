@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: wedding-website
 resources:
 - namespace.yaml
+- limitRange-default-memory.yaml
 - serviceAccount-default.yaml
 - ghcr-pull.secret.yaml
 - wedding-password.secret.yaml
