@@ -122,7 +122,7 @@ Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}
 
 The Cilium Gateway reaches a backend as the entity `ingress`, which a `NetworkPolicy` cannot select. Allow it with a `CiliumNetworkPolicy` and `fromEntities: [ingress]` (example: `apps/hydra/vaultwarden/ciliumNetworkPolicy-vaultwarden-from-gateway.yaml`). To test a block, run `curl --max-time 5` from a pod of another namespace that has curl (a caddy pod in `private-endpoints`): a blocked call times out with exit 28.
 
-The host policy is inert today: see `kubernetes/infrastructure/resources/firewall/README.md` before you turn it on.
+The node firewall is live: `kubernetes/infrastructure/resources/firewall/README.md` lists the open ports and how to change the policy safely.
 
 ### Private endpoints (tailnet-only)
 
