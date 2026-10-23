@@ -17,6 +17,12 @@ spec:
         kubernetes.io/egress-bandwidth: "5M"
         kubernetes.io/ingress-bandwidth: "10M"
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 65533
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: umami
         image: ghcr.io/umami-software/umami:postgresql-v2.20.2 # {"$imagepolicy": "umami:umami"}
@@ -25,6 +31,11 @@ spec:
             memory: 128Mi
           limits:
             memory: 512Mi
+        # Prisma fetches its schema engine into node_modules at start, so the root filesystem stays writable.
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: [ALL]
         ports:
         - containerPort: 3000
           livenessProbe:

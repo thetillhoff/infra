@@ -24,6 +24,11 @@ spec:
       containers:
       - name: postgres
         image: postgres:17.11-alpine # No image policy set, to prevent major updates from breaking things
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
         ports:
         - containerPort: 5432
           livenessProbe:
@@ -54,7 +59,17 @@ spec:
         volumeMounts:
         - name: db-data
           mountPath: "/var/lib/postgresql/data"
+        # The unix socket and temporary files.
+        - name: run
+          mountPath: /var/run/postgresql
+        - name: tmp
+          mountPath: /tmp
 
+      volumes:
+      - name: run
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: db-data
