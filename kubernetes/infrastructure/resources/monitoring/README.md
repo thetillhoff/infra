@@ -46,4 +46,5 @@ Grafana alerts use the SMTP settings of Grafana. The Prometheus rules (`serverFi
 - A Flux resource that waits on a failed dependency does not alert. The dependency does.
 - Failed Jobs have no rule: `kube_job_failed` keeps old failed Jobs, so a rule would mail about them at once.
 - The chart default `extraFlags` holds `web.enable-lifecycle`. Our override must keep it, or the reload sidecar gets 403 and a change of a rule needs a pod restart.
-- Test the path with a throwaway Kustomization on `path: ./does-not-exist`. Delete it afterwards.
+- Check a change of a rule before you push: render the chart with `helm template` and run `promtool check rules` on the rendered `alerting_rules.yml` in Docker. A wrong key (`serverFiles` is top-level, not under `server:`) renders an empty `{}` without an error. After the rollout, `/api/v1/rules` of Prometheus must list the rule.
+- Test the path with a throwaway Kustomization (`interval: 1m`, `path: ./does-not-exist`, `prune: false`). The alert fires after about 5 minutes. Delete the Kustomization afterwards: the resolved mail follows within about 2 minutes. The counter `alertmanager_notifications_total{integration="email"}` on `:9093/metrics` rises by one per mail. Through the API-server proxy this call can time out because of the NetworkPolicy: retry.
