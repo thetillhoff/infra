@@ -12,6 +12,12 @@ spec:
       labels:
         app: thetillhoff-de
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
       initContainers:
       # Fetches the website id from umami; the site container reads it through fileKeyRef.
       - name: fetch-website-id
@@ -38,6 +44,12 @@ spec:
         image: ghcr.io/thetillhoff/thetillhoff.de:v1.5.0 # {"$imagepolicy": "thetillhoff-de:thetillhoff-de"}
         ports:
         - containerPort: 80
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+            add: [NET_BIND_SERVICE]
         env:
         - name: UMAMI_WEBSITE_ID
           valueFrom:
@@ -50,9 +62,19 @@ spec:
           httpGet:
             port: 8080
           initialDelaySeconds: 5
+        volumeMounts:
+        # Caddy writes its autosave config and state here.
+        - name: caddy-data
+          mountPath: /data
+        - name: caddy-config
+          mountPath: /config
       volumes:
       - name: scripts
         configMap:
           name: fetch-website-id
       - name: config
+        emptyDir: {}
+      - name: caddy-data
+        emptyDir: {}
+      - name: caddy-config
         emptyDir: {}
