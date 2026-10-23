@@ -3,6 +3,8 @@ kind: Kustomization
 namespace: link-shortener
 resources:
 - namespace.yaml
+- networkPolicy-default-deny-ingress.yaml
+- ciliumNetworkPolicy-link-shortener-from-gateway.yaml
 - limitRange-default-memory.yaml
 - serviceAccount-default.yaml
 - deployment.yaml
