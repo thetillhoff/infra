@@ -351,6 +351,27 @@ Grafana alerts mail through its own SMTP settings. Flux events mail through the 
 - A Kustomization that stays broken mails once, then again after 4 hours (default `repeat_interval`). Silence after the first mail is not a fault.
 - Test the path with a throwaway Kustomization on `path: ./does-not-exist`. Delete it afterwards.
 
+### A StatefulSet does not replace a pod that is not Ready
+
+A crash-looping pod keeps its old revision after you fix the spec. Delete the pod once the new spec is applied (`kubectl delete pod <name>`); the PVC stays. Flux then reports the Kustomization as stalled until the pod is Ready.
+
+### Postgres runs as uid 70 (alpine image)
+
+All postgres pods run non-root as uid 70 with `fsGroup: 70`. `fsGroup` changes only the group, and postgres refuses a data directory owned by another uid. Data that the Debian image wrote belongs to uid 999 and needs a one-time root `chown -R 70:70` (init container with `CHOWN` and `DAC_OVERRIDE`). Debian and alpine also use different libc collations: run `REINDEX DATABASE` after a Debian to alpine switch if the database uses a locale other than `C`.
+
+### Flux can lag behind a new chart version
+
+A `HelmRelease` can report `no '<chart>' chart with version matching` while the version exists upstream, because the source-controller keeps an old index. Run `flux reconcile source helm <repo> -n <namespace>`, then reconcile the release.
+
+### Umami website id reaches the site through an init container
+
+`apps/hydra/thetillhoff-de/fetch-website-id.sh` reads the id of `thetillhoff.de` from the umami API and writes `/config/config.env`. The site container takes `UMAMI_WEBSITE_ID` from it with `fileKeyRef` (`EnvFiles`, beta, on in Kubernetes 1.36).
+
+- The env file accepts only single-quoted values (`KEY='value'`). An unquoted value fails the pod with `couldn't parse env file`.
+- The `umami-reader` user is view-only. `/api/websites` lists only websites it owns, so the script reads them through `/api/users/<id>/teams` and `/api/teams/<id>/websites`. The website must stay in the `everyone` team.
+- The script fails open: the pod starts without the id and the page without tracking. Running pods keep an old id after a umami database reset. Run `kubectl rollout restart deployment/thetillhoff-de`.
+- Only `/script.js` and `/api/send` of umami are public. The UI is at `analytics.internal.thetillhoff.de`.
+
 ## Known Pulumi Pitfalls
 
 ### @pulumiverse/talos provider bump triggers kubernetes cascade
