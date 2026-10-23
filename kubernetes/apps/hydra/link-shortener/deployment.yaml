@@ -15,11 +15,23 @@ spec:
         kubernetes.io/egress-bandwidth: "5M"
         kubernetes.io/ingress-bandwidth: "1M"
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: link-shortener
         image: caddy:2.11.7 # {"$imagepolicy": "link-shortener:link-shortener"}
         ports:
         - containerPort: 80
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+            add: [NET_BIND_SERVICE]
         livenessProbe:
           httpGet:
             port: 8080
@@ -28,7 +40,16 @@ spec:
         - name: caddyfile
           subPath: Caddyfile
           mountPath: /etc/caddy/Caddyfile
+        # Caddy writes its autosave config and state here.
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /config
       volumes:
       - name: caddyfile
         configMap:
           name: caddyfile
+      - name: data
+        emptyDir: {}
+      - name: config
+        emptyDir: {}
