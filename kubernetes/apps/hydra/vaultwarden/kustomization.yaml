@@ -3,6 +3,8 @@ kind: Kustomization
 namespace: vaultwarden
 resources:
 - namespace.yaml
+- networkPolicy-default-deny-ingress.yaml
+- ciliumNetworkPolicy-vaultwarden-from-gateway.yaml
 - limitRange-default-memory.yaml
 - serviceAccount-default.yaml
 - statefulset.yaml

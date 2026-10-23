@@ -1,0 +1,15 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vaultwarden-from-gateway
+# The Cilium Gateway reaches the pod as the entity `ingress`, which a NetworkPolicy cannot select.
+spec:
+  endpointSelector:
+    matchLabels:
+      app: vaultwarden
+  ingress:
+    - fromEntities: [ingress]
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
