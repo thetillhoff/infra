@@ -23,9 +23,20 @@ spec:
         image: redis:8.10.2-alpine # {"$imagepolicy": "webscan:redis"}
         ports:
         - containerPort: 6379
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
         livenessProbe:
           exec:
             command:
             - redis-cli
             - ping
           initialDelaySeconds: 5
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        emptyDir: {}

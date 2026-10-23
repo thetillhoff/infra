@@ -15,11 +15,22 @@ spec:
         kubernetes.io/egress-bandwidth: "10M"
         kubernetes.io/ingress-bandwidth: "5M"
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: webscan
         image: ghcr.io/thetillhoff/webscan:5.4.41 # {"$imagepolicy": "webscan:webscan"}
         ports:
         - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
         args:
         - --port=8080
         - --redis-addr=redis:6379
@@ -47,3 +58,9 @@ spec:
           httpGet:
             port: 8080
           initialDelaySeconds: 5
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
