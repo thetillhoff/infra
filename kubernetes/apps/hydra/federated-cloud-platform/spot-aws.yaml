@@ -8,8 +8,8 @@ spec:
   # spot history page.
   schedule: "5 * * * *" # offset from spot-azure to avoid both hitting public-api at once
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       ttlSecondsAfterFinished: 604800

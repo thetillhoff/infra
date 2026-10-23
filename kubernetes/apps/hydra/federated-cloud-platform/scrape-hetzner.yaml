@@ -6,8 +6,8 @@ metadata:
 spec:
   schedule: "15 4 * * 0" # weekly, Sunday 04:15 UTC (45m after scrape-gcp)
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       ttlSecondsAfterFinished: 604800
