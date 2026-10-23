@@ -1,24 +1,17 @@
-apiVersion: "cilium.io/v2"
+apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: "allow-node-to-node-and-http-https-talos"
+  name: nodes-ingress
 spec:
-  description: "Allow node-to-node, HTTP, HTTPS and talos traffic from the cluster"
+  description: Only web traffic, the Kubernetes API and the Talos API are open to the internet. Everything else is for the nodes and pods of the cluster.
   nodeSelector: {}
   ingress:
-    - fromEntities:
-        - world
+    - fromEntities: [world]
       toPorts:
         - ports:
-            - port: "80"
-            - port: "443"
-            - port: "50000"
-    - fromEntities:
-      - cluster
-      - host
-  egress:
-    - toEntities:
-      - cluster
-      - world
-      - remote-node
-      - host
+            - {port: "80", protocol: TCP}
+            - {port: "443", protocol: TCP}
+            - {port: "443", protocol: UDP}
+            - {port: "6443", protocol: TCP}
+            - {port: "50000", protocol: TCP}
+    - fromEntities: [cluster, host, remote-node]

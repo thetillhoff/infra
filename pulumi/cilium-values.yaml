@@ -7,6 +7,8 @@
 ipam:
   mode: kubernetes
 kubeProxyReplacement: true
+hostFirewall:
+  enabled: true # enforces CiliumClusterwideNetworkPolicy on the nodes (resources/firewall)
 securityContext:
   capabilities:
     ciliumAgent:
