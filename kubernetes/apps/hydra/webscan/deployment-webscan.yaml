@@ -23,7 +23,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: webscan
-        image: ghcr.io/thetillhoff/webscan:5.4.41 # {"$imagepolicy": "webscan:webscan"}
+        image: ghcr.io/thetillhoff/webscan:5.4.42 # {"$imagepolicy": "webscan:webscan"}
         ports:
         - containerPort: 8080
         securityContext:
