@@ -41,9 +41,11 @@ HEAD
     | grep -v '^$' | grep -vx "$SELF" | sort | list_links
 
   echo '<h1>external</h1>'
+  hidden=$(kubectl get gateway https-gateway-thetillhoff-de -n gateways \
+    -o jsonpath='{.metadata.annotations.home-index\.internal\.thetillhoff\.de/hide}')
   kubectl get gateway https-gateway-thetillhoff-de -n gateways \
     -o jsonpath='{range .spec.listeners[*]}{.hostname}{"\n"}{end}' \
-    | grep -v '^$' | sort | list_links
+    | grep -v '^$' | grep -vxF -e "$SELF" -e "${hidden:-$SELF}" | sort | list_links
 
   echo '</main>'
 }

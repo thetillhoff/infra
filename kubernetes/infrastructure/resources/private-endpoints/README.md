@@ -9,7 +9,7 @@ Admin UIs (grafana, longhorn, hubble) and the app UIs that must not be public (t
 - external-dns (in the `cert-manager` namespace, with the `cloudflare-api-token` of that namespace) reads the address and creates the `A` record.
 - The WireGuard mesh and the tailnet ACLs are the access control. The public DNS resolves the name, but nothing routes `100.64.0.0/10`.
 - All proxies share one Caddy image automation (`imageRepository`, `imagePolicy`, `imageUpdateAutomation` in this directory).
-- `home.internal.thetillhoff.de` lists all endpoints. Its sidecar lists the Services of the namespace every 60 s and renders one link per `external-dns.kubernetes.io/hostname` annotation. A new endpoint appears with no extra step.
+- `home.internal.thetillhoff.de` lists all endpoints. Its sidecar lists the Services of the namespace every 60 s and renders one link per `external-dns.kubernetes.io/hostname` annotation. A new endpoint appears with no extra step. The external section lists the listeners of the public Gateway. To hide one, add its hostname on a new line in the Gateway annotation `home-index.internal.thetillhoff.de/hide`.
 
 To add an endpoint, copy a `certificate`, `deployment` and `service` trio, add a `caddy-config/<name>.Caddyfile`, and add a `configMapGenerator` entry in `kustomization.yaml`. Edit the files under `caddy-config/`, never a ConfigMap manifest. Caddy does not watch its Caddyfile, and the generated ConfigMap name changes with its content, so Flux rolls the Deployment.
 

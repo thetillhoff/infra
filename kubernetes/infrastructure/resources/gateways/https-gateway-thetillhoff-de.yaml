@@ -4,6 +4,9 @@ metadata:
   name: https-gateway-thetillhoff-de
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Hostnames, one per line, that the external section of home.internal.thetillhoff.de leaves out.
+    home-index.internal.thetillhoff.de/hide: |
+      analytics.thetillhoff.de
 spec:
   gatewayClassName: cilium
   listeners:
