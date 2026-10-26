@@ -20,7 +20,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: redis
-        image: redis:8.10.2-alpine # {"$imagepolicy": "webscan:redis"}
+        image: redis:8.10.3-alpine # {"$imagepolicy": "webscan:redis"}
         ports:
         - containerPort: 6379
         securityContext:
