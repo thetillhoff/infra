@@ -424,7 +424,7 @@ alerting:
           model:
             datasource: { type: prometheus, uid: prometheus }
             editorMode: code
-            expr: max by (namespace, job_name) (kube_job_status_failed{namespace="federated-cloud-platform"} > 0) unless on (namespace, job_name) (kube_job_status_succeeded{namespace="federated-cloud-platform"} > 0) and on (namespace, job_name) ((time() - max by (namespace, job_name) (kube_job_status_start_time{namespace="federated-cloud-platform"})) < 86400)
+            expr: max by (namespace, job_name) (kube_job_status_failed{namespace="federated-cloud-platform", job_name!~"spot-azure-.*"} > 0) unless on (namespace, job_name) (kube_job_status_succeeded{namespace="federated-cloud-platform"} > 0) and on (namespace, job_name) ((time() - max by (namespace, job_name) (kube_job_status_start_time{namespace="federated-cloud-platform"})) < 86400)
             instant: true
             range: false
             intervalMs: 60000
@@ -462,11 +462,9 @@ alerting:
       #
       # 900s is measured, not guessed. Over 30 days the healthy value never rose
       # above -103s for any of the eight CronJobs in the namespace, so a positive
-      # 15 minutes is already far outside normal. The one exception is the fault
-      # this rule exists for: spot-azure skips its 01:00 and 02:00 UTC slots most
-      # nights after the 00:00 run dies on Azure 429s, and the value climbs to
-      # +797s within 13 minutes and on to +5297s. That cost 17 hourly samples in
-      # the last 7 days with nothing alerting.
+      # 15 minutes is already far outside normal. A run that outlasts its own
+      # interval is the fault this rule exists for: concurrencyPolicy Forbid
+      # then skips the next slot.
       #
       # A suspended CronJob stops reporting this series rather than reporting a
       # stale one, so suspending a job silences this instead of alerting forever.
@@ -502,6 +500,50 @@ alerting:
             expression: A
             conditions:
             - evaluator: { type: gt, params: [900, 0] }
+              operator: { type: and }
+              query: { params: [] }
+              reducer: { type: last, params: [] }
+              type: query
+            intervalMs: 60000
+            maxDataPoints: 43200
+            refId: B
+      # spot-azure is throttled by Azure now and then and simply tries again the
+      # next hour, so a single failed run is no reason to alert. Only a long gap
+      # without any success is. A CronJob that never succeeded has no
+      # last_successful_time series, so the second query falls back to the
+      # creation time of the CronJob.
+      - uid: fcp-spot-azure-no-success
+        title: spot-azure has not succeeded for 6 hours
+        condition: B
+        for: 15m
+        execErrState: KeepLast
+        noDataState: OK
+        annotations:
+          summary: "CronJob spot-azure in federated-cloud-platform has had no successful run for 6 hours - check `kubectl logs -n federated-cloud-platform job/<latest spot-azure job>`"
+        data:
+        - refId: A
+          queryType: ''
+          relativeTimeRange: { from: 600, to: 0 }
+          datasourceUid: prometheus
+          model:
+            datasource: { type: prometheus, uid: prometheus }
+            editorMode: code
+            expr: max by (namespace, cronjob) (time() - kube_cronjob_status_last_successful_time{namespace="federated-cloud-platform", cronjob="spot-azure"}) or max by (namespace, cronjob) (time() - kube_cronjob_created{namespace="federated-cloud-platform", cronjob="spot-azure"})
+            instant: true
+            range: false
+            intervalMs: 60000
+            maxDataPoints: 43200
+            refId: A
+        - refId: B
+          queryType: ''
+          relativeTimeRange: { from: 0, to: 0 }
+          datasourceUid: __expr__
+          model:
+            datasource: { type: __expr__, uid: __expr__, name: Expression }
+            type: threshold
+            expression: A
+            conditions:
+            - evaluator: { type: gt, params: [21600, 0] }
               operator: { type: and }
               query: { params: [] }
               reducer: { type: last, params: [] }

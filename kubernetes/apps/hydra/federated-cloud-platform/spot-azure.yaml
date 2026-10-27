@@ -6,7 +6,7 @@ metadata:
 spec:
   # Hourly. Spot prices move constantly; this samples them for the per-instance
   # spot history page.
-  schedule: "0 * * * *"
+  schedule: "40 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 1
