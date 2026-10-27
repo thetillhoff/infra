@@ -424,7 +424,7 @@ alerting:
           model:
             datasource: { type: prometheus, uid: prometheus }
             editorMode: code
-            expr: max by (namespace, job_name) (kube_job_status_failed{namespace="federated-cloud-platform", job_name!~"spot-azure-.*"} > 0) unless on (namespace, job_name) (kube_job_status_succeeded{namespace="federated-cloud-platform"} > 0) and on (namespace, job_name) ((time() - max by (namespace, job_name) (kube_job_status_start_time{namespace="federated-cloud-platform"})) < 86400)
+            expr: max by (namespace, job_name) (kube_job_status_failed{namespace="federated-cloud-platform", job_name!~"spot-(azure|aws)-.*"} > 0) unless on (namespace, job_name) (kube_job_status_succeeded{namespace="federated-cloud-platform"} > 0) and on (namespace, job_name) ((time() - max by (namespace, job_name) (kube_job_status_start_time{namespace="federated-cloud-platform"})) < 86400)
             instant: true
             range: false
             intervalMs: 60000
@@ -507,19 +507,19 @@ alerting:
             intervalMs: 60000
             maxDataPoints: 43200
             refId: B
-      # spot-azure is throttled by Azure now and then and simply tries again the
+      # The spot jobs are throttled by their provider now and then and simply try again the
       # next hour, so a single failed run is no reason to alert. Only a long gap
       # without any success is. A CronJob that never succeeded has no
       # last_successful_time series, so the second query falls back to the
       # creation time of the CronJob.
-      - uid: fcp-spot-azure-no-success
-        title: spot-azure has not succeeded for 6 hours
+      - uid: fcp-spot-no-success
+        title: A spot CronJob has not succeeded for 6 hours
         condition: B
         for: 15m
         execErrState: KeepLast
         noDataState: OK
         annotations:
-          summary: "CronJob spot-azure in federated-cloud-platform has had no successful run for 6 hours - check `kubectl logs -n federated-cloud-platform job/<latest spot-azure job>`"
+          summary: "CronJob {{ `{{ $labels.cronjob }}` }} in federated-cloud-platform has had no successful run for 6 hours - check `kubectl logs -n federated-cloud-platform job/<latest job>`"
         data:
         - refId: A
           queryType: ''
@@ -528,7 +528,7 @@ alerting:
           model:
             datasource: { type: prometheus, uid: prometheus }
             editorMode: code
-            expr: max by (namespace, cronjob) (time() - kube_cronjob_status_last_successful_time{namespace="federated-cloud-platform", cronjob="spot-azure"}) or max by (namespace, cronjob) (time() - kube_cronjob_created{namespace="federated-cloud-platform", cronjob="spot-azure"})
+            expr: max by (namespace, cronjob) (time() - kube_cronjob_status_last_successful_time{namespace="federated-cloud-platform", cronjob=~"spot-(azure|aws)"}) or max by (namespace, cronjob) (time() - kube_cronjob_created{namespace="federated-cloud-platform", cronjob=~"spot-(azure|aws)"})
             instant: true
             range: false
             intervalMs: 60000
