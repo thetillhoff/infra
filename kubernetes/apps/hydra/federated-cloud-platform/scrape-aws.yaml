@@ -38,7 +38,7 @@ spec:
                   drop: ["ALL"]
           containers:
             - name: scrape-aws
-              image: ghcr.io/thetillhoff/federated-cloud-platform/scrape-aws:65 # {"$imagepolicy": "federated-cloud-platform:fcp-scrape-aws"}
+              image: ghcr.io/thetillhoff/federated-cloud-platform/scrape-aws:66 # {"$imagepolicy": "federated-cloud-platform:fcp-scrape-aws"}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
