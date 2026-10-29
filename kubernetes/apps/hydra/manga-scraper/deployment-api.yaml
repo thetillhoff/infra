@@ -59,7 +59,7 @@ spec:
         # Idempotent, so running it on every pod start keeps the database in step
         # with the image without a separate Job to re-run.
         - name: migrations
-          image: ghcr.io/thetillhoff/manga-scraper-migrations:86 # {"$imagepolicy": "manga-scraper:manga-scraper-migrations"}
+          image: ghcr.io/thetillhoff/manga-scraper-migrations:87 # {"$imagepolicy": "manga-scraper:manga-scraper-migrations"}
           # Root until the image makes /schema writable for a non-root user.
           securityContext:
             runAsNonRoot: false
