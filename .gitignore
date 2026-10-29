@@ -12,3 +12,6 @@ ansible/roles/stash/files/dev-data/
 secret.auto.tfvars
 kubeconfig
 talosconfig
+
+.playwright-mcp/
+docs/superpowers/
