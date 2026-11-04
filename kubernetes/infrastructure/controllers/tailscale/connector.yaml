@@ -3,7 +3,7 @@ kind: Connector
 metadata:
   name: k8s-exit-node
 spec:
-  replicas: 2
+  replicas: 3
   hostnamePrefix: k8s-exit-node
   exitNode: true
   tags:
