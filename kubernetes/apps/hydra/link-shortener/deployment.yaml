@@ -23,7 +23,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: link-shortener
-        image: caddy:2.11.7 # {"$imagepolicy": "link-shortener:link-shortener"}
+        image: caddy:2.11.8 # {"$imagepolicy": "link-shortener:link-shortener"}
         ports:
         - containerPort: 80
         securityContext:
