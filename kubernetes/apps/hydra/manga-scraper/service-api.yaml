@@ -7,5 +7,9 @@ spec:
   selector:
     app: api
   ports:
-    - port: 3001
+    # Named metrics so Prometheus finds it (monitoring/prometheus/values.yaml scrapes
+    # any port named metrics): /metrics has the preload gauges and the histograms of
+    # what browsers measured of their own loading.
+    - name: metrics
+      port: 3001
       targetPort: 3001

@@ -5,7 +5,7 @@ metadata:
   namespace: manga-scraper
 # Only the UI talks to the api. It is reachable on the pod network otherwise, and
 # POST /sources/:id/scrape is unauthenticated, so this is what keeps an unrelated
-# pod from starting crawls.
+# pod from starting crawls. Prometheus is the second caller: it reads /metrics.
 spec:
   podSelector:
     matchLabels: {app: api}
@@ -14,5 +14,14 @@ spec:
     - from:
         - podSelector:
             matchLabels: {app: ui}
+      ports:
+        - {protocol: TCP, port: 3001}
+    - from:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: monitoring}
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+              app.kubernetes.io/component: server
       ports:
         - {protocol: TCP, port: 3001}
