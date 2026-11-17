@@ -2,8 +2,6 @@ name: Validate Pulumi changes
 
 on:
   push:
-    branches:
-      - main
     paths:
       - ".github/**"
       - "pulumi/**"
@@ -11,26 +9,6 @@ on:
 
 jobs:
   preview:
-    runs-on: ubuntu-26.04
-    defaults:
-      run:
-        working-directory: pulumi
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
-        with:
-          cache: 'npm'
-          node-version-file: pulumi/.nvmrc
-          cache-dependency-path: 'pulumi/package-lock.json'
-      - run: npm ci
-
-      - run: pulumi preview
-        env:
-          PULUMI_STACK: 'infra'
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-
-  plan:
-    needs: preview
     runs-on: ubuntu-26.04
     concurrency: pulumi-state
     defaults:
@@ -45,7 +23,11 @@ jobs:
           cache-dependency-path: 'pulumi/package-lock.json'
       - run: npm ci
 
-      - run: pulumi preview
+      # The runner image has no pulumi CLI; the action installs it.
+      - uses: pulumi/actions@96c7761824268174e0d2a4e8c7d75671eebd24a7 # v7.1.0
+        with:
+          command: preview
+          stack-name: infra
+          work-dir: pulumi
         env:
-          PULUMI_STACK: 'infra'
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

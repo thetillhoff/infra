@@ -1,0 +1,41 @@
+name: Validate Kubernetes manifests
+
+# Runs on every branch without a path filter: Renovate automerges a branch only after its checks pass.
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  kubeconform:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Build every Flux Kustomization
+        run: |
+          mkdir build
+          for f in kubernetes/clusters/hydra/*.yaml; do
+            kubectl kustomize "$(awk '/^  path:/ {print $2}' "$f")" > "build/$(basename "$f")"
+          done
+
+      # Secrets hold SOPS metadata. The trading CRDs and their objects have no public schema.
+      - uses: docker://ghcr.io/yannh/kubeconform:v0.8.0
+        with:
+          args: >-
+            -strict -summary
+            -skip Secret,CustomResourceDefinition,AutoTrade,StrategyConfig
+            -schema-location default
+            -schema-location https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json
+            build
+
+  # Builds each Flux Kustomization and renders each HelmRelease with its values.
+  flux-local:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: docker://ghcr.io/allenporter/flux-local:v8.4.0
+        env:
+          HOME: /tmp
+        with:
+          args: test --enable-helm --path kubernetes/clusters/hydra
