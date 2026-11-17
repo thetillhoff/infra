@@ -4,3 +4,11 @@ args:
   # There is a better way, with using kubelet-csr-approver.
   # For now, we'll use this and mark it as TODO.
   - --kubelet-insecure-tls
+
+# Sized from the 14-day peak working set (about 50Mi), limit about 2x. No CPU limit.
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    memory: 128Mi

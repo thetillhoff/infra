@@ -18,3 +18,12 @@ alloy:
       valueFrom:
         fieldRef:
           fieldPath: spec.nodeName
+
+# Sized from the 14-day peak working set (about 15Mi), limit about 2x.
+configReloader:
+  resources:
+    requests:
+      cpu: 5m
+      memory: 16Mi
+    limits:
+      memory: 32Mi

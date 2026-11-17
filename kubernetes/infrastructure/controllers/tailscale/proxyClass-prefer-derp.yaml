@@ -6,6 +6,13 @@ spec:
   statefulSet:
     pod:
       tailscaleContainer:
+        # The operator sets only a 1Mi request. Sized from the 14-day peak, limit about 2x.
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 128Mi
         env:
           # Carry proxy traffic over DERP (HTTPS/TCP) instead of a direct
           # WireGuard path (UDP). Hole punching between a port-restricted home

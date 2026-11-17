@@ -1,0 +1,19 @@
+# Log-based alerts. The loki-sc-rules sidecar loads every ConfigMap with the label `loki_rule`.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-rules
+  labels:
+    loki_rule: ""
+data:
+  federated-cloud-platform.yaml: |
+    groups:
+      - name: federated-cloud-platform
+        rules:
+          - alert: FcpDatacenterWithoutRegionRule
+            expr: sum by (container) (count_over_time({namespace="federated-cloud-platform"} |= "datacenter without a region rule" [1h])) > 0
+            labels:
+              severity: error
+            annotations:
+              summary: "A scraper created a datacenter that no region rule covers"
+              description: "Find its name in the public-api logs (`datacenter without a region rule`), add a rule in services/backend/api/datacenter/region.go and assign the region in the admin UI."

@@ -9,6 +9,7 @@ resources:
 - helmRelease.yaml
 - connector.yaml
 - proxyClass-prefer-derp.yaml
+- proxyClass-exit-node.yaml
 
 configMapGenerator:
 - name: tailscale-helm-values

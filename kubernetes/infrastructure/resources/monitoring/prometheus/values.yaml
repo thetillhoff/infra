@@ -68,19 +68,231 @@ serverFiles:
               severity: error
             annotations:
               summary: "{{ $labels.pod }} ({{ $labels.container }}) in {{ $labels.namespace }} is crash looping"
+          - alert: PodRestartLoop
+            expr: max by (namespace, pod, container) (increase(kube_pod_container_status_restarts_total[10m])) > 3
+            for: 10m
+            labels:
+              severity: error
+            annotations:
+              summary: "{{ $labels.pod }} ({{ $labels.container }}) in {{ $labels.namespace }} restarted {{ $value | humanize }} times in 10 minutes"
+          - alert: ContainerOOMKilled
+            expr: |
+              max by (namespace, pod, container) (increase(kube_pod_container_status_restarts_total[15m])) > 0
+              and on (namespace, pod, container) max by (namespace, pod, container) (kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}) == 1
+            labels:
+              severity: warning
+            annotations:
+              summary: "{{ $labels.container }} in {{ $labels.namespace }}/{{ $labels.pod }} was OOM-killed"
+              description: "Raise its memory limit or find the leak."
+          - alert: PodPending
+            expr: max by (namespace, pod) (kube_pod_status_phase{phase="Pending"}) == 1
+            for: 5m
+            labels:
+              severity: error
+            annotations:
+              summary: "{{ $labels.pod }} in {{ $labels.namespace }} is pending for more than 5 minutes"
+      - name: nodes
+        rules:
+          - alert: NodeNotReady
+            expr: max by (node) (kube_node_status_condition{condition="Ready", status="true"}) == 0
+            for: 5m
+            labels:
+              severity: error
+            annotations:
+              summary: "Node {{ $labels.node }} is not Ready"
+          - alert: NodeHighCPU
+            expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "CPU usage on {{ $labels.instance }} is {{ $value | humanize }}%"
+          - alert: NodeHighMemory
+            expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Memory usage on {{ $labels.instance }} is {{ $value | humanize }}%"
+          - alert: NodeDiskFull
+            expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}) * 100 > 85
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Disk {{ $labels.mountpoint }} on {{ $labels.instance }} is {{ $value | humanize }}% full"
+      - name: monitoring
+        rules:
+          - alert: TargetDown
+            expr: up == 0
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Prometheus cannot scrape {{ $labels.job }} target {{ $labels.instance }}"
+      - name: storage
+        rules:
+          - alert: PersistentVolumeClaimPending
+            expr: max by (namespace, persistentvolumeclaim) (kube_persistentvolumeclaim_status_phase{phase="Pending"}) == 1
+            for: 5m
+            labels:
+              severity: error
+            annotations:
+              summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is pending for more than 5 minutes"
+          # The Prometheus PVC is excluded: `server.retentionSize` keeps it at about 90% by design.
+          - alert: PersistentVolumeFull
+            expr: max by (namespace, persistentvolumeclaim) (kubelet_volume_stats_used_bytes{persistentvolumeclaim!="prometheus-server"} / kubelet_volume_stats_capacity_bytes) * 100 > 85
+            for: 15m
+            labels:
+              severity: warning
+            annotations:
+              summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is {{ $value | humanize }}% full"
+          # The StorageClass retains PVs, so a deleted PVC leaves a Released PV and its Longhorn volume.
+          - alert: PersistentVolumeReleased
+            expr: max by (persistentvolume) (kube_persistentvolume_status_phase{phase="Released"}) == 1
+            for: 1h
+            labels:
+              severity: warning
+            annotations:
+              summary: "PV {{ $labels.persistentvolume }} is Released: delete it and its Longhorn volume, or reuse it"
+          # longhorn_volume_robustness: 1 healthy, 2 degraded, 3 faulted.
+          - alert: LonghornVolumeNotHealthy
+            expr: max by (volume, pvc_namespace, pvc) (longhorn_volume_robustness) > 1
+            for: 15m
+            labels:
+              severity: error
+            annotations:
+              summary: "Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) is degraded or faulted"
+          # longhorn_backup_state 4 = Error.
+          - alert: LonghornBackupFailed
+            expr: max by (volume, backup) (longhorn_backup_state) == 4
+            labels:
+              severity: error
+            annotations:
+              summary: "Longhorn backup {{ $labels.backup }} of volume {{ $labels.volume }} failed"
+          # The RecurringJob `daily` backs up every volume at 05:00.
+          - alert: LonghornBackupMissing
+            expr: max by (volume, pvc_namespace, pvc) (time() - longhorn_volume_last_backup_at) > 36 * 3600
+            for: 1h
+            labels:
+              severity: error
+            annotations:
+              summary: "Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) has no backup for more than 36 hours"
+          - alert: LonghornBackupTargetUnavailable
+            expr: max by (backup_target) (longhorn_backup_target_status) == 0
+            for: 30m
+            labels:
+              severity: error
+            annotations:
+              summary: "The Longhorn backup target {{ $labels.backup_target }} is not available"
+      - name: certificates
+        rules:
+          # cert-manager renews at 2/3 of the lifetime (30 days before expiry for Let's Encrypt).
+          - alert: CertificateExpiringSoon
+            expr: max by (namespace, name) (certmanager_certificate_expiration_timestamp_seconds - time()) < 14 * 86400
+            for: 1h
+            labels:
+              severity: error
+            annotations:
+              summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} expires in {{ $value | humanizeDuration }}"
+          - alert: CertificateNotReady
+            expr: max by (namespace, name) (certmanager_certificate_ready_status{condition!="True"}) == 1
+            for: 1h
+            labels:
+              severity: error
+            annotations:
+              summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} is not Ready"
+      - name: network
+        rules:
+          # Policy denies are expected (default-deny namespaces, node firewall); other drop reasons point to a fault.
+          - alert: CiliumHighDropRate
+            expr: sum by (reason) (rate(cilium_drop_count_total{reason!~"Policy denied|Unsupported L3 protocol"}[10m])) > 1
+            for: 15m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Cilium drops {{ $value | humanize }} packets/s with reason '{{ $labels.reason }}'"
+      - name: federated-cloud-platform
+        rules:
+          # The spot jobs have their own rule below.
+          - alert: FcpJobFailed
+            expr: |
+              max by (namespace, job_name) (kube_job_status_failed{namespace="federated-cloud-platform", job_name!~"spot-(azure|aws)-.*"} > 0)
+              unless on (namespace, job_name) (kube_job_status_succeeded{namespace="federated-cloud-platform"} > 0)
+              and on (namespace, job_name) ((time() - max by (namespace, job_name) (kube_job_status_start_time{namespace="federated-cloud-platform"})) < 86400)
+            for: 15m
+            labels:
+              severity: error
+            annotations:
+              summary: "Job {{ $labels.job_name }} in federated-cloud-platform failed and did not succeed"
+              description: "Run `kubectl logs -n federated-cloud-platform job/{{ $labels.job_name }}`."
+          # concurrencyPolicy Forbid skips a run while the previous Job still runs, so a hung Job stops the schedule.
+          - alert: FcpCronJobMissedSchedule
+            expr: max by (namespace, cronjob) (time() - kube_cronjob_next_schedule_time{namespace="federated-cloud-platform"}) > 900
+            for: 15m
+            labels:
+              severity: error
+            annotations:
+              summary: "CronJob {{ $labels.cronjob }} in federated-cloud-platform missed its schedule"
+              description: "Run `kubectl describe cronjob -n federated-cloud-platform {{ $labels.cronjob }}`."
+          - alert: FcpSpotCronJobNoSuccess
+            expr: |
+              (
+                max by (namespace, cronjob) (time() - kube_cronjob_status_last_successful_time{namespace="federated-cloud-platform", cronjob=~"spot-(azure|aws)"})
+                or max by (namespace, cronjob) (time() - kube_cronjob_created{namespace="federated-cloud-platform", cronjob=~"spot-(azure|aws)"})
+              ) > 21600
+            for: 15m
+            labels:
+              severity: error
+            annotations:
+              summary: "CronJob {{ $labels.cronjob }} in federated-cloud-platform has no successful run for 6 hours"
 
 configmapReload:
   prometheus:
     containerSecurityContext: *containerSecurityContext
+    resources:
+      requests:
+        cpu: 5m
+        memory: 16Mi
+      limits:
+        memory: 32Mi
+
+# Subchart resources below: sized from the 14-day peak working set, limit about 2x. No CPU limit.
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
 
 prometheus-node-exporter:
   extraArgs:
     - --no-collector.kernel_hung
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 64Mi
 
 # Receives the alerts of the Prometheus rules above. It mails through the SMTP
 # account of Grafana, so the password is mounted from the grafana-smtp secret.
 alertmanager:
   enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 64Mi
+  configmapReload:
+    resources:
+      requests:
+        cpu: 5m
+        memory: 32Mi
+      limits:
+        memory: 64Mi
   persistence:
     enabled: false
   extraSecretMounts:
