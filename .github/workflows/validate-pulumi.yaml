@@ -21,7 +21,8 @@ jobs:
           cache: 'npm'
           node-version-file: pulumi/.nvmrc
           cache-dependency-path: 'pulumi/package-lock.json'
-      - run: npm ci
+      # No install scripts: the pulumi CLI downloads the provider plugins on its own.
+      - run: npm ci --ignore-scripts
 
       # The runner image has no pulumi CLI; the action installs it.
       - uses: pulumi/actions@96c7761824268174e0d2a4e8c7d75671eebd24a7 # v7.1.0
