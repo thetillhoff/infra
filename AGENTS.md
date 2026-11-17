@@ -67,7 +67,13 @@ sops decrypt -i <file>        # decrypt in-place
 export SOPS_AGE_KEY_FILE=$(pwd)/age.key  # or use task configure-env
 ```
 
-Secret files matching `*secret*` or containing `data`/`stringData` keys are auto-encrypted per `.sops.yaml`.
+`sops encrypt` encrypts the `data`/`stringData` values of a YAML Secret, and a non-YAML file whole (`.sops.yaml`).
+
+### CI
+
+Every push runs `.github/workflows/validate-kubernetes.yaml`: strict `kubeconform` on each built Flux Kustomization, and `flux-local test`, which also renders each HelmRelease. To run it locally, use the flux-local image of the workflow with `docker run --rm -e HOME=/tmp -v "$PWD:/repo:z" -w /repo <image> test --enable-helm --path kubernetes/clusters/hydra` (helm needs a writable HOME).
+
+Renovate automerges only after these checks pass, and never a version in `pulumi/index.ts` (`UPGRADE-K8S-AND-OTHERS.md`).
 
 ## Architecture
 
@@ -105,7 +111,7 @@ kubernetes/
     controllers/           # HelmReleases: cert-manager, external-dns, longhorn, tailscale operator (kubelet-csr-approver exists but is disabled in `controllers/kustomization.yaml`)
     resources/             # Cluster resources: cert-manager issuers, gateways, firewall policies, monitoring, private-endpoints
   apps/
-    hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, tailscale, trading, federated-cloud-platform, manga-scraper
+    hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, trading, federated-cloud-platform, manga-scraper, webscan, wedding-website
 ```
 
 `kubernetes/apps/hydra/trading/` is the **source of truth for the trading app on hydra** (Flux `app-trading`). The `~/code/trading` repo's `k8s/`/`services/` manifests are **local-dev (kind) only** and intentionally diverge — never edit them expecting a hydra change.
@@ -136,7 +142,7 @@ Longhorn for persistent volumes in Kubernetes. Its StorageClass is the default a
 
 ### Versions
 
-Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator, flux) are centralized in `pulumi/index.ts`.
+Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator) are centralized in `pulumi/index.ts`. Flux itself follows `2.x` (`pulumi/hcloud-talos-cluster-component/fluxInstance.yaml`): the flux-operator updates it.
 Talos version lives in `packer/common.pkrvars.hcl` + the nodegroup name (`hcloud-talos-vX-Y-Z-controlplane`).
 
 **Only ever upgrade to GA versions** — no alpha/beta/rc. Check each project's releases page for the latest

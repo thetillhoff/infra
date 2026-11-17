@@ -7,7 +7,7 @@ server:
   resources:
     requests:
       cpu: 100m
-      memory: 1Gi
+      memory: 1792Mi # the 14-day peak working set is about 1666Mi
     limits:
       memory: 3Gi
   global:
