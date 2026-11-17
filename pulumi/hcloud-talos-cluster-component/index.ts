@@ -13,7 +13,6 @@ export interface HcloudTalosClusterArgs {
   ciliumVersion: pulumi.Input<string>;
   gatewayApiCrdsVersion: pulumi.Input<string>;
   fluxOperatorVersion: pulumi.Input<string>;
-  fluxVersion: pulumi.Input<string>;
   fluxInstanceYaml: pulumi.Input<string>;
   gitUsername: pulumi.Input<string>;
 }

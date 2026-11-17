@@ -1,6 +1,8 @@
 import { machine } from "@pulumiverse/talos";
 import * as tailscale from "@pulumi/tailscale";
 import * as cloudflare from "@pulumi/cloudflare";
+import * as hcloud from "@pulumi/hcloud";
+import * as pulumi from "@pulumi/pulumi";
 import { readFileSync } from "fs";
 import { join } from "path";
 
@@ -20,7 +22,6 @@ const versions = {
   cilium: "1.20.4", // From https://github.com/cilium/cilium/releases
   gatewayApiCrds: "v1.7.0", // From https://github.com/kubernetes-sigs/gateway-api/releases
   fluxOperator: "0.62.1", // From https://github.com/controlplaneio-fluxcd/flux-operator/releases
-  flux: "v2.10.0", // From https://github.com/fluxcd/flux2/releases
 };
 const clusterDnsNames = [
   `${domain}`,
@@ -155,6 +156,41 @@ const nodegroups = new HcloudTalosNodegroups(
   {},
 );
 
+// Outer layer to the Cilium host firewall (kubernetes/infrastructure/resources/firewall), which
+// filters only IPv4: etcd, the kubelet and trustd also listen on the public IPv6 address.
+const world = ["0.0.0.0/0", "::/0"];
+const nodes = Object.values(nodegroups.nodegroups).flatMap(
+  (nodegroup) => nodegroup.nodes,
+);
+// A node can send IPv6 from any address of its /64, not only from ::1.
+const nodeIps = pulumi
+  .all([
+    nodegroups.ipv4Addresses,
+    pulumi.all(nodes.map((node) => node.ipv6Network)),
+  ])
+  .apply(([ipv4, ipv6Networks]) => [
+    ...ipv4.map((ip) => `${ip}/32`),
+    ...ipv6Networks,
+  ]);
+const nodesFirewall = new hcloud.Firewall("nodes", {
+  name: `${k8sClusterName}-nodes`,
+  rules: [
+    ...["80", "443", "6443", "50000"].map((port) => ({
+      direction: "in",
+      protocol: "tcp",
+      port,
+      sourceIps: world,
+    })),
+    { direction: "in", protocol: "icmp", sourceIps: world },
+    { direction: "in", protocol: "tcp", port: "any", sourceIps: nodeIps },
+    { direction: "in", protocol: "udp", port: "any", sourceIps: nodeIps },
+  ],
+});
+new hcloud.FirewallAttachment("nodes", {
+  firewallId: nodesFirewall.id.apply(Number),
+  serverIds: nodes.map((node) => node.id.apply(Number)),
+});
+
 const primaryControlplaneNodegroupName = "hcloud-talos-v1-13-8-controlplane";
 
 const hcloudTalosCluster = new HcloudTalosCluster(
@@ -167,7 +203,6 @@ const hcloudTalosCluster = new HcloudTalosCluster(
     ciliumVersion: versions.cilium,
     gatewayApiCrdsVersion: versions.gatewayApiCrds,
     fluxOperatorVersion: versions.fluxOperator,
-    fluxVersion: versions.flux,
     fluxInstanceYaml: readFileSync(
       join(__dirname, "hcloud-talos-cluster-component", "fluxInstance.yaml"),
       "utf8",

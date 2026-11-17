@@ -8,7 +8,8 @@ metadata:
     fluxcd.controlplane.io/reconcileEvery: "10min"
 spec:
   distribution:
-    version: "2.10.0" # TODO: add update mechanism
+    # The flux-operator updates Flux to each new 2.x release; a new major stays a manual change.
+    version: "2.x"
     registry: "ghcr.io/fluxcd"
     artifact: "oci://ghcr.io/controlplaneio-fluxcd/flux-operator-manifests"
   cluster:
