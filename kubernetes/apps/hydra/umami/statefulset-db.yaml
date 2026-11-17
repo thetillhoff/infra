@@ -36,6 +36,10 @@ spec:
           failureThreshold: 6
           exec:
             command: ["pg_isready"]
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["pg_isready"]
 
         env:
         - name: POSTGRES_PASSWORD

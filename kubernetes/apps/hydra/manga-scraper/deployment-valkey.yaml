@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: valkey
-          image: valkey/valkey:8-alpine
+          image: valkey/valkey:8.1.11-alpine # {"$imagepolicy": "manga-scraper:valkey"}
           # Cache only, and it must stay that way: no RDB, no AOF, a hard memory
           # ceiling and LRU eviction. It cannot outgrow the cap, cannot survive a
           # restart, and needs no sweeper to stay bounded.

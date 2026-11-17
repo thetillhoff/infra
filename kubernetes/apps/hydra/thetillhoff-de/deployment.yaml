@@ -62,6 +62,10 @@ spec:
           httpGet:
             port: 8080
           initialDelaySeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8080
+          periodSeconds: 5
         volumeMounts:
         # Caddy writes its autosave config and state here.
         - name: caddy-data

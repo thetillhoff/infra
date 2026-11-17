@@ -26,7 +26,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: gateway
-          image: ghcr.io/gnzsnz/ib-gateway:stable
+          image: ghcr.io/gnzsnz/ib-gateway:10.45.1j
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

@@ -1,0 +1,15 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: valkey
+  namespace: manga-scraper
+spec:
+  imageRepositoryRef:
+    name: valkey
+  filterTags:
+    pattern: '^(?P<version>[0-9]+\.[0-9]+\.[0-9]+)-alpine$'
+    extract: '$version'
+  # A new major is a manual decision.
+  policy:
+    semver:
+      range: '>=8.0.0 <9.0.0'

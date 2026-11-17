@@ -45,6 +45,12 @@ spec:
               value: http://scraper-api.federated-cloud-platform.svc.cluster.local:9090
           ports:
             - containerPort: 9091
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9091
+            initialDelaySeconds: 10
+            periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /health

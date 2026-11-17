@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: valkey
+  namespace: manga-scraper
+spec:
+  image: valkey/valkey
+  interval: 5m0s
