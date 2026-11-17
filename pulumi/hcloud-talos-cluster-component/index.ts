@@ -90,7 +90,7 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
     const gatewayApiCrds = new kubernetes.yaml.v2.ConfigFile(
       "gatewayApiCrds",
       {
-        file: `https://github.com/kubernetes-sigs/gateway-api/releases/download/${props.gatewayApiCrdsVersion}/experimental-install.yaml`,
+        file: `https://github.com/kubernetes-sigs/gateway-api/releases/download/${props.gatewayApiCrdsVersion}/standard-install.yaml`,
       },
       {
         parent: this,

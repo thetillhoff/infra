@@ -7,6 +7,11 @@
 ipam:
   mode: kubernetes
 kubeProxyReplacement: true
+# eBPF instead of iptables for the masquerade. BPF host routing conflicts with KubeSpan, so
+# routing stays legacy. Needs `forwardKubeDNSToHost: false` in the Talos patch, else CoreDNS breaks.
+bpf:
+  masquerade: true
+  hostLegacyRouting: true
 hostFirewall:
   enabled: true # enforces CiliumClusterwideNetworkPolicy on the nodes (resources/firewall)
 securityContext:
@@ -168,6 +173,10 @@ hubble:
 # More info at https://docs.cilium.io/en/stable/network/kubernetes/bandwidth-manager/
 bandwidthManager:
   enabled: true
+  # BBR for pods needs BPF host routing (see `bpf.hostLegacyRouting`). The host namespace
+  # holds the internet-facing Envoy gateway, so it gets BBR.
+  bbr: true
+  bbrHostNamespaceOnly: true
 
 # Enable cilium metrics
 prometheus:

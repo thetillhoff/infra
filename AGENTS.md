@@ -154,6 +154,6 @@ Default kubeconfig context may be a local kind cluster, not hydra. Always run `e
 
 Recover an unresponsive Talos node with a Hetzner hard reset (console or `hcloud server reset`). If `apid` is dead, `talosctl reboot` cannot reach it.
 
-### Cilium Gateway API: PROGRAMMED False is normal
+### Cilium Gateway API: the Gateway address is one node only
 
-Gateways always show `PROGRAMMED: False / AddressNotAssigned`. Cilium runs in host-network mode (`pulumi/cilium-values.yaml`): the Envoy daemonset binds to the node IPs, and no LoadBalancer IP is written to `.status.addresses`. Check health with the Envoy pods and a real HTTP response, not the gateway status.
+Cilium runs in host-network mode (`pulumi/cilium-values.yaml`): the Envoy daemonset binds to the IPs of all nodes, and DNS points to all of them. The Gateway status shows only one node IP. Check health with the Envoy pods and a real HTTP response, not the gateway status.

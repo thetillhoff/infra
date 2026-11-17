@@ -1,15 +1,26 @@
 # TODO
 
-- Upgrade Talos v1.13.8 -> v1.14.2 by blue/green nodegroup swap (`UPGRADE-TALOS.md`), then Kubernetes v1.36.5 -> v1.37.1. The Packer image exists (snapshot `talos-v1.14.2-amd64`, ID 443210363). Postponed: Hetzner had no cx43 servers available on 2026-10-14. Retry later; the plan is a new nodegroup `hcloud-talos-v1-14-2-controlplane` with that image ID and a copy of the v1.13.8 patch.
+- Upgrade Talos v1.13.8 -> v1.14.2 by blue/green nodegroup swap (`UPGRADE-TALOS.md`), then Kubernetes v1.36.5 -> v1.37.1. The Packer image exists (snapshot `talos-v1.14.2-amd64`, ID 443210363). Postponed: Hetzner had no cx43 servers available on 2026-10-14. Retry later; the plan is a new nodegroup `hcloud-talos-v1-14-2-controlplane` with that image ID and a copy of the v1.13.8 patch. Add these to the new nodegroup only, because each one needs a stop or a rebuild of a live server:
+  - An `hcloud.PlacementGroup` of type `spread` per nodegroup, so that the three etcd members never share a physical host.
+  - An `hcloud.Firewall` with the same open ports as `kubernetes/infrastructure/resources/firewall/ciliumClusterwideNetworkPolicy.yaml`, as an outer layer for the time when Cilium is down. Allow the KubeSpan (51820/udp) and Cilium ports between the node IPs.
+  - An `hcloud.Network` with one subnet, attached to each server. Set `machine.kubelet.nodeIP.validSubnets` and `cluster.etcd.advertisedSubnets` to that subnet: the nodes then show the private IP as `InternalIP` and the public IP as `ExternalIP`. Mixed old and new members during the swap are fine, because the old members still advertise public IPs that the new ones reach.
 - Hold TypeScript 7: `@pulumi/pulumi` rejects it in its peer range. Retry when the SDK allows it.
 - Hold `@types/node` at 24 until Node 26 is LTS.
 - Delete the unwired directory `kubernetes/apps/hydra/tailscale`. No Kustomization in `clusters/hydra/` references it, and its image tags are stale.
 - Pick a dashboard to replace the removed `kubernetes-cluster` entry (gnetId 15520 has only revision 1, an unreviewed third-party template).
 - Enable the Longhorn NetworkPolicies again (`networkPolicies.restrictInternalTraffic: true`) with `networkPolicies.metricsScrapeSources` set so Prometheus can still scrape.
-- Set `upgrade.crds: CreateReplace` on the tailscale HelmRelease. Helm does not update CRDs from a chart's `crds/` directory on upgrade, so the existing CRDs keep their old schema.
+- Run `task deploy` for the Pulumi changes that are in the repo but not live: Cilium 1.20.4 with `bpf.masquerade` and host-namespace BBR, Gateway API CRDs v1.7.0 from the standard channel, flux-operator 0.62.1, and `forwardKubeDNSToHost: false` in the Talos patch. Plan a short window:
+  - The Helm upgrade does not restart the Cilium agents. Run `kubectl -n kube-system rollout restart ds/cilium` after it. Connections that iptables translated can drop once.
+  - Check DNS from a pod and an app URL after the restart.
+  - Cilium 1.20 documents Gateway API v1.6.3. Check its release notes for v1.7.0 first, or set `gatewayApiCrds` to `v1.6.3`.
+- Bump ib-gateway from `10.45.1j` to the current `stable` line (`10.50.1g`, see "Supported Tags" in the README of `gnzsnz/ib-gateway-docker`) outside market hours. The restart ends the IBKR session. The pin from `stable` to `10.45.1j` (same digest) also restarts the pod once: push it outside market hours too.
 - Decide on the PostgreSQL majors: trading runs 16, manga and umami 17, federated-cloud-platform 18. Each major needs a dump and restore.
-- Add a Grafana check that an alert mail arrives. The contact point exists, but no upgrade step sends a test message.
-- Pin valkey in manga-scraper: `valkey/valkey:8-alpine` floats. 8.1.10 is the newest 8 tag. Version 9.1.2 is a major bump.
+- Send a test alert through the Alertmanager after the move of all alert rules from Grafana to Prometheus and the Loki ruler (procedure: `kubernetes/infrastructure/resources/monitoring/README.md`). Check in `/api/v1/rules` of Loki that the ruler loaded `FcpDatacenterWithoutRegionRule`.
+- Split `infrastructure-controllers` into one Kustomization per controller. Step 1 is in the repo: a temporary `kustomize.toolkit.fluxcd.io/prune: disabled` annotation on every object in `kubernetes/infrastructure/controllers/`. After Flux applies it (check one object, for example `kubectl get ns longhorn -o jsonpath='{.metadata.annotations}'`):
+  - Add `controller-cert-manager`, `controller-external-dns`, `controller-longhorn` and `controller-tailscale` to `kubernetes/clusters/hydra/`, and delete `infrastructure.yaml` and `controllers/kustomization.yaml` in the same commit.
+  - Set `dependsOn` only where an apply needs it: `resource-cert-manager` and `resource-private-endpoints` on `controller-cert-manager`; `resource-monitoring` and the apps with a PVC on `controller-longhorn`. A broader `dependsOn` blocks every dependent Kustomization when the dependency fails.
+  - Update `AGENTS.md` (sync order) and `UPGRADE-*.md` references.
+  - After the new Kustomizations are Ready and own the objects, remove the annotation.
 - Upgrade umami from v2.20.2 to v3. Check the v3 image tag format first: the Flux image policy only matches `postgresql-v*`. Take a Longhorn backup of the umami volume before the schema migration.
 - Run the umami app (`nextjs` user in the image) as non-root. Check vaultwarden, link-shortener (caddy, port 80) and ib-gateway for non-root as well. Add `runAsNonRoot` to the federated-cloud-platform redis.
 - Hardening H1 (option): Restrict 6443 and 50000 to an admin IP in `kubernetes/infrastructure/resources/firewall/ciliumClusterwideNetworkPolicy.yaml`. Both ports are open to the internet behind client certificates, and the policy blocks everything else. Only do it with a fixed admin address: a changed home IP locks out `kubectl` and `talosctl` (recovery: Hetzner console).

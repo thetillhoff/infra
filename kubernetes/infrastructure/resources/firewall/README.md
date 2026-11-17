@@ -1,6 +1,6 @@
 # Firewall
 
-`hostFirewall.enabled` (`pulumi/cilium-values.yaml`) lets Cilium enforce `ciliumClusterwideNetworkPolicy.yaml` on the nodes. The policy opens only 80/tcp, 443/tcp and udp, 6443 (Kubernetes API) and 50000 (Talos API) to the internet. Client certificates protect the two API ports. etcd, the kubelet, Talos trustd (50001) and the Cilium ports are for the cluster only. ICMP from the internet is dropped too.
+`hostFirewall.enabled` (`pulumi/cilium-values.yaml`) lets Cilium enforce `ciliumClusterwideNetworkPolicy.yaml` on the nodes. The policy opens only 80/tcp, 443/tcp, 6443 (Kubernetes API) and 50000 (Talos API) to the internet. Client certificates protect the two API ports. etcd, the kubelet, Talos trustd (50001) and the Cilium ports are for the cluster only. ICMP from the internet is dropped too.
 
 The policy has no egress rule on purpose: it would add risk and no protection. Pod to pod traffic is not covered here: see the `default-deny-ingress` policies of the namespaces.
 
