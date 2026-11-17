@@ -11,6 +11,16 @@ spec:
         kind: HelmRepository
         name: metrics-server
   interval: 10m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
 
   valuesFrom:
     - kind: ConfigMap # This value is case sensitive

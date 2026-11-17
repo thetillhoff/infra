@@ -1,5 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+# Temporary: keeps Flux from pruning the controllers while they move to one Kustomization each.
+commonAnnotations:
+  kustomize.toolkit.fluxcd.io/prune: disabled
 resources:
 # Gateway API CRDs are installed via pulumi
 # - kubelet-csr-approver # TODO see pulumi/hcloud-talos-nodegroup-component/configPatches/talos-*-controlplane-patch.yaml for more info
