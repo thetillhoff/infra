@@ -4,6 +4,8 @@ metadata:
   name: app-wedding-website
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: controller-longhorn
   interval: 10m0s
   path: ./kubernetes/apps/hydra/wedding-website
   prune: true

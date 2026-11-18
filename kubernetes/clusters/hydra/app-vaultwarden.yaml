@@ -4,6 +4,8 @@ metadata:
   name: app-vaultwarden
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: controller-longhorn
   interval: 10m0s
   path: ./kubernetes/apps/hydra/vaultwarden
   prune: true

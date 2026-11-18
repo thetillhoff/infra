@@ -4,8 +4,6 @@ metadata:
   name: resource-firewall
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: infrastructure-controllers
   interval: 10m0s
   path: ./kubernetes/infrastructure/resources/firewall
   prune: true

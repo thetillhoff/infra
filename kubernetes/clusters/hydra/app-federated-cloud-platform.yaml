@@ -4,6 +4,8 @@ metadata:
   name: app-federated-cloud-platform
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: controller-longhorn
   interval: 10m0s
   path: ./kubernetes/apps/hydra/federated-cloud-platform
   prune: true

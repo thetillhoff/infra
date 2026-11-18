@@ -4,6 +4,8 @@ metadata:
   name: app-trading
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: controller-longhorn
   interval: 10m0s
   path: ./kubernetes/apps/hydra/trading
   prune: true
