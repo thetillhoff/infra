@@ -163,21 +163,15 @@ serverFiles:
               severity: error
             annotations:
               summary: "Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) is degraded or faulted"
-          # longhorn_backup_state 4 = Error.
-          - alert: LonghornBackupFailed
-            expr: max by (volume, backup) (longhorn_backup_state) == 4
-            labels:
-              severity: error
-            annotations:
-              summary: "Longhorn backup {{ $labels.backup }} of volume {{ $labels.volume }} failed"
-          # The RecurringJob `daily` backs up every volume at 05:00.
+          # The RecurringJob `daily` backs up every volume at 05:40, so a volume past 26 hours missed
+          # a run. A rule on failed Backup objects would keep firing after a later backup succeeds.
           - alert: LonghornBackupMissing
-            expr: max by (volume, pvc_namespace, pvc) (time() - longhorn_volume_last_backup_at) > 36 * 3600
+            expr: max by (volume, pvc_namespace, pvc) (time() - longhorn_volume_last_backup_at) > 26 * 3600
             for: 1h
             labels:
               severity: error
             annotations:
-              summary: "Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) has no backup for more than 36 hours"
+              summary: "Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) has no backup for more than 26 hours"
           - alert: LonghornBackupTargetUnavailable
             expr: max by (backup_target) (longhorn_backup_target_status{condition="unavailable"}) == 1
             for: 30m
