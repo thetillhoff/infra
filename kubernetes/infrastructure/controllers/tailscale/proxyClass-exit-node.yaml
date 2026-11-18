@@ -7,6 +7,15 @@ metadata:
 spec:
   statefulSet:
     pod:
+      # One exit node per cluster node, so that a node loss leaves the others.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              tailscale.com/parent-resource: k8s-exit-node
+              tailscale.com/parent-resource-type: connector
       tailscaleContainer:
         resources:
           requests:

@@ -1,5 +1,7 @@
 name: Validate Pulumi changes
 
+# A type check only, with no Pulumi token: a preview reads the stack state (Talos secrets,
+# kubeconfig), and it would run the code of every npm package that Renovate bumps.
 on:
   push:
     paths:
@@ -8,9 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  preview:
+  typecheck:
     runs-on: ubuntu-26.04
-    concurrency: pulumi-state
     defaults:
       run:
         working-directory: pulumi
@@ -21,14 +22,5 @@ jobs:
           cache: 'npm'
           node-version-file: pulumi/.nvmrc
           cache-dependency-path: 'pulumi/package-lock.json'
-      # No install scripts: the pulumi CLI downloads the provider plugins on its own.
       - run: npm ci --ignore-scripts
-
-      # The runner image has no pulumi CLI; the action installs it.
-      - uses: pulumi/actions@96c7761824268174e0d2a4e8c7d75671eebd24a7 # v7.1.0
-        with:
-          command: preview
-          stack-name: infra
-          work-dir: pulumi
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      - run: npx tsc --noEmit

@@ -73,6 +73,8 @@ export SOPS_AGE_KEY_FILE=$(pwd)/age.key  # or use task configure-env
 
 Every push runs `.github/workflows/validate-kubernetes.yaml`: strict `kubeconform` on each built Flux Kustomization, and `flux-local test`, which also renders each HelmRelease. To run it locally, use the flux-local image of the workflow with `docker run --rm -e HOME=/tmp -v "$PWD:/repo:z" -w /repo <image> test --enable-helm --path kubernetes/clusters/hydra` (helm needs a writable HOME).
 
+A push that changes `pulumi/` also runs `validate-pulumi.yaml`: a type check with `tsc --noEmit`, with no Pulumi token, so it cannot read the stack state. Run `task preview` locally for a real preview.
+
 Renovate automerges only after these checks pass, and never a version in `pulumi/index.ts` (`UPGRADE-K8S-AND-OTHERS.md`).
 
 ## Architecture
