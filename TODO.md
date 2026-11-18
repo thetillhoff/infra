@@ -10,7 +10,6 @@
 - Pick a dashboard to replace the removed `kubernetes-cluster` entry (gnetId 15520 has only revision 1, an unreviewed third-party template).
 - Enable the Longhorn NetworkPolicies again (`networkPolicies.restrictInternalTraffic: true`) with `networkPolicies.metricsScrapeSources` set so Prometheus can still scrape.
 - Bump ib-gateway from `10.45.1j` to the current `stable` line (`10.50.1g`, see "Supported Tags" in the README of `gnzsnz/ib-gateway-docker`) outside market hours. The restart ends the IBKR session. The pin from `stable` to `10.45.1j` (same digest) also restarts the pod once: push it outside market hours too.
-- Delete the CRD `xlistenersets.gateway.networking.x-k8s.io`: an older Gateway API bundle left it, Pulumi does not manage it, and no objects of it exist (`kubectl delete crd xlistenersets.gateway.networking.x-k8s.io`).
 - Test the restore runbook of `kubernetes/infrastructure/controllers/longhorn/README.md` once, for example with one system backup on a throwaway cluster. It is not tested.
 - Decide on the PostgreSQL majors: trading runs 16, manga and umami 17, federated-cloud-platform 18. Each major needs a dump and restore.
 - Send a test alert through the Alertmanager after the move of all alert rules from Grafana to Prometheus and the Loki ruler (procedure: `kubernetes/infrastructure/resources/monitoring/README.md`). Check in `/api/v1/rules` of Loki that the ruler loaded `FcpDatacenterWithoutRegionRule`.
