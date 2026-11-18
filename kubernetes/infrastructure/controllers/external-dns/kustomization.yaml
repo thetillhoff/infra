@@ -1,8 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-# Temporary: keeps Flux from pruning these objects while they move from infrastructure-controllers.
-commonAnnotations:
-  kustomize.toolkit.fluxcd.io/prune: disabled
 # Deployed into the cert-manager namespace so it can read the existing
 # cloudflare-api-token secret directly (reuses cert-manager's Cloudflare token).
 namespace: cert-manager
