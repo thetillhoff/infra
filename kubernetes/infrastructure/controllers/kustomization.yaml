@@ -5,7 +5,7 @@ commonAnnotations:
   kustomize.toolkit.fluxcd.io/prune: disabled
 resources:
 # Gateway API CRDs are installed via pulumi
-# - kubelet-csr-approver # TODO see pulumi/hcloud-talos-nodegroup-component/configPatches/talos-*-controlplane-patch.yaml for more info
+- kubelet-csr-approver
 - cert-manager
 - external-dns
 - longhorn
