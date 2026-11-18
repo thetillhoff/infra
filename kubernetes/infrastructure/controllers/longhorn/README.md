@@ -6,7 +6,7 @@ Both jobs write to the backup target `s3://hydra-k8s-backup@backblaze/` and keep
 
 | Job | Time (UTC) | Content |
 | --- | --- | --- |
-| `daily` (`recurringJob-daily.yaml`) | 05:00 | One backup of each volume in the group `default`: the data. |
+| `daily` (`recurringJob-daily.yaml`) | 05:40 | One backup of each volume in the group `default`: the data. |
 | `system-backup` (`recurringJob-system-backup.yaml`) | 06:40 | The Longhorn settings and objects, and the PVs, PVCs and StorageClasses that tie the newest volume backups to their apps. |
 
 A volume backup alone restores the data, but you must create the PV and PVC for it by hand. A system backup restores the volumes together with their PVs and PVCs, so that each app finds its data under the old PVC name. The system backup does not copy the data again: it points to the newest volume backup of each volume.

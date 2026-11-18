@@ -5,3 +5,5 @@
 providerRegex: '^hcloud-talos-[a-z0-9-]+$'
 # The node names are not in DNS.
 bypassDnsResolution: true
+# 30 days instead of the hard maximum of 367. The kubelet renews before expiry.
+maxExpirationSeconds: "2592000"
