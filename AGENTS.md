@@ -108,8 +108,8 @@ block unrelated deploys. Names match the entrypoint filenames in `kubernetes/clu
 kubernetes/
   clusters/hydra/          # FluxCD Kustomization entrypoints
   infrastructure/
-    controllers/           # HelmReleases: cert-manager, external-dns, longhorn, tailscale operator (kubelet-csr-approver exists but is disabled in `controllers/kustomization.yaml`)
-    resources/             # Cluster resources: cert-manager issuers, gateways, firewall policies, monitoring, private-endpoints
+    controllers/           # HelmReleases: cert-manager, external-dns, kubelet-csr-approver, longhorn, tailscale operator
+    resources/             # Cluster resources: admission policies, cert-manager issuers, gateways, firewall policies, monitoring, private-endpoints
   apps/
     hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, trading, federated-cloud-platform, manga-scraper, webscan, wedding-website
 ```
@@ -128,7 +128,11 @@ Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}
 
 The Cilium Gateway reaches a backend as the entity `ingress`, which a `NetworkPolicy` cannot select. Allow it with a `CiliumNetworkPolicy` and `fromEntities: [ingress]` (example: `apps/hydra/vaultwarden/ciliumNetworkPolicy-vaultwarden-from-gateway.yaml`). To test a block, run `curl --max-time 5` from a pod of another namespace that has curl (a caddy pod in `private-endpoints`): a blocked call times out with exit 28.
 
-The node firewall is live: `kubernetes/infrastructure/resources/firewall/README.md` lists the open ports and how to change the policy safely.
+The node firewall is live: `kubernetes/infrastructure/resources/firewall/README.md` lists the open ports and how to change the policy safely. Which layer encrypts which traffic: "Network encryption" in `pulumi/README.md`.
+
+### Workloads with 2 or more replicas
+
+The ValidatingAdmissionPolicy in `kubernetes/infrastructure/resources/admission-policies/` rejects such a Deployment or StatefulSet in an app namespace without `topologySpreadConstraints` or `podAntiAffinity`. Add a `PodDisruptionBudget` next to it by hand (example: `apps/hydra/thetillhoff-de/`): the policy cannot check that.
 
 ### Private endpoints (tailnet-only)
 
@@ -138,7 +142,7 @@ The public `analytics.thetillhoff.de` route (`apps/hydra/umami/httpRoute-https.y
 
 ### Storage
 
-Longhorn for persistent volumes in Kubernetes. Its StorageClass is the default and uses `reclaimPolicy: Retain`: a deleted PVC leaves an orphan PV and a Longhorn volume (cleanup: `kubernetes` skill, `references/longhorn.md`). Bare-metal ZFS on `blackhole` (managed via Ansible).
+Longhorn for persistent volumes in Kubernetes. Its StorageClass is the default and uses `reclaimPolicy: Retain`: a deleted PVC leaves an orphan PV and a Longhorn volume (cleanup: `kubernetes` skill, `references/longhorn.md`). Backups and the restore runbook after a cluster rebuild: `kubernetes/infrastructure/controllers/longhorn/README.md`. Bare-metal ZFS on `blackhole` (managed via Ansible).
 
 ### Versions
 

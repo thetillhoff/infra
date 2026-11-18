@@ -1,0 +1,21 @@
+# Only the namespaces whose manifests this repo writes; charts and operators set their own spread.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: replicated-workload-spread
+spec:
+  policyName: replicated-workload-spread
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kube-system
+            - flux-system
+            - cert-manager
+            - kubelet-csr-approver
+            - longhorn
+            - monitoring
+            - tailscale

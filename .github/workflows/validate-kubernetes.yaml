@@ -18,12 +18,13 @@ jobs:
             kubectl kustomize "$(awk '/^  path:/ {print $2}' "$f")" > "build/$(basename "$f")"
           done
 
-      # Secrets hold SOPS metadata. The trading CRDs and their objects have no public schema.
+      # Secrets hold SOPS metadata. The trading CRDs and their objects have no public schema. The
+      # catalog schema of RecurringJob lacks the task system-backup of Longhorn 1.13.
       - uses: docker://ghcr.io/yannh/kubeconform:v0.8.0
         with:
           args: >-
             -strict -summary
-            -skip Secret,CustomResourceDefinition,AutoTrade,StrategyConfig
+            -skip Secret,CustomResourceDefinition,AutoTrade,StrategyConfig,RecurringJob
             -schema-location default
             -schema-location https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json
             build
