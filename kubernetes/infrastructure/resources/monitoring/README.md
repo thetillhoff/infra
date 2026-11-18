@@ -31,20 +31,17 @@ Check a change of the Loki config before you push: render the chart with `helm t
 
 An init container downloads each `dashboards:` entry from grafana.com (`gnetId` and `revision`). Since chart 13 the script runs with `pipefail`, so an entry with a missing revision crashes the init container and blocks the rollout. Before you add one, check that `https://grafana.com/api/dashboards/<id>/revisions/<rev>/download` returns 200.
 
-## Alert mail has two paths
+## Alerts
 
-Grafana alerts use the SMTP settings of Grafana. The Prometheus rules (`serverFiles` in `prometheus/values.yaml`) go through the Prometheus Alertmanager, which reuses the `grafana-smtp` secret. To alert on a new app, add a rule there. Prometheus holds the alert state. Flux events are not used: they carry no end time, so the alert expired and fired again at every reconcile.
+All alerts go through the Prometheus Alertmanager, which mails with the `grafana-smtp` secret. Grafana has no alert rules. Prometheus holds the alert state. Flux events are not used: they carry no end time, so the alert expired and fired again at every reconcile.
 
-| Rule | Fires when | After |
-| ---- | ---------- | ----- |
-| `FluxResourceNotReady` | Any Flux resource is not ready (reads `flux_resource_info` of the Flux Operator) | 5m |
-| `WorkloadUnavailable` | A Deployment, StatefulSet or DaemonSet has unavailable replicas | 15m |
-| `PodCrashLooping` | A container is in `CrashLoopBackOff` | 10m |
-
-- Alertmanager has no authentication. A NetworkPolicy admits only the Prometheus server on `:9093`. Add any new sender there.
+- Metric rules: `serverFiles` in `prometheus/values.yaml`, one group per topic (flux, workloads, nodes, monitoring, storage, certificates, network, one group per app). To alert on a new app, add a group there.
+- Log rules: `loki/configMap-loki-rules.yaml`. The Loki ruler evaluates them and sends to the same Alertmanager.
+- Nothing alerts when the cluster or the Alertmanager is down. That needs an external dead-man's switch.
+- Alertmanager has no authentication. A NetworkPolicy admits only the Prometheus server and the Loki ruler on `:9093`. Add any new sender there.
 - An alert sends one mail, then a reminder every 24 hours, then one mail when it resolves. Each alert is its own mail.
 - A Flux resource that waits on a failed dependency does not alert. The dependency does.
-- Failed Jobs have no rule: `kube_job_failed` keeps old failed Jobs, so a rule would mail about them at once.
+- `kube_job_status_failed` keeps old failed Jobs. A Job rule must ignore a Job that succeeded later or is older than a day (see `FcpJobFailed`).
 - The chart default `extraFlags` holds `web.enable-lifecycle`. Our override must keep it, or the reload sidecar gets 403 and a change of a rule needs a pod restart.
 - Check a change of a rule before you push: render the chart with `helm template` and run `promtool check rules` on the rendered `alerting_rules.yml` in Docker. A wrong key (`serverFiles` is top-level, not under `server:`) renders an empty `{}` without an error. After the rollout, `/api/v1/rules` of Prometheus must list the rule.
 - Test the path with a throwaway Kustomization (`interval: 1m`, `path: ./does-not-exist`, `prune: false`). The alert fires after about 5 minutes. Delete the Kustomization afterwards: the resolved mail follows within about 2 minutes. The counter `alertmanager_notifications_total{integration="email"}` on `:9093/metrics` rises by one per mail. Through the API-server proxy this call can time out because of the NetworkPolicy: retry.

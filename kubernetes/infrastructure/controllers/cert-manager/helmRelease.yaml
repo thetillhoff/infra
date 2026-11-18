@@ -11,6 +11,16 @@ spec:
         name: cert-manager
       version: v1.21.2 # From https://artifacthub.io/packages/helm/cert-manager/cert-manager
   interval: 10m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
 
   valuesFrom:
     - kind: ConfigMap # This value is case sensitive

@@ -11,6 +11,12 @@ spec:
         kind: HelmRepository
         name: prometheus-community
   interval: 10m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
 
   # Recreate strategy + RWO PVC: old pod must fully terminate before the new one
   # can bind the volume, and WAL replay under memory pressure is slow. Default ~5m
@@ -18,6 +24,9 @@ spec:
   timeout: 15m
   upgrade:
     timeout: 15m
+    crds: CreateReplace
+    remediation:
+      retries: 3
 
   valuesFrom:
     - kind: ConfigMap # This value is case sensitive

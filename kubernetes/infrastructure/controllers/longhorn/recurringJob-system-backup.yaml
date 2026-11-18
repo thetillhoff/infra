@@ -1,0 +1,17 @@
+# Saves the Longhorn and Kubernetes objects (PVs, PVCs, settings) that a restore after a
+# cluster rebuild needs. It points to the newest volume backup of the `daily` job, which
+# runs before it; it creates a volume backup only for a volume that has none.
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: system-backup
+spec:
+  name: system-backup
+  task: system-backup
+  cron: "40 6 * * *"
+  groups: []
+  retain: 7
+  concurrency: 1
+  labels: {}
+  parameters:
+    volume-backup-policy: if-not-present

@@ -47,6 +47,17 @@ spec:
                   key: password
           ports:
             - containerPort: 5432
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
+            periodSeconds: 5
+          # High failureThreshold: crash recovery after an unclean stop must finish before a restart.
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data

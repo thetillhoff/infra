@@ -1,0 +1,16 @@
+# defaultProxyClass does not apply to a Connector. The exit nodes keep direct
+# WireGuard paths, so this class sets only the resources of prefer-derp.
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyClass
+metadata:
+  name: exit-node
+spec:
+  statefulSet:
+    pod:
+      tailscaleContainer:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 128Mi

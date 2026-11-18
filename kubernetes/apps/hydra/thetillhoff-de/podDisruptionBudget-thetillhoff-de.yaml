@@ -1,0 +1,10 @@
+# A drain evicts one replica at a time.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: thetillhoff-de
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: thetillhoff-de

@@ -20,6 +20,18 @@ spec:
           image: ghcr.io/thetillhoff/trading-frontend:183 # {"$imagepolicy": "trading:trading-frontend"}
           ports:
             - containerPort: 8080
+          # The static shell, not /api: a down backend must not restart or unready the frontend.
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            periodSeconds: 5
           securityContext:
             runAsNonRoot: true
             runAsUser: 10001

@@ -1,7 +1,8 @@
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
 metadata:
-  name: tailscale
+  name: valkey
+  namespace: manga-scraper
 spec:
-  image: ghcr.io/tailscale/tailscale
+  image: valkey/valkey
   interval: 5m0s

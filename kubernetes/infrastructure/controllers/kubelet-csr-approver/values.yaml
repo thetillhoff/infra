@@ -1,5 +1,9 @@
-providerRegex: '.*'
-# providerRegex: '^node-\d+-\w+$'
-bypass-dns-resolution: true
-bypass-hostname-check: true
-skipDenyStep: true
+# https://github.com/postfinance/kubelet-csr-approver/blob/main/charts/kubelet-csr-approver/values.yaml
+
+# Approves the serving certificate requests of the kubelets (`rotate-server-certificates`
+# in the Talos patch). Only node names of this cluster pass.
+providerRegex: '^hcloud-talos-[a-z0-9-]+$'
+# The node names are not in DNS.
+bypassDnsResolution: true
+# 30 days instead of the hard maximum of 367. The kubelet renews before expiry.
+maxExpirationSeconds: "2592000"

@@ -1,5 +1,5 @@
 # Alertmanager has no authentication: any pod that reaches it can send mail or
-# create silences. Only the Prometheus server may connect.
+# create silences. Only the Prometheus server and the Loki ruler may connect.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -16,5 +16,9 @@ spec:
             matchLabels:
               app.kubernetes.io/name: prometheus
               app.kubernetes.io/component: server
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: loki
+              app.kubernetes.io/component: single-binary
       ports:
         - port: 9093

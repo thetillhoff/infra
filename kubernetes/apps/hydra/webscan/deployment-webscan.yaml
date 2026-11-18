@@ -58,6 +58,10 @@ spec:
           httpGet:
             port: 8080
           initialDelaySeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8080
+          periodSeconds: 5
         volumeMounts:
         - name: tmp
           mountPath: /tmp

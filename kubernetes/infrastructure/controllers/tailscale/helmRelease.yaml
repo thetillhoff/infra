@@ -11,6 +11,16 @@ spec:
         name: tailscale
       version: v1.104.2 # From https://pkgs.tailscale.com/helmcharts/
   interval: 10m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
 
   valuesFrom:
     - kind: ConfigMap # This value is case sensitive

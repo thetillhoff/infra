@@ -77,25 +77,15 @@ tasks:
         echo export SOPS_AGE_KEY_FILE="$(pwd)/age.key"
 
   reconcile:
-    desc: Reconcile flux sources
+    desc: Reconcile the flux source, then every flux kustomization
     dir: '{{.USER_WORKING_DIR}}'
     cmds:
       - flux reconcile kustomization flux-system --with-source
-      - flux reconcile kustomization infrastructure-controllers --with-source
-      # resources (depend on controllers)
-      - flux reconcile kustomization resource-cert-manager --with-source
-      - flux reconcile kustomization resource-firewall --with-source
-      - flux reconcile kustomization resource-gateways --with-source
-      - flux reconcile kustomization resource-monitoring --with-source
-      - flux reconcile kustomization resource-private-endpoints --with-source
-      # apps
-      - flux reconcile kustomization app-link-shortener --with-source
-      - flux reconcile kustomization app-thetillhoff-de --with-source
-      - flux reconcile kustomization app-trading --with-source
-      - flux reconcile kustomization app-umami --with-source
-      - flux reconcile kustomization app-vaultwarden --with-source
-      - flux reconcile kustomization app-webscan --with-source
-      - flux reconcile kustomization app-wedding-website --with-source
+      # A Kustomization with an unready dependsOn waits for it, so the order of the others does not matter.
+      - |
+        for ks in $(kubectl get kustomizations.kustomize.toolkit.fluxcd.io -n flux-system -o jsonpath='{.items[*].metadata.name}'); do
+          [ "$ks" = flux-system ] || flux reconcile kustomization "$ks"
+        done
 
   flux-status:
     desc: Show flux status

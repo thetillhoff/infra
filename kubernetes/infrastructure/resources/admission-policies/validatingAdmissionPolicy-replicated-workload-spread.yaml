@@ -1,0 +1,22 @@
+# A ValidatingAdmissionPolicy sees only the object itself, so it cannot check that a
+# PodDisruptionBudget exists. Add one next to each workload with 2 or more replicas.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: replicated-workload-spread
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "statefulsets"]
+  validations:
+    - expression: >-
+        !has(object.spec.replicas) || object.spec.replicas < 2
+        || has(object.spec.template.spec.topologySpreadConstraints)
+        || (has(object.spec.template.spec.affinity) && has(object.spec.template.spec.affinity.podAntiAffinity))
+      message: >-
+        A workload with 2 or more replicas needs topologySpreadConstraints or podAntiAffinity
+        across nodes, and a PodDisruptionBudget.

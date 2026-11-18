@@ -13,7 +13,7 @@ metadata:
 spec:
   name: daily
   task: backup
-  cron: "0 5 * * *"
+  cron: "40 5 * * *"
   groups:
     - default
   retain: 7

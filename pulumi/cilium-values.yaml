@@ -7,6 +7,11 @@
 ipam:
   mode: kubernetes
 kubeProxyReplacement: true
+# eBPF instead of iptables for the masquerade. BPF host routing conflicts with KubeSpan, so
+# routing stays legacy. Needs `forwardKubeDNSToHost: false` in the Talos patch, else CoreDNS breaks.
+bpf:
+  masquerade: true
+  hostLegacyRouting: true
 hostFirewall:
   enabled: true # enforces CiliumClusterwideNetworkPolicy on the nodes (resources/firewall)
 securityContext:
@@ -41,12 +46,10 @@ k8sServicePort: 7445
 # ipv6:
 #   enabled: true
 # ---
+# Off: Talos KubeSpan encrypts all traffic between the nodes, the VXLAN tunnel of the pods
+# included. See "Network encryption" in pulumi/README.md.
 encryption:
-  enabled: true # This enabled encryption for pod-to-pod traffic
-  type: wireguard
-  # Node Encryption is not useful to add, since "Cilium automatically disables node-to-node encryption from and to Kubernetes control-plane nodes"
-  # More info at https://docs.cilium.io/en/stable/security/network/encryption-wireguard/#node-to-node-encryption-beta
-  # nodeEncryption: true
+  enabled: false
 # ---
 # Enabling gatewayAPI
 # Using hostNetwork mode removes the need for separate loadbalancer
@@ -168,6 +171,10 @@ hubble:
 # More info at https://docs.cilium.io/en/stable/network/kubernetes/bandwidth-manager/
 bandwidthManager:
   enabled: true
+  # BBR for pods needs BPF host routing (see `bpf.hostLegacyRouting`). The host namespace
+  # holds the internet-facing Envoy gateway, so it gets BBR.
+  bbr: true
+  bbrHostNamespaceOnly: true
 
 # Enable cilium metrics
 prometheus:

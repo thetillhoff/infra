@@ -8,6 +8,7 @@ resources:
 - limitRange-default-memory.yaml
 - serviceAccount-default.yaml
 - deployment.yaml
+- podDisruptionBudget-thetillhoff-de.yaml
 - service.yaml
 - httpRoute-http.yaml
 - httpRoute-https.yaml

@@ -5,3 +5,12 @@ proxyConfig:
   # own, so all *.internal endpoints get it. See proxyClass-prefer-derp.yaml for
   # why. Override per resource with `tailscale.com/proxy-class: <name>`.
   defaultProxyClass: prefer-derp
+
+# Sized from the 14-day peak working set, limit about 2x. No CPU limit.
+operatorConfig:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      memory: 128Mi

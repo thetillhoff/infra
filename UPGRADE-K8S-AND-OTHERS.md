@@ -11,11 +11,12 @@
 - Update `versions.kubernetes` in `pulumi/index.ts` to match.
 - Run `task deploy` to ensure no drift.
 
-## Other versions (Cilium, FluxOperator, Flux, Gateway API CRDs)
+## Other versions (Cilium, FluxOperator, Gateway API CRDs)
 
-- Check latest versions via the links in comments next to each version in `pulumi/index.ts`.
-- Read changelogs before bumping.
-- Update the values in `pulumi/index.ts`.
-- Run `task deploy`.
+Renovate opens a pull request for each new version in `pulumi/index.ts` and does not merge it: the version is live only after `task deploy`. Merge the pull request only when you deploy it, so that `main` matches the cluster. Flux itself follows `2.x` and needs no step.
+
+- Read the changelog. For the Gateway API CRDs, check that the Cilium version in use supports the new version.
+- Merge the pull request, then run `task deploy`.
+- After a Cilium upgrade or a change of `pulumi/cilium-values.yaml`, run `kubectl -n kube-system rollout restart ds/cilium`. The Helm upgrade does not restart the agents.
 
   > **Helm repo error:** If deploy fails with `unable to locate chart: no cached repo found`, run `helm repo add cilium https://helm.cilium.io/ && helm repo update`, then retry.

@@ -11,7 +11,13 @@ spec:
         - ports:
             - {port: "80", protocol: TCP}
             - {port: "443", protocol: TCP}
-            - {port: "443", protocol: UDP}
             - {port: "6443", protocol: TCP}
             - {port: "50000", protocol: TCP}
     - fromEntities: [cluster, host, remote-node]
+    # DestinationUnreachable carries "fragmentation needed" for path MTU discovery.
+    - fromEntities: [world]
+      icmps:
+        - fields:
+            - {type: DestinationUnreachable, family: IPv4}
+            - {type: TimeExceeded, family: IPv4}
+            - {type: EchoRequest, family: IPv4}

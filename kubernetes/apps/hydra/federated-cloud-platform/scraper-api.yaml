@@ -42,6 +42,12 @@ spec:
               value: fcp
           ports:
             - containerPort: 9090
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9090
+            initialDelaySeconds: 10
+            periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /health

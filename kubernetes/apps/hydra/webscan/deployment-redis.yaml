@@ -34,6 +34,12 @@ spec:
             - redis-cli
             - ping
           initialDelaySeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          periodSeconds: 5
         volumeMounts:
         - name: data
           mountPath: /data

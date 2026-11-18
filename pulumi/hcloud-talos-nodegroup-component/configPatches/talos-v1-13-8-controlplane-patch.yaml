@@ -13,6 +13,11 @@ machine:
   # For encrypted volumes
       - name: dm_crypt
 
+  # Cilium `bpf.masquerade` breaks CoreDNS when CoreDNS forwards to the host DNS of Talos.
+  features:
+    hostDNS:
+      forwardKubeDNSToHost: false
+
   # Enable the Talos KubeSpan feature
   # More info at https://www.talos.dev/v1.10/talos-guides/network/kubespan/#enabling
   network:
@@ -45,25 +50,12 @@ machine:
   #   node.cilium.io/agent-not-ready: true:NoExecute
 
   kubelet:
-    # Certificate rotation disabled as it needs manual approval of new certs
-    # More info at https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/#certificate-rotation
-    # extraArgs:
-    #   rotate-server-certificates: true
+    # A serving certificate from the cluster CA instead of a self-signed one, so that clients such
+    # as metrics-server can verify the kubelet. kubelet-csr-approver (Flux) approves the requests.
+    extraArgs:
+      rotate-server-certificates: true
 
     extraConfig:
-      # rotateCertificates enables client certificate rotation. The
-      # Kubelet will request a new certificate from the
-      # certificates.k8s.io API. This requires an approver to approve
-      # the certificate signing requests.
-      # rotateCertificates: true
-
-      # serverTLSBootstrap enables server certificate bootstrap.
-      # Instead of self signing a serving certificate, the Kubelet
-      # will request a certificate from the 'certificates.k8s.io' API.
-      # This requires an approver to approve the certificate signing
-      # requests (CSR).
-      # serverTLSBootstrap: true
-
       # Reserve CPU + memory for node and kube daemons (kubelet, containerd, and etcd,
       # which runs as a Talos system service outside pods) so workloads can't starve them
       # and wedge the node NotReady.

@@ -51,6 +51,18 @@ spec:
                 secretKeyRef:
                   name: trading-postgres
                   key: dsn
+          # kopf's liveness endpoint (KOPF_LIVENESS_ENDPOINT default).
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 10
           securityContext:
             runAsNonRoot: true
             runAsUser: 10001

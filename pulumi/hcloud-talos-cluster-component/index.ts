@@ -13,7 +13,6 @@ export interface HcloudTalosClusterArgs {
   ciliumVersion: pulumi.Input<string>;
   gatewayApiCrdsVersion: pulumi.Input<string>;
   fluxOperatorVersion: pulumi.Input<string>;
-  fluxVersion: pulumi.Input<string>;
   fluxInstanceYaml: pulumi.Input<string>;
   gitUsername: pulumi.Input<string>;
 }
@@ -90,7 +89,7 @@ export class HcloudTalosCluster extends pulumi.ComponentResource {
     const gatewayApiCrds = new kubernetes.yaml.v2.ConfigFile(
       "gatewayApiCrds",
       {
-        file: `https://github.com/kubernetes-sigs/gateway-api/releases/download/${props.gatewayApiCrdsVersion}/experimental-install.yaml`,
+        file: `https://github.com/kubernetes-sigs/gateway-api/releases/download/${props.gatewayApiCrdsVersion}/standard-install.yaml`,
       },
       {
         parent: this,

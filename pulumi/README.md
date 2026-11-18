@@ -11,6 +11,22 @@ kubectl -n kube-system rollout status daemonset cilium
 
 Compare the pod ages (`kubectl -n kube-system get pods -l k8s-app=cilium`) with the deploy time. Check the behaviour, not the ConfigMap.
 
+## Network encryption
+
+Talos KubeSpan is the one encryption layer between the nodes. It routes all traffic between node IPs through WireGuard (`forceRouting`): when a peer is down, the traffic is dropped, not sent in clear. Cilium WireGuard is off, because it would only encrypt the pod traffic a second time, and Cilium never encrypts host traffic of control-plane nodes.
+
+| Traffic | Encryption |
+| --- | --- |
+| Internet to the gateway | TLS from cert-manager (Let's Encrypt). Port 80 only redirects. `cloud.` goes through Cloudflare, which checks the origin certificate (`ssl: strict`). |
+| Gateway (Envoy, host network) to a pod on another node | KubeSpan |
+| Pod to pod on different nodes | VXLAN between the node IPs, so KubeSpan |
+| Node to node (etcd, kubelet, API server, Longhorn replicas) | KubeSpan, plus mTLS of etcd and the kubelet |
+| Pod to pod on the same node | None: the traffic does not leave the node. |
+| Tailnet to a private endpoint | Tailscale WireGuard, then TLS of the Caddy proxy |
+| Pods to the internet | The TLS of each app |
+
+KubeSpan has an MTU of 1420, and VXLAN takes 50 bytes of it. Check the peers with `talosctl get kubespanpeerstatuses`: each one must be `up`.
+
 ## Cloudflare
 
 `cloudflareProxiedDnsNames` in `index.ts` lists the hostnames that go through the Cloudflare edge. The `ssl-mode` zone setting (`cloudflare.ZoneSetting`) is pinned to `strict`. Cert-manager already issues a certificate for each Gateway listener, so a proxied hostname needs no extra step. The stack secret `cloudflare:apiToken` needs `Zone > Zone Settings > Edit` and its DNS scope. The cause of the redirect loop with `flexible` is in the `kubernetes` skill (`references/ingress-tls.md`).

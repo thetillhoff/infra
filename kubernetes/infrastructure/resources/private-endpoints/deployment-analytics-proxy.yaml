@@ -26,6 +26,16 @@ spec:
           image: caddy:2.11.9-alpine # {"$imagepolicy": "private-endpoints:caddy"}
           ports:
             - containerPort: 8443
+          # TCP, not HTTP: the TLS site matches only its host name and proxies to the backend.
+          livenessProbe:
+            tcpSocket:
+              port: 8443
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            tcpSocket:
+              port: 8443
+            periodSeconds: 5
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

@@ -47,4 +47,6 @@ resources:
   - imagePolicy-ui.yaml
   - imageRepository-migrations.yaml
   - imagePolicy-migrations.yaml
+  - imageRepository-valkey.yaml
+  - imagePolicy-valkey.yaml
   - imageUpdateAutomation.yaml

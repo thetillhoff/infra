@@ -35,7 +35,17 @@ loki:
       - selector: '{container="cilium-agent"}'
         priority: 1
         period: 168h
-  ruler:
+  # Log-based alerts: the sidecar writes the `loki_rule` ConfigMaps to /rules/fake
+  # (`fake` is the tenant when auth is off), the ruler sends to the Prometheus Alertmanager.
+  rulerConfig:
+    wal:
+      dir: /var/loki/ruler-wal
+    storage:
+      type: local
+      local:
+        directory: /rules
+    rule_path: /var/loki/rules-tmp
+    alertmanager_url: http://prometheus-alertmanager:9093
     enable_api: true
 
 deploymentMode: Monolithic
@@ -55,6 +65,21 @@ singleBinary:
 
 # disable resouce hogging chunks cache - we're on local disk anyways
 chunksCache:
+  enabled: false
+# The results cache requests about 1.2Gi; queries are rare enough to run uncached.
+resultsCache:
+  enabled: false
+
+# Single binary: Grafana and Alloy talk to the `loki` Service directly.
+gateway:
+  enabled: false
+lokiCanary:
+  enabled: false
+sidecar:
+  rules:
+    folder: /rules/fake
+# The chart test needs the canary.
+test:
   enabled: false
 
 # Zero out replica counts of other deployment modes

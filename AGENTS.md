@@ -67,7 +67,13 @@ sops decrypt -i <file>        # decrypt in-place
 export SOPS_AGE_KEY_FILE=$(pwd)/age.key  # or use task configure-env
 ```
 
-Secret files matching `*secret*` or containing `data`/`stringData` keys are auto-encrypted per `.sops.yaml`.
+`sops encrypt` encrypts the `data`/`stringData` values of a YAML Secret, and a non-YAML file whole (`.sops.yaml`).
+
+### CI
+
+Every push runs `.github/workflows/validate-kubernetes.yaml`: strict `kubeconform` on each built Flux Kustomization, and `flux-local test`, which also renders each HelmRelease. To run it locally, use the flux-local image of the workflow with `docker run --rm -e HOME=/tmp -v "$PWD:/repo:z" -w /repo <image> test --enable-helm --path kubernetes/clusters/hydra` (helm needs a writable HOME).
+
+Renovate automerges only after these checks pass, and never a version in `pulumi/index.ts` (`UPGRADE-K8S-AND-OTHERS.md`).
 
 ## Architecture
 
@@ -102,10 +108,10 @@ block unrelated deploys. Names match the entrypoint filenames in `kubernetes/clu
 kubernetes/
   clusters/hydra/          # FluxCD Kustomization entrypoints
   infrastructure/
-    controllers/           # HelmReleases: cert-manager, external-dns, longhorn, tailscale operator (kubelet-csr-approver exists but is disabled in `controllers/kustomization.yaml`)
-    resources/             # Cluster resources: cert-manager issuers, gateways, firewall policies, monitoring, private-endpoints
+    controllers/           # HelmReleases: cert-manager, external-dns, kubelet-csr-approver, longhorn, tailscale operator
+    resources/             # Cluster resources: admission policies, cert-manager issuers, gateways, firewall policies, monitoring, private-endpoints
   apps/
-    hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, tailscale, trading, federated-cloud-platform, manga-scraper
+    hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, trading, federated-cloud-platform, manga-scraper, webscan, wedding-website
 ```
 
 `kubernetes/apps/hydra/trading/` is the **source of truth for the trading app on hydra** (Flux `app-trading`). The `~/code/trading` repo's `k8s/`/`services/` manifests are **local-dev (kind) only** and intentionally diverge — never edit them expecting a hydra change.
@@ -122,7 +128,11 @@ Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}
 
 The Cilium Gateway reaches a backend as the entity `ingress`, which a `NetworkPolicy` cannot select. Allow it with a `CiliumNetworkPolicy` and `fromEntities: [ingress]` (example: `apps/hydra/vaultwarden/ciliumNetworkPolicy-vaultwarden-from-gateway.yaml`). To test a block, run `curl --max-time 5` from a pod of another namespace that has curl (a caddy pod in `private-endpoints`): a blocked call times out with exit 28.
 
-The node firewall is live: `kubernetes/infrastructure/resources/firewall/README.md` lists the open ports and how to change the policy safely.
+The node firewall is live: `kubernetes/infrastructure/resources/firewall/README.md` lists the open ports and how to change the policy safely. Which layer encrypts which traffic: "Network encryption" in `pulumi/README.md`.
+
+### Workloads with 2 or more replicas
+
+The ValidatingAdmissionPolicy in `kubernetes/infrastructure/resources/admission-policies/` rejects such a Deployment or StatefulSet in an app namespace without `topologySpreadConstraints` or `podAntiAffinity`. Add a `PodDisruptionBudget` next to it by hand (example: `apps/hydra/thetillhoff-de/`): the policy cannot check that.
 
 ### Private endpoints (tailnet-only)
 
@@ -132,11 +142,11 @@ The public `analytics.thetillhoff.de` route (`apps/hydra/umami/httpRoute-https.y
 
 ### Storage
 
-Longhorn for persistent volumes in Kubernetes. Its StorageClass is the default and uses `reclaimPolicy: Retain`: a deleted PVC leaves an orphan PV and a Longhorn volume (cleanup: `kubernetes` skill, `references/longhorn.md`). Bare-metal ZFS on `blackhole` (managed via Ansible).
+Longhorn for persistent volumes in Kubernetes. Its StorageClass is the default and uses `reclaimPolicy: Retain`: a deleted PVC leaves an orphan PV and a Longhorn volume (cleanup: `kubernetes` skill, `references/longhorn.md`). Backups and the restore runbook after a cluster rebuild: `kubernetes/infrastructure/controllers/longhorn/README.md`. Bare-metal ZFS on `blackhole` (managed via Ansible).
 
 ### Versions
 
-Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator, flux) are centralized in `pulumi/index.ts`.
+Version constants (kubernetes, cilium, gatewayApiCrds, fluxOperator) are centralized in `pulumi/index.ts`. Flux itself follows `2.x` (`pulumi/hcloud-talos-cluster-component/fluxInstance.yaml`): the flux-operator updates it.
 Talos version lives in `packer/common.pkrvars.hcl` + the nodegroup name (`hcloud-talos-vX-Y-Z-controlplane`).
 
 **Only ever upgrade to GA versions** — no alpha/beta/rc. Check each project's releases page for the latest
@@ -154,6 +164,6 @@ Default kubeconfig context may be a local kind cluster, not hydra. Always run `e
 
 Recover an unresponsive Talos node with a Hetzner hard reset (console or `hcloud server reset`). If `apid` is dead, `talosctl reboot` cannot reach it.
 
-### Cilium Gateway API: PROGRAMMED False is normal
+### Cilium Gateway API: the Gateway address is one node only
 
-Gateways always show `PROGRAMMED: False / AddressNotAssigned`. Cilium runs in host-network mode (`pulumi/cilium-values.yaml`): the Envoy daemonset binds to the node IPs, and no LoadBalancer IP is written to `.status.addresses`. Check health with the Envoy pods and a real HTTP response, not the gateway status.
+Cilium runs in host-network mode (`pulumi/cilium-values.yaml`): the Envoy daemonset binds to the IPs of all nodes, and DNS points to all of them. The Gateway status shows only one node IP. Check health with the Envoy pods and a real HTTP response, not the gateway status.

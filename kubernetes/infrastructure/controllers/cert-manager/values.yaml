@@ -5,3 +5,23 @@ config:
   kind: ControllerConfiguration
   gatewayAPI:
     enabled: true
+
+# The chart sets no resources; the best-practice docs ask for values that fit the cluster.
+# Sized from the 14-day peak working set, limit about 2x. No CPU limit.
+resources: &resources
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    memory: 128Mi
+cainjector:
+  resources: *resources
+webhook:
+  resources: &resourcesSmall
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 64Mi
+startupapicheck:
+  resources: *resourcesSmall

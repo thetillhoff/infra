@@ -11,6 +11,16 @@ spec:
         name: external-dns
       version: 1.23.0 # From https://artifacthub.io/packages/helm/external-dns/external-dns
   interval: 10m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
 
   valuesFrom:
     - kind: ConfigMap # This value is case sensitive

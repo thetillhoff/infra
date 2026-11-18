@@ -35,6 +35,17 @@ spec:
               value: http://ibkr-broker:8002
           ports:
             - containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 5
           securityContext:
             runAsNonRoot: true
             runAsUser: 10001
