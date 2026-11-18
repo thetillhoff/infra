@@ -11,6 +11,14 @@ kubectl -n kube-system rollout status daemonset cilium
 
 Compare the pod ages (`kubectl -n kube-system get pods -l k8s-app=cilium`) with the deploy time. Check the behaviour, not the ConfigMap.
 
+## A change of the Talos host DNS needs a CoreDNS restart
+
+CoreDNS forwards to the nameservers in its `/etc/resolv.conf`, which the kubelet writes when the pod starts. After a change of `machine.features.hostDNS` in the Talos patch (for example `forwardKubeDNSToHost`), the running CoreDNS pods keep the old nameserver, and every lookup of an external name fails. Restart CoreDNS right after the deploy:
+
+```sh
+kubectl -n kube-system rollout restart deployment coredns
+```
+
 ## Network encryption
 
 Talos KubeSpan is the one encryption layer between the nodes. It routes all traffic between node IPs through WireGuard (`forceRouting`): when a peer is down, the traffic is dropped, not sent in clear. Cilium WireGuard is off, because it would only encrypt the pod traffic a second time, and Cilium never encrypts host traffic of control-plane nodes.
