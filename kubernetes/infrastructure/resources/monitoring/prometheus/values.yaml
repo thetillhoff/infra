@@ -179,7 +179,7 @@ serverFiles:
             annotations:
               summary: "Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) has no backup for more than 36 hours"
           - alert: LonghornBackupTargetUnavailable
-            expr: max by (backup_target) (longhorn_backup_target_status) == 0
+            expr: max by (backup_target) (longhorn_backup_target_status{condition="unavailable"}) == 1
             for: 30m
             labels:
               severity: error
