@@ -4,7 +4,7 @@ metadata:
   name: ibkr-broker
   namespace: trading
 spec:
-  replicas: 1
+  replicas: 0
   # maxSurge 0: the old pod must be GONE before the new one starts. This pod holds an
   # exclusive IBKR connection keyed by IBKR_CLIENT_ID, so an overlapping replica is refused
   # by the gateway with "Error 326: client id already in use" and the broker then comes up

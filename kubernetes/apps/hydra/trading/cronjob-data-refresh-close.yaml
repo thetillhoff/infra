@@ -8,7 +8,7 @@ spec:
   timeZone: America/New_York
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 600
-  suspend: false   # always-on; refreshes full universe after market close regardless of AutoTrade state
+  suspend: true   # trading disabled
   jobTemplate:
     spec:
       ttlSecondsAfterFinished: 604800

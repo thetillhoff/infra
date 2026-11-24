@@ -11,5 +11,5 @@ spec:
   # the short side (signal_types buy) is worth +30..+104 points of active alpha in EVERY held-out
   # window, for the adx and the macd generator alike. Real capital still waits on live evidence.
   strategyConfig: adx-long
-  enabled: true
+  enabled: false
   preloadOnDeploy: false   # data already loaded; set true to trigger a fresh full-universe refresh on next deploy

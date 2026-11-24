@@ -4,7 +4,7 @@ metadata:
   name: frontend
   namespace: trading
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: frontend
