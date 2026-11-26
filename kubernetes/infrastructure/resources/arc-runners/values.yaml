@@ -44,7 +44,7 @@ template:
             memory: 1Gi
           limits:
             cpu: "3"
-            memory: 3Gi
+            memory: 4Gi
         volumeMounts:
           - name: work
             mountPath: /home/runner/_work
@@ -67,7 +67,7 @@ template:
             memory: 1Gi
           limits:
             cpu: "3"
-            memory: 3Gi
+            memory: 4Gi
         volumeMounts:
           - name: work
             mountPath: /home/runner/_work
