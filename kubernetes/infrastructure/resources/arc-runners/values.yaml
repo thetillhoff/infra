@@ -40,8 +40,10 @@ template:
           periodSeconds: 5
         resources:
           requests:
+            cpu: 500m
             memory: 512Mi
           limits:
+            cpu: "3"
             memory: 2Gi
         volumeMounts:
           - name: work
@@ -61,8 +63,10 @@ template:
             value: "120"
         resources:
           requests:
+            cpu: 500m
             memory: 512Mi
           limits:
+            cpu: "3"
             memory: 2Gi
         volumeMounts:
           - name: work
