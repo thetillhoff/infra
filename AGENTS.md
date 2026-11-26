@@ -107,15 +107,15 @@ Kustomizations are **per controller, per component and per app** — a broken on
 kubernetes/
   clusters/hydra/          # FluxCD Kustomization entrypoints
   infrastructure/
-    controllers/           # HelmReleases: cert-manager, external-dns, kubelet-csr-approver, longhorn, tailscale operator
-    resources/             # Cluster resources: admission policies, cert-manager issuers, gateways, firewall policies, monitoring, private-endpoints
+    controllers/           # HelmReleases: cert-manager, external-dns, kubelet-csr-approver, longhorn, tailscale operator, arc (GitHub Actions runner controller)
+    resources/             # Cluster resources: admission policies, arc-runners, cert-manager issuers, gateways, firewall policies, monitoring, private-endpoints
   apps/
     hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, trading, federated-cloud-platform, manga-scraper, webscan, wedding-website
 ```
 
 `kubernetes/apps/hydra/trading/` is the **source of truth for the trading app on hydra** (Flux `app-trading`). The `~/code/trading` repo's `k8s/`/`services/` manifests are **local-dev (kind) only** and intentionally diverge — never edit them expecting a hydra change.
 
-Notes about one app or one component are in a `README.md` next to it (for example `manga-scraper`, `thetillhoff-de`, `private-endpoints`, `monitoring`, `firewall`, `cert-manager`, `pulumi`).
+Notes about one app or one component are in a `README.md` next to it (for example `manga-scraper`, `thetillhoff-de`, `private-endpoints`, `monitoring`, `firewall`, `cert-manager`, `arc-runners`, `pulumi`).
 
 Each app dir typically contains: namespace, a `default` ServiceAccount without API token (`serviceAccount-default.yaml`), deployment/statefulset, service, HTTPRoutes (http+https), imagePolicy + imageRepository + imageUpdateAutomation (for FluxCD image automation), and optionally `*.secret.yaml` (SOPS-encrypted).
 
@@ -159,7 +159,7 @@ Default kubeconfig context may be a local kind cluster, not hydra. Always run `e
 
 ### Memory pressure
 
-3 control-plane nodes (cx43, 8 vCPU / 16 GB), no workers. The baseline is heavy: prometheus about 2.75GB, 3x kube-apiserver up to 3.9GB, Longhorn, Cilium. A large batch burst can still hit the kernel OOM-killer and take the nodes down. The `trading` namespace has a ResourceQuota. Every app namespace, `monitoring`, `cert-manager` and `tailscale` has a `LimitRange` (`limitRange-default-memory.yaml`) that gives a container without limits a 256Mi memory limit. A container that peaks above about 150Mi needs its own `resources`.
+3 control-plane nodes (cx43, 8 vCPU / 16 GB), no workers. The baseline is heavy: prometheus about 2.75GB, 3x kube-apiserver up to 3.9GB, Longhorn, Cilium. A large batch burst can still hit the kernel OOM-killer and take the nodes down. The `trading` namespace has a ResourceQuota. Every app namespace, `monitoring`, `cert-manager`, `tailscale`, `arc-systems` and `arc-runners` has a `LimitRange` (`limitRange-default-memory.yaml`) that gives a container without limits a 256Mi memory limit. A container that peaks above about 150Mi needs its own `resources`.
 
 Recover an unresponsive Talos node with a Hetzner hard reset (console or `hcloud server reset`). If `apid` is dead, `talosctl reboot` cannot reach it.
 
