@@ -305,11 +305,19 @@ alertmanager:
       receiver: email
       group_by: ["..."]
       repeat_interval: 24h
+      routes:
+        - receiver: email-firing-only
+          matchers:
+            - alertname=~"Fcp.*"
     receivers:
       - name: email
         email_configs:
           - to: thetillhoff@gmail.com
             send_resolved: true
+      - name: email-firing-only
+        email_configs:
+          - to: thetillhoff@gmail.com
+            send_resolved: false
 
 prometheus-pushgateway:
   enabled: false
