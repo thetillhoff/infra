@@ -1,6 +1,4 @@
-githubConfigUrl: https://github.com/thetillhoff/manga-scraper
 githubConfigSecret: github-app
-runnerScaleSetName: hydra
 minRunners: 0
 maxRunners: 2
 
