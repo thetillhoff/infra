@@ -165,8 +165,11 @@ serverFiles:
               summary: "Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) is degraded or faulted"
           # The RecurringJob `daily` backs up every volume at 05:40, so a volume past 26 hours missed
           # a run. A rule on failed Backup objects would keep firing after a later backup succeeds.
+          # A detached volume (its app is scaled to 0) gets no backup, and nothing writes to it.
           - alert: LonghornBackupMissing
-            expr: max by (volume, pvc_namespace, pvc) (time() - longhorn_volume_last_backup_at) > 26 * 3600
+            expr: |
+              max by (volume, pvc_namespace, pvc) (time() - longhorn_volume_last_backup_at) > 26 * 3600
+                unless on (volume) longhorn_volume_state{state="detached"} == 1
             for: 1h
             labels:
               severity: error
