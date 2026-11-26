@@ -15,13 +15,13 @@ template:
   spec:
     initContainers:
       - name: init-dind-externals
-        image: ghcr.io/actions/actions-runner:latest
+        image: ghcr.io/actions/actions-runner:2.338.2@sha256:6d0b2d80d80f143f77dcb676e50920100bbb547e39e883454d57f45ab8c31300
         command: ["cp", "-r", "/home/runner/externals/.", "/home/runner/tmpDir/"]
         volumeMounts:
           - name: dind-externals
             mountPath: /home/runner/tmpDir
       - name: dind
-        image: docker:dind
+        image: docker:29.10.1-dind@sha256:fbbc96e0af32cdc190aff92ba97a1281a115351a723afe21af78879cc55126b0
         args:
           - dockerd
           - --host=unix:///var/run/docker.sock
@@ -54,7 +54,7 @@ template:
             mountPath: /home/runner/externals
     containers:
       - name: runner
-        image: ghcr.io/actions/actions-runner:latest
+        image: ghcr.io/actions/actions-runner:2.338.2@sha256:6d0b2d80d80f143f77dcb676e50920100bbb547e39e883454d57f45ab8c31300
         command: ["/home/runner/run.sh"]
         env:
           - name: DOCKER_HOST
