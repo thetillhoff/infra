@@ -1,7 +1,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: hydra
+  name: hydra-manga-scraper
 spec:
   chart:
     spec:
@@ -23,3 +23,5 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: arc-runners-helm-values # automatically overridden by kustomize
+    - kind: ConfigMap
+      name: arc-runners-helm-values-manga-scraper # automatically overridden by kustomize

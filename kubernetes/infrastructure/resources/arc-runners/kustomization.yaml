@@ -7,12 +7,19 @@ resources:
 - networkPolicy-default-deny-ingress.yaml
 - ciliumNetworkPolicy-egress-internet-only.yaml
 - github-app.secret.yaml
-- helmRelease.yaml
+- helmRelease-manga-scraper.yaml
+- helmRelease-federated-cloud-platform.yaml
 
 configMapGenerator:
 - name: arc-runners-helm-values
   files:
   - values.yaml
+- name: arc-runners-helm-values-manga-scraper
+  files:
+  - values.yaml=values-manga-scraper.yaml
+- name: arc-runners-helm-values-federated-cloud-platform
+  files:
+  - values.yaml=values-federated-cloud-platform.yaml
 
 configurations:
 - kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease
