@@ -44,7 +44,7 @@ All alerts go through the Prometheus Alertmanager, which mails with the `grafana
 - `kube_job_status_failed` keeps old failed Jobs. A Job rule must ignore a Job that succeeded later or is older than a day (see `FcpJobFailed`).
 - The chart default `extraFlags` holds `web.enable-lifecycle`. Our override must keep it, or the reload sidecar gets 403 and a change of a rule needs a pod restart.
 - Check a change of a rule before you push: render the chart with `helm template` and run `promtool check rules` on the rendered `alerting_rules.yml` in Docker. A wrong key (`serverFiles` is top-level, not under `server:`) renders an empty `{}` without an error. After the rollout, `/api/v1/rules` of Prometheus must list the rule.
-- Test the path with a throwaway Kustomization (`interval: 1m`, `path: ./does-not-exist`, `prune: false`). The alert fires after about 5 minutes. Delete the Kustomization afterwards: the resolved mail follows within about 2 minutes. The counter `alertmanager_notifications_total{integration="email"}` on `:9093/metrics` rises by one per mail. Through the API-server proxy this call can time out because of the NetworkPolicy: retry.
+- Test the path with a throwaway Kustomization (`interval: 1m`, `path: ./does-not-exist`, `prune: false`). The alert fires after about 5 minutes. Delete the Kustomization afterwards: the resolved mail follows within about 2 minutes. The counter `alertmanager_notifications_total{integration="email"}` on `:9093/metrics` rises by one per mail. Use `kubectl port-forward` for this call: the API-server proxy can time out because of the NetworkPolicy.
 
 ## Prometheus hardening
 
