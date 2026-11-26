@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hydra
+spec:
+  chart:
+    spec:
+      chart: gha-runner-scale-set
+      sourceRef:
+        kind: HelmRepository
+        name: arc
+        namespace: arc-systems
+      version: 0.15.1 # Same version as the controller in controllers/arc
+  interval: 10m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  valuesFrom:
+    - kind: ConfigMap
+      name: arc-runners-helm-values # automatically overridden by kustomize

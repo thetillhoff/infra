@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: arc-runners
+resources:
+- namespace.yaml
+- limitRange-default-memory.yaml
+- networkPolicy-default-deny-ingress.yaml
+- ciliumNetworkPolicy-egress-internet-only.yaml
+- github-app.secret.yaml
+- helmRelease.yaml
+
+configMapGenerator:
+- name: arc-runners-helm-values
+  files:
+  - values.yaml
+
+configurations:
+- kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease

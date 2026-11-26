@@ -1,0 +1,80 @@
+githubConfigUrl: https://github.com/thetillhoff/manga-scraper
+githubConfigSecret: github-app
+runnerScaleSetName: hydra
+minRunners: 0
+maxRunners: 2
+
+# Explicit, because the chart otherwise looks up the controller in the live cluster, which CI cannot do.
+controllerServiceAccount:
+  name: arc-gha-rs-controller
+  namespace: arc-systems
+
+# The chart documents this pod spec for containerMode "dind". It is written out because the chart
+# does not merge `resources` into that mode.
+template:
+  spec:
+    initContainers:
+      - name: init-dind-externals
+        image: ghcr.io/actions/actions-runner:latest
+        command: ["cp", "-r", "/home/runner/externals/.", "/home/runner/tmpDir/"]
+        volumeMounts:
+          - name: dind-externals
+            mountPath: /home/runner/tmpDir
+      - name: dind
+        image: docker:dind
+        args:
+          - dockerd
+          - --host=unix:///var/run/docker.sock
+          - --group=$(DOCKER_GROUP_GID)
+        env:
+          - name: DOCKER_GROUP_GID
+            value: "123"
+        securityContext:
+          privileged: true
+        restartPolicy: Always
+        startupProbe:
+          exec:
+            command:
+              - docker
+              - info
+          initialDelaySeconds: 0
+          failureThreshold: 24
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: 512Mi
+          limits:
+            memory: 2Gi
+        volumeMounts:
+          - name: work
+            mountPath: /home/runner/_work
+          - name: dind-sock
+            mountPath: /var/run
+          - name: dind-externals
+            mountPath: /home/runner/externals
+    containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:latest
+        command: ["/home/runner/run.sh"]
+        env:
+          - name: DOCKER_HOST
+            value: unix:///var/run/docker.sock
+          - name: RUNNER_WAIT_FOR_DOCKER_IN_SECONDS
+            value: "120"
+        resources:
+          requests:
+            memory: 512Mi
+          limits:
+            memory: 2Gi
+        volumeMounts:
+          - name: work
+            mountPath: /home/runner/_work
+          - name: dind-sock
+            mountPath: /var/run
+    volumes:
+      - name: work
+        emptyDir: {}
+      - name: dind-sock
+        emptyDir: {}
+      - name: dind-externals
+        emptyDir: {}

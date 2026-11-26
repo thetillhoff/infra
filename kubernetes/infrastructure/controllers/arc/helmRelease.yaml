@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arc
+spec:
+  chart:
+    spec:
+      chart: gha-runner-scale-set-controller
+      sourceRef:
+        kind: HelmRepository
+        name: arc
+      version: 0.15.1 # From https://github.com/actions/actions-runner-controller/releases
+  interval: 10m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  values:
+    resources:
+      requests:
+        memory: 64Mi
+      limits:
+        memory: 256Mi

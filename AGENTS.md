@@ -107,15 +107,15 @@ Kustomizations are **per controller, per component and per app** — a broken on
 kubernetes/
   clusters/hydra/          # FluxCD Kustomization entrypoints
   infrastructure/
-    controllers/           # HelmReleases: cert-manager, external-dns, kubelet-csr-approver, longhorn, tailscale operator
-    resources/             # Cluster resources: admission policies, cert-manager issuers, gateways, firewall policies, monitoring, private-endpoints
+    controllers/           # one dir per controller (HelmRelease)
+    resources/             # one dir per cluster component
   apps/
-    hydra/                 # Per-app dirs: link-shortener, vaultwarden, umami, thetillhoff-de, trading, federated-cloud-platform, manga-scraper, webscan, wedding-website
+    hydra/                 # one dir per app
 ```
 
 `kubernetes/apps/hydra/trading/` is the **source of truth for the trading app on hydra** (Flux `app-trading`). The `~/code/trading` repo's `k8s/`/`services/` manifests are **local-dev (kind) only** and intentionally diverge — never edit them expecting a hydra change.
 
-Notes about one app or one component are in a `README.md` next to it (for example `manga-scraper`, `thetillhoff-de`, `private-endpoints`, `monitoring`, `firewall`, `cert-manager`, `pulumi`).
+Notes about one app or one component are in a `README.md` next to it (list: `find kubernetes pulumi -name README.md`).
 
 Each app dir typically contains: namespace, a `default` ServiceAccount without API token (`serviceAccount-default.yaml`), deployment/statefulset, service, HTTPRoutes (http+https), imagePolicy + imageRepository + imageUpdateAutomation (for FluxCD image automation), and optionally `*.secret.yaml` (SOPS-encrypted).
 
@@ -123,7 +123,7 @@ Each app dir typically contains: namespace, a `default` ServiceAccount without A
 
 Cilium is both the CNI and the Gateway API implementation (no separate ingress controller). Apps expose themselves via `HTTPRoute` resources referencing Gateways in `kubernetes/infrastructure/resources/gateways/`. Network policies use `CiliumClusterwideNetworkPolicy` in `kubernetes/infrastructure/resources/firewall/`.
 
-Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}` — it is a **node/host** firewall, not a pod-to-pod policy. The app namespaces `trading`, `manga-scraper`, `federated-cloud-platform`, `vaultwarden`, `umami`, `webscan`, `link-shortener`, `thetillhoff-de` and `wedding-website` have a `default-deny-ingress` policy; other namespaces are open.
+Note: the `CiliumClusterwideNetworkPolicy` in `firewall/` uses `nodeSelector: {}` — it is a **node/host** firewall, not a pod-to-pod policy. A namespace with a `default-deny-ingress` policy blocks ingress by default (list: `kubectl get networkpolicy -A | grep default-deny-ingress`); other namespaces are open.
 
 The Cilium Gateway reaches a backend as the entity `ingress`, which a `NetworkPolicy` cannot select. Allow it with a `CiliumNetworkPolicy` and `fromEntities: [ingress]` (example: `apps/hydra/vaultwarden/ciliumNetworkPolicy-vaultwarden-from-gateway.yaml`). To test a block, run `curl --max-time 5` from a pod of another namespace that has curl (a caddy pod in `private-endpoints`): a blocked call times out with exit 28.
 
@@ -159,7 +159,7 @@ Default kubeconfig context may be a local kind cluster, not hydra. Always run `e
 
 ### Memory pressure
 
-3 control-plane nodes (cx43, 8 vCPU / 16 GB), no workers. The baseline is heavy: prometheus about 2.75GB, 3x kube-apiserver up to 3.9GB, Longhorn, Cilium. A large batch burst can still hit the kernel OOM-killer and take the nodes down. The `trading` namespace has a ResourceQuota. Every app namespace, `monitoring`, `cert-manager` and `tailscale` has a `LimitRange` (`limitRange-default-memory.yaml`) that gives a container without limits a 256Mi memory limit. A container that peaks above about 150Mi needs its own `resources`.
+3 control-plane nodes (cx43, 8 vCPU / 16 GB), no workers. The baseline is heavy: prometheus about 2.75GB, 3x kube-apiserver up to 3.9GB, Longhorn, Cilium. A large batch burst can still hit the kernel OOM-killer and take the nodes down. The `trading` namespace has a ResourceQuota. A namespace with a `LimitRange` (`limitRange-default-memory.yaml`; list: `find kubernetes -name limitRange-default-memory.yaml`) gives a container without limits a 256Mi memory limit. A container that peaks above about 150Mi needs its own `resources`.
 
 Recover an unresponsive Talos node with a Hetzner hard reset (console or `hcloud server reset`). If `apid` is dead, `talosctl reboot` cannot reach it.
 
