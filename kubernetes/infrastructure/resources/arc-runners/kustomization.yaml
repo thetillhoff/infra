@@ -4,6 +4,8 @@ namespace: arc-runners
 resources:
 - namespace.yaml
 - limitRange-default-memory.yaml
+- networkPolicy-default-deny-ingress.yaml
+- ciliumNetworkPolicy-egress-internet-only.yaml
 - github-app.secret.yaml
 - helmRelease.yaml
 
