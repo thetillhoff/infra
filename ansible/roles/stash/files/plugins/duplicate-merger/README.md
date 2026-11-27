@@ -1,0 +1,49 @@
+# Duplicate Merger
+
+Adds a "Keep this" button to each row of the native Scene Duplicate Checker (Settings, Tools).
+The button merges the metadata of a duplicate group into the kept file and deletes the other files from disk.
+The page does not reload: a resolved group is hidden.
+
+## What a run does
+
+For one group, in this order. A failed step stops the run before any delete.
+
+1. `sceneUpdate` combines the metadata on the scene of the kept file.
+2. The plugin reads the scene again. It stops when a tag or performer of any source is missing.
+3. `sceneMerge` moves files, markers, and play and O history.
+4. `sceneUpdate` makes the kept file the primary file.
+5. `deleteFiles` deletes the other files from disk. `destroyFiles` removes the database entry of a file that is already missing on disk.
+
+The "Dry run" box is on by default. It lists the calls and sends none.
+
+## Which file stays
+
+Rules run in order. Each rule keeps the best files and the next rule decides between the rest.
+
+1. The file exists on disk.
+2. The longer file (2 seconds tolerance, same as `video`).
+3. A file with audio.
+4. The higher short side. A group with both a 720p and a 1080p file needs a choice: no file is deleted until the user picks one. The suggested file is 1080p when a scene in the group has a rating of 5 stars, else 720p. A short side above 1080 also needs a choice.
+5. The higher frame rate, counted up to 30 fps (same cap as `video shrink`).
+6. The higher bitrate, counted up to the lean limit of `video` (350 kb/s at 720p, scaled by pixel count).
+7. The smaller file.
+8. The older file, then the lower file ID.
+
+## Metadata
+
+- Tags, URLs, galleries, stash IDs and groups of all scenes are combined.
+- Performers are combined. The dialog shows when they differ.
+- When two scenes have a different title, code, details, director, date, rating or studio, the dialog asks which value to keep. A value that only one scene has is copied.
+
+## Files
+
+- `rank.js`: the rules and the conflict check, no network.
+- `plan.js`: the steps and the GraphQL queries.
+- `duplicate-merger.js`: the page.
+- `*.test.js`: run with `node --test`.
+
+## Limits
+
+- The native page is not patchable, so the plugin reads its table. A change of that table can break the buttons.
+- The page script is not tested against a running Stash. The rules and the steps are tested with a fake `gql`.
+- Stash does not check files for corruption. The plugin cannot tell a damaged keeper from a good one.
