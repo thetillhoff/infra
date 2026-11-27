@@ -20,7 +20,7 @@ jobs:
 
       # Secrets hold SOPS metadata. The trading CRDs and their objects have no public schema. The
       # catalog schema of RecurringJob lacks the task system-backup of Longhorn 1.13.
-      - uses: docker://ghcr.io/yannh/kubeconform:v0.8.0
+      - uses: docker://ghcr.io/yannh/kubeconform:v0.8.0@sha256:faffaf43f95aa6425306e1ab8d6fcad72acb9049158f38e574c085ea1ec0f64e
         with:
           args: >-
             -strict -summary
@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: docker://ghcr.io/allenporter/flux-local:v8.4.0
+      - uses: docker://ghcr.io/allenporter/flux-local:v8.4.0@sha256:c0be852e30f299ce6a220cc992b0c21a2a0b0684cc17713b9d718e18d9c8beff
         env:
           HOME: /tmp
         with:
