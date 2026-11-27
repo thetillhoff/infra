@@ -37,6 +37,7 @@ All alerts go through the Prometheus Alertmanager, which mails with the `grafana
 
 - Metric rules: `serverFiles` in `prometheus/values.yaml`, one group per topic (flux, workloads, nodes, monitoring, storage, certificates, network, one group per app). To alert on a new app, add a group there.
 - Log rules: `loki/configMap-loki-rules.yaml`. The Loki ruler evaluates them and sends to the same Alertmanager.
+- Alerts with a name that matches `Fcp.*` go to the receiver `email-firing-only` (`alertmanager.config.route.routes` in `prometheus/values.yaml`): one mail when the alert fires, no resolved mail. All other alerts keep the resolved mail. To move another alert to this receiver, widen the `alertname` matcher.
 - Nothing alerts when the cluster or the Alertmanager is down. That needs an external dead-man's switch.
 - Alertmanager has no authentication. A NetworkPolicy admits only the Prometheus server and the Loki ruler on `:9093`. Add any new sender there.
 - An alert sends one mail, then a reminder every 24 hours, then one mail when it resolves. Each alert is its own mail.
