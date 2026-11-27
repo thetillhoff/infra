@@ -1,0 +1,10 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: tape
+# Baseline: nothing here accepts traffic unless a policy allows it. The tracker has no
+# listener, so only postgres needs an allow rule.
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]

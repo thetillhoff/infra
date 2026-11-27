@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: tape
+  namespace: tape
+# A pod without requests would be BestEffort, and the quota rejects pods that declare nothing.
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: 200m
+        memory: 256Mi
+      defaultRequest:
+        cpu: 50m
+        memory: 64Mi

@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: tape
+resources:
+  - namespace.yaml
+  - serviceAccount-default.yaml
+  - resourceQuota-tape.yaml
+  - limitRange-tape.yaml
+  - ghcr-creds.secret.yaml
+  - tape-postgres.secret.yaml
+  - tape-session.secret.yaml
+
+  - networkPolicy-default-deny-ingress.yaml
+  - networkPolicy-postgres.yaml
+
+  - service-postgres.yaml
+  - statefulSet-postgres.yaml
+
+  # The tracker creates its tables at start, so there is no migration job.
+  - deployment-tracker.yaml
+
+  - imageRepository-tracker.yaml
+  - imagePolicy-tracker.yaml
+  - imageUpdateAutomation.yaml
