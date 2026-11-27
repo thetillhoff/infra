@@ -73,3 +73,15 @@ test('the keeper file can never be in the delete list', () => {
   const { scenes, r, conflicts } = setup();
   assert.throws(() => buildPlan(scenes, r.keeper, [...r.losers, r.keeper], conflicts), /keeper file/);
 });
+
+test('cleanup: a multi-file scene keeps its best file, deletes the rest, skips manual cases', async () => {
+  const one = sc('1', [f('10'), f('11', { width: 854, height: 480 })]);
+  const mixed = sc('2', [f('20'), f('21', { width: 1920, height: 1080 })]);
+  const { buildCleanup, runCleanup } = require('./plan.js');
+  const items = [one, mixed].map((s) => buildCleanup(s, pickKeeper([s])));
+  assert.deepEqual([items[0].keepFileId, items[0].deleteIds, !!items[1].manual], ['10', ['11'], true]);
+  const { gql, calls } = fakeGql();
+  await runCleanup(items, gql, () => {}, false);
+  assert.deepEqual(calls.map((c) => c[0]), ['update', 'deleteFiles']);
+  assert.deepEqual(calls[0][1].input, { id: '1', primary_file_id: '10' });
+});

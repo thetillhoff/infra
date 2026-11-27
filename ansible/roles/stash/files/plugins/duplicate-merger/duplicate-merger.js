@@ -5,7 +5,7 @@
   'use strict';
 
   const { pickKeeper, findConflicts } = window.DupRank;
-  const { Q, buildPlan, runPlan } = window.DupPlan;
+  const { Q, buildPlan, runPlan, buildCleanup, runCleanup } = window.DupPlan;
   const ROOT = '#scene-duplicate-checker';
   const cache = new Map(); // scene id -> scene
   const el = (tag, props = {}, ...kids) => {
@@ -62,7 +62,14 @@
 
   // ---- annotate -------------------------------------------------------------------------------
   let busy = false;
+  function ensureBar() {
+    const root = document.querySelector(ROOT);
+    if (!root || root.querySelector('.dm-bar')) return;
+    root.prepend(el('div', { className: 'dm-bar' }, el('button', { className: 'btn btn-secondary', textContent: 'Clean up scenes that hold several files', onclick: openCleanup })));
+  }
+
   async function annotate() {
+    ensureBar();
     if (busy || !document.querySelector(ROOT)) return;
     busy = true;
     try {
@@ -132,6 +139,7 @@
       } catch (e) {
         log.textContent += `ERROR: ${e.message}\n`;
       }
+      run.disabled = !dry.checked;
     };
 
     const overlay = el('div', { className: 'dm-overlay' }, el('div', { className: 'dm-modal' },
@@ -143,6 +151,42 @@
       needReview ? el('label', {}, review, ' I checked the choices above') : '',
       el('label', {}, dry, ' Dry run (nothing is changed)'),
       el('div', { style: 'margin-top:1rem' }, run, ' ', el('button', { className: 'btn btn-secondary', textContent: 'Close', onclick: close })),
+      log));
+    document.body.append(overlay);
+  }
+
+  // ---- clean up scenes that already hold several files ------------------------------------------
+  async function openCleanup() {
+    const scenes = (await gql(Q.multi)).findScenes.scenes;
+    const items = scenes.map((s) => buildCleanup(s, pickKeeper([s])));
+    const log = el('pre', { textContent: '' });
+    const dry = el('input', { type: 'checkbox', checked: true });
+    const run = el('button', { className: 'btn btn-danger', textContent: 'Run' });
+    const todo = items.filter((i) => !i.manual);
+    run.disabled = !todo.length;
+    run.onclick = async () => {
+      run.disabled = true;
+      log.textContent = '';
+      try {
+        await runCleanup(items, gql, (m) => (log.textContent += m + '\n'), dry.checked);
+        if (!dry.checked) scenes.forEach((s) => cache.delete(s.id));
+      } catch (e) {
+        log.textContent += `ERROR: ${e.message}\n`;
+      }
+      run.disabled = !dry.checked; // a dry run can be followed by the real one
+    };
+    const rows = items.map((i) => el('div', { className: i.manual ? 'dm-manual' : '' },
+      el('b', { textContent: `scene ${i.scene.id} ${i.scene.title || ''}` }),
+      i.manual ? ` - needs your choice, skipped: ${i.manual}` : '',
+      i.scene.files.map((f) => {
+        const label = i.manual ? 'file' : f.id === i.keepFileId ? 'keep' : 'delete';
+        return el('div', { className: label === 'delete' ? 'dm-del' : '', textContent: `${label}: ${describe({ file: f })}` });
+      })));
+    const overlay = el('div', { className: 'dm-overlay' }, el('div', { className: 'dm-modal' },
+      el('h4', { textContent: `${items.length} scene(s) hold several files` }),
+      rows,
+      el('label', {}, dry, ' Dry run (nothing is changed)'),
+      el('div', { style: 'margin-top:1rem' }, run, ' ', el('button', { className: 'btn btn-secondary', textContent: 'Close', onclick: () => overlay.remove() })),
       log));
     document.body.append(overlay);
   }

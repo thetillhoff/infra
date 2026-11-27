@@ -16,6 +16,11 @@ For one group, in this order. A failed step stops the run before any delete.
 
 The "Dry run" box is on by default. It lists the calls and sends none.
 
+## Scenes that already hold several files
+
+The native Merge leaves one scene with several files. The bar above the table lists these scenes.
+Each scene keeps its best file (same rules as below) and `deleteFiles` deletes the others. A scene with a 720p and a 1080p file is skipped: no file is deleted. Delete the extra file in Stash by hand. The dry run is on by default.
+
 ## Which file stays
 
 Rules run in order. Each rule keeps the best files and the next rule decides between the rest.
@@ -44,5 +49,5 @@ Rules run in order. Each rule keeps the best files and the next rule decides bet
 ## Limits
 
 - The native page is not patchable, so the plugin reads its table. A change of that table can break the buttons.
-- The page script is not tested against a running Stash. The rules and the steps are tested with a fake `gql`.
+- The unit tests use a fake `gql`. The page and the mutations were checked once against Stash 0.32 with Playwright.
 - Stash does not check files for corruption. The plugin cannot tell a damaged keeper from a good one.

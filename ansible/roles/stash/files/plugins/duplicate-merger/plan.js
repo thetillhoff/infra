@@ -13,6 +13,7 @@
     files { id path basename width height duration frame_rate bit_rate size audio_codec video_codec mod_time }`;
 
   const Q = {
+    multi: `query { findScenes(scene_filter: { file_count: { value: 1, modifier: GREATER_THAN } }, filter: { per_page: -1 }) { scenes { ${SCENE_FIELDS} } } }`,
     scenes: `query ($ids: [ID!]) { findScenes(ids: $ids, filter: { per_page: -1 }) { scenes { ${SCENE_FIELDS} } } }`,
     update: `mutation ($input: SceneUpdateInput!) { sceneUpdate(input: $input) { id } }`,
     merge: `mutation ($input: SceneMergeInput!) { sceneMerge(input: $input) { id } }`,
@@ -84,7 +85,26 @@
     if (plan.deleteIds.length) await call('deleteFiles (from disk)', Q.deleteFiles, { ids: plan.deleteIds });    log(dry ? 'dry run done, nothing changed' : 'done');
   }
 
-  const api = { Q, buildPlan, runPlan };
+  // One scene that holds several files (made by the native Merge): keep the best file, delete the rest.
+  // `auto` is the result of pickKeeper([scene]). A scene that needs a human choice is skipped.
+  function buildCleanup(scene, auto) {
+    return { scene, keepFileId: auto.keeper.file.id, deleteIds: auto.losers.map((l) => l.file.id), manual: auto.manual };
+  }
+
+  async function runCleanup(items, gql, log, dry) {
+    for (const it of items) {
+      if (it.manual) { log(`skip scene ${it.scene.id}: ${it.manual}`); continue; }
+      const call = async (label, q, v) => {
+        log(`${dry ? '[dry run] would run' : 'run'} ${label} ${JSON.stringify(v)}`);
+        return dry ? null : gql(q, v);
+      };
+      await call(`scene ${it.scene.id}: primary file`, Q.update, { input: { id: it.scene.id, primary_file_id: it.keepFileId } });
+      await call(`scene ${it.scene.id}: deleteFiles`, Q.deleteFiles, { ids: it.deleteIds });
+    }
+    log(dry ? 'dry run done, nothing changed' : 'done');
+  }
+
+  const api = { Q, buildPlan, runPlan, buildCleanup, runCleanup };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.DupPlan = api;
 })(typeof window !== 'undefined' ? window : globalThis);
