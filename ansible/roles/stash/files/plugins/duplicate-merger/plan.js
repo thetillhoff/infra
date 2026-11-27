@@ -10,14 +10,13 @@
     galleries { id }
     groups { group { id } scene_index }
     stash_ids { endpoint stash_id }
-    files { id path basename width height duration frame_rate bit_rate size audio_codec video_codec mod_time missing_since }`;
+    files { id path basename width height duration frame_rate bit_rate size audio_codec video_codec mod_time }`;
 
   const Q = {
     scenes: `query ($ids: [ID!]) { findScenes(ids: $ids, filter: { per_page: -1 }) { scenes { ${SCENE_FIELDS} } } }`,
     update: `mutation ($input: SceneUpdateInput!) { sceneUpdate(input: $input) { id } }`,
     merge: `mutation ($input: SceneMergeInput!) { sceneMerge(input: $input) { id } }`,
     deleteFiles: `mutation ($ids: [ID!]!) { deleteFiles(ids: $ids) }`,
-    destroyFiles: `mutation ($ids: [ID!]!) { destroyFiles(ids: $ids) }`,
   };
 
   const uniq = (xs) => [...new Set(xs)];
@@ -60,8 +59,7 @@
       update: input,
       mergeSources: others.map((s) => s.id),
       keepFileId: keeper.file.id,
-      deleteIds: gone.filter((l) => !l.file.missing_since).map((l) => l.file.id),
-      destroyIds: gone.filter((l) => l.file.missing_since).map((l) => l.file.id),
+      deleteIds: gone.map((l) => l.file.id),
       required: { performers: input.performer_ids, tags: input.tag_ids },
     };
   }
@@ -83,9 +81,7 @@
     if (plan.mergeSources.length)
       await call('sceneMerge (history, markers, files)', Q.merge, { input: { source: plan.mergeSources, destination: plan.dest.id, play_history: true, o_history: true } });
     await call('sceneUpdate (primary file)', Q.update, { input: { id: plan.dest.id, primary_file_id: plan.keepFileId } });
-    if (plan.deleteIds.length) await call('deleteFiles (from disk)', Q.deleteFiles, { ids: plan.deleteIds });
-    if (plan.destroyIds.length) await call('destroyFiles (missing on disk, database only)', Q.destroyFiles, { ids: plan.destroyIds });
-    log(dry ? 'dry run done, nothing changed' : 'done');
+    if (plan.deleteIds.length) await call('deleteFiles (from disk)', Q.deleteFiles, { ids: plan.deleteIds });    log(dry ? 'dry run done, nothing changed' : 'done');
   }
 
   const api = { Q, buildPlan, runPlan };

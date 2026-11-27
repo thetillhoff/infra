@@ -3,7 +3,7 @@ const assert = require('node:assert');
 const { pickKeeper, findConflicts, unionIds } = require('./rank.js');
 
 let n = 0;
-const file = (o) => ({ id: ++n, width: 1280, height: 720, duration: 600, frame_rate: 30, bit_rate: 500000, size: 1e8, audio_codec: 'aac', mod_time: '2026-01-01', missing_since: null, ...o });
+const file = (o) => ({ id: ++n, width: 1280, height: 720, duration: 600, frame_rate: 30, bit_rate: 500000, size: 1e8, audio_codec: 'aac', mod_time: '2026-01-01', ...o });
 const scene = (f, o = {}) => ({ id: String(f.id), rating100: 0, files: [f], ...o });
 const run = (files, o) => pickKeeper(files.map((f) => scene(f, o)));
 
@@ -34,11 +34,6 @@ test('720p next to 1080p needs a human; target picks the suggestion', () => {
 test('portrait uses the short side', () => {
   const a = file({ width: 720, height: 1280 }), b = file({ width: 480, height: 854 });
   assert.equal(run([a, b]).keeper.file.id, a.id);
-});
-
-test('a missing file loses, even when better', () => {
-  const old = file({ width: 1280, height: 720, missing_since: '2026-05-05', size: 1 }), nu = file({});
-  assert.equal(run([old, nu]).keeper.file.id, nu.id);
 });
 
 test('a truncated file loses', () => {

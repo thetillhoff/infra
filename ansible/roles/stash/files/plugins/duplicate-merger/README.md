@@ -12,7 +12,7 @@ For one group, in this order. A failed step stops the run before any delete.
 2. The plugin reads the scene again. It stops when a tag or performer of any source is missing.
 3. `sceneMerge` moves files, markers, and play and O history.
 4. `sceneUpdate` makes the kept file the primary file.
-5. `deleteFiles` deletes the other files from disk. `destroyFiles` removes the database entry of a file that is already missing on disk.
+5. `deleteFiles` deletes the other files from disk.
 
 The "Dry run" box is on by default. It lists the calls and sends none.
 
@@ -20,14 +20,13 @@ The "Dry run" box is on by default. It lists the calls and sends none.
 
 Rules run in order. Each rule keeps the best files and the next rule decides between the rest.
 
-1. The file exists on disk.
-2. The longer file (2 seconds tolerance, same as `video`).
-3. A file with audio.
-4. The higher short side. A group with both a 720p and a 1080p file needs a choice: no file is deleted until the user picks one. The suggested file is 1080p when a scene in the group has a rating of 5 stars, else 720p. A short side above 1080 also needs a choice.
-5. The higher frame rate, counted up to 30 fps (same cap as `video shrink`).
-6. The higher bitrate, counted up to the lean limit of `video` (350 kb/s at 720p, scaled by pixel count).
-7. The smaller file.
-8. The older file, then the lower file ID.
+1. The longer file (2 seconds tolerance, same as `video`).
+2. A file with audio.
+3. The higher short side. A group with both a 720p and a 1080p file needs a choice: no file is deleted until the user picks one. The suggested file is 1080p when a scene in the group has a rating of 5 stars, else 720p. A short side above 1080 also needs a choice.
+4. The higher frame rate, counted up to 30 fps (same cap as `video shrink`).
+5. The higher bitrate, counted up to the lean limit of `video` (350 kb/s at 720p, scaled by pixel count).
+6. The smaller file.
+7. The older file, then the lower file ID.
 
 ## Metadata
 

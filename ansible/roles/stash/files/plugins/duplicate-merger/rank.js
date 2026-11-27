@@ -31,7 +31,6 @@
   }
 
   const RULES = [
-    ['present on disk', (l) => best(l, (c) => (c.file.missing_since ? 0 : 1))],
     ['longer duration', (l) => best(l, (c) => c.file.duration || 0, DUR_TOLERANCE)],
     ['has audio', (l) => best(l, (c) => (c.file.audio_codec ? 1 : 0))],
     ['higher frame rate (up to 30)', (l) => best(l, (c) => fpsOf(c.file), 0.5)],
@@ -67,16 +66,14 @@
       if (next.length < list.length) trail.push(name);
       list = next;
     };
-    step('present on disk', RULES[0][1]);
-    step('longer duration', RULES[1][1]);
-    step('has audio', RULES[2][1]);
+    for (const [name, fn] of RULES.slice(0, 2)) step(name, fn);
     if (list.length > 1) {
       const r = byResolution(list, target);
       if (r.survivors.length < list.length) trail.push('higher resolution');
       list = r.survivors;
       manual = r.manual;
     }
-    for (const [name, fn] of RULES.slice(3)) step(name, fn);
+    for (const [name, fn] of RULES.slice(2)) step(name, fn);
     const keeper = list[0];
     const losers = candidates(scenes).filter((c) => c.file.id !== keeper.file.id);
     return { keeper, losers, manual, trail, target };

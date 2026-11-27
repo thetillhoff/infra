@@ -57,7 +57,7 @@
 
   const describe = (c) => {
     const f = c.file;
-    return `${f.path} - ${f.width}x${f.height}, ${Math.round(f.frame_rate || 0)} fps, ${Math.round((f.bit_rate || 0) / 1000)} kb/s, ${(f.size / 1e6).toFixed(0)} MB${f.missing_since ? ', MISSING on disk' : ''}`;
+    return `${f.path} - ${f.width}x${f.height}, ${Math.round(f.frame_rate || 0)} fps, ${Math.round((f.bit_rate || 0) / 1000)} kb/s, ${(f.size / 1e6).toFixed(0)} MB`;
   };
 
   // ---- annotate -------------------------------------------------------------------------------
