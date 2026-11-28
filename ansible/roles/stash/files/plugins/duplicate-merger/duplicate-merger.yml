@@ -1,7 +1,9 @@
 name: Duplicate Merger
-description: Rule-based duplicate scene merger. Picks the best-quality file as destination, previews merge direction, and executes in bulk.
-version: 0.1.0
+description: Adds "Keep this" to the native Scene Duplicate Checker. Ranks the files, combines the metadata, merges, and deletes the other files.
+version: 0.2.0
 
 ui:
   javascript:
+    - rank.js
+    - plan.js
     - duplicate-merger.js
