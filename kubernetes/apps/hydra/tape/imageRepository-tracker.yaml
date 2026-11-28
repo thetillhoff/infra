@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: tape-tracker
+  namespace: tape
+spec:
+  image: ghcr.io/thetillhoff/tape-tracker
+  interval: 5m0s
+  secretRef:
+    name: ghcr-creds

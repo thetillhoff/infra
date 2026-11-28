@@ -71,7 +71,7 @@ export SOPS_AGE_KEY_FILE=$(pwd)/age.key  # or use task configure-env
 
 ### CI
 
-Every push runs `.github/workflows/validate-kubernetes.yaml`: strict `kubeconform` on each built Flux Kustomization, and `flux-local test`, which also renders each HelmRelease. To run it locally, use the flux-local image of the workflow with `docker run --rm -e HOME=/tmp -v "$PWD:/repo:z" -w /repo <image> test --enable-helm --path kubernetes/clusters/hydra` (helm needs a writable HOME).
+Every push runs `.github/workflows/validate-kubernetes.yaml`: strict `kubeconform` on each built Flux Kustomization, and `flux-local test`, which also renders each HelmRelease. To run it locally, use the flux-local image of the workflow with `docker run --rm --user 0:0 -e HOME=/tmp -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/repo -v "$PWD:/repo:z" -w /repo <image> test --enable-helm --path kubernetes/clusters/hydra` (helm needs a writable HOME; on a rootless host the mount needs `--user 0:0` and git needs the `safe.directory` variables).
 
 A push that changes `pulumi/` also runs `validate-pulumi.yaml`: a type check with `tsc --noEmit`, with no Pulumi token, so it cannot read the stack state. Run `task preview` locally for a real preview.
 
@@ -157,9 +157,9 @@ GA before bumping; a "next minor" that isn't GA yet (k8s/Talos often lag each ot
 
 Default kubeconfig context may be a local kind cluster, not hydra. Always run `eval "$(task configure-env)"` before any kubectl/flux commands.
 
-### Memory pressure
+### Memory limits
 
-3 control-plane nodes (cx43, 8 vCPU / 16 GB), no workers. The baseline is heavy: prometheus about 2.75GB, 3x kube-apiserver up to 3.9GB, Longhorn, Cilium. A large batch burst can still hit the kernel OOM-killer and take the nodes down. The `trading` namespace has a ResourceQuota. A namespace with a `LimitRange` (`limitRange-default-memory.yaml`; list: `find kubernetes -name limitRange-default-memory.yaml`) gives a container without limits a 256Mi memory limit. A container that peaks above about 150Mi needs its own `resources`.
+3 control-plane nodes (cx43, 8 vCPU / 16 GB), no workers. The `trading` namespace has a ResourceQuota. A namespace with a `LimitRange` (`limitRange-default-memory.yaml`; list: `find kubernetes -name limitRange-default-memory.yaml`) gives a container without limits a 256Mi memory limit. A container that peaks above about 150Mi needs its own `resources`.
 
 Recover an unresponsive Talos node with a Hetzner hard reset (console or `hcloud server reset`). If `apid` is dead, `talosctl reboot` cannot reach it.
 

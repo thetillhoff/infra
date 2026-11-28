@@ -9,6 +9,7 @@ resources:
 - github-app.secret.yaml
 - helmRelease-manga-scraper.yaml
 - helmRelease-federated-cloud-platform.yaml
+- helmRelease-tape.yaml
 
 configMapGenerator:
 - name: arc-runners-helm-values
@@ -20,6 +21,9 @@ configMapGenerator:
 - name: arc-runners-helm-values-federated-cloud-platform
   files:
   - values.yaml=values-federated-cloud-platform.yaml
+- name: arc-runners-helm-values-tape
+  files:
+  - values.yaml=values-tape.yaml
 
 configurations:
 - kustomizeconfig.yaml # Used to map the generated configmap into the helmRelease

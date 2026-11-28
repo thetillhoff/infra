@@ -17,7 +17,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: admin-web
-          image: ghcr.io/thetillhoff/federated-cloud-platform/admin-web:73 # {"$imagepolicy": "federated-cloud-platform:fcp-admin-web"}
+          image: ghcr.io/thetillhoff/federated-cloud-platform/admin-web:74 # {"$imagepolicy": "federated-cloud-platform:fcp-admin-web"}
           ports:
             - containerPort: 8080
           # The static shell, not /health: that path proxies to the API.

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracker
+  namespace: tape
+spec:
+  replicas: 1
+  # Recreate: two managers at once would write every viewer row twice.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: tracker
+  template:
+    metadata:
+      labels:
+        app: tracker
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullSecrets:
+        - name: ghcr-creds
+      containers:
+        - name: tracker
+          image: ghcr.io/thetillhoff/tape-tracker:2 # {"$imagepolicy": "tape:tape-tracker"}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: TRACKER_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: tape-postgres
+                  key: dsn
+            - name: TAPE_SESSIONID
+              valueFrom:
+                secretKeyRef:
+                  name: tape-session
+                  key: sessionid
+          # Start values, not measured. Read kubectl top after a day with real handles.
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
