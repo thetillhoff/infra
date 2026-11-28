@@ -18,6 +18,7 @@
     update: `mutation ($input: SceneUpdateInput!) { sceneUpdate(input: $input) { id } }`,
     merge: `mutation ($input: SceneMergeInput!) { sceneMerge(input: $input) { id } }`,
     phash: `mutation { metadataGenerate(input: { phashes: true }) }`, // overwrite is off: only scenes without a phash
+    jobs: `query { jobQueue { id status progress } }`,
     deleteFiles: `mutation ($ids: [ID!]!) { deleteFiles(ids: $ids) }`,
   };
 

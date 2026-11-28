@@ -22,7 +22,7 @@ The buttons work as in the table above: `Keep (<reason>)` on the suggested file 
 
 ## Missing phashes
 
-Next to the native warning "Missing phashes for N scenes" a button starts Stash's phash task. It skips scenes that already have a phash. Reload the page when the task ends.
+Next to the native warning "Missing phashes for N scenes" a button starts Stash's phash task. It skips scenes that already have a phash. The button shows the progress. When the task ends it becomes "Finished - reload this page", and a click reloads the page.
 
 ## Which file stays
 

@@ -73,8 +73,16 @@
     btn.onclick = async () => {
       btn.disabled = true;
       try {
-        await gql(Q.phash);
-        btn.textContent = 'Started - see the task queue, then reload this page';
+        const id = String((await gql(Q.phash)).metadataGenerate);
+        for (;;) {
+          const job = ((await gql(Q.jobs)).jobQueue || []).find((j) => j.id === id);
+          if (!job) break; // a finished job leaves the queue
+          btn.textContent = `Generating phashes... ${Math.round((job.progress || 0) * 100)}%`;
+          await new Promise((r) => setTimeout(r, 1500));
+        }
+        btn.textContent = 'Finished - reload this page';
+        btn.disabled = false;
+        btn.onclick = () => location.reload();
       } catch (e) {
         btn.textContent = `Failed: ${e.message}`;
         btn.disabled = false;
