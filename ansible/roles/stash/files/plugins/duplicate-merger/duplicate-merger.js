@@ -23,6 +23,7 @@
 
   document.head.append(el('style', { textContent: `
     [data-dm-done] { display: none; }
+    .dm-keep { white-space: normal; }
     .dm-badge { display: block; font-size: .8em; opacity: .85; }
     .dm-badge.dm-manual { color: #f0ad4e; }
     .dm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 2000; overflow: auto; }
@@ -49,7 +50,7 @@
   }
 
   async function load(ids) {
-    const need = ids.filter((id) => !cache.has(id));
+    const need = [...new Set(ids)].filter((id) => !cache.has(id)); // one scene can sit in two groups
     if (!need.length) return;
     const data = await gql(Q.scenes, { ids: need });
     data.findScenes.scenes.forEach((s) => cache.set(s.id, s));
@@ -82,15 +83,13 @@
         g.rows.forEach((tr, i) => {
           tr.dataset.dm = '1';
           const id = g.ids[i];
-          const isKeeper = auto.keeper.scene.id === id;
+          const suggested = !auto.manual && auto.keeper.scene.id === id;
           const ops = tr.querySelector('td:last-child');
           if (!ops || ops.querySelector('[data-dm-keep]')) return;
-          ops.append(el('button', { className: `btn ${isKeeper ? 'btn-success' : 'btn-secondary'} edit-button`, textContent: isKeeper ? 'Keep (suggested)' : 'Keep this', onclick: () => openModal(g, scenes, id) }));
+          const label = suggested ? `Keep (${auto.trail.join(', ') || 'suggested'})` : 'Keep this';
+          ops.append(el('button', { className: `btn ${suggested ? 'btn-success' : 'btn-secondary'} edit-button dm-keep`, textContent: label, onclick: () => openModal(g, scenes, id) }));
           ops.lastElementChild.dataset.dmKeep = id;
-          if (isKeeper) {
-            const title = tr.querySelector('td.text-left') || tr.children[2];
-            title?.append(el('span', { className: `dm-badge${auto.manual ? ' dm-manual' : ''}`, textContent: auto.manual ? `needs your choice: ${auto.manual}` : `suggested keeper (${auto.trail.join(', ') || 'only candidate'})` }));
-          }
+          if (auto.manual && i === 0) ops.append(el('span', { className: 'dm-badge dm-manual', textContent: `no suggestion: ${auto.manual}` }));
         });
       }
     } catch (e) {
@@ -112,10 +111,9 @@
 
     const close = () => overlay.remove();
     const log = el('pre', { textContent: '' });
-    const dry = el('input', { type: 'checkbox', checked: true });
     const review = el('input', { type: 'checkbox' });
-    const run = el('button', { className: 'btn btn-danger', textContent: 'Run' });
-    const needReview = auto.manual || conflicts.length;
+    const run = el('button', { className: 'btn btn-danger', textContent: 'Merge and delete the others' });
+    const needReview = conflicts.length; // picking the file is the choice for a 720p/1080p group
     run.disabled = !!needReview;
     review.onchange = () => (run.disabled = !review.checked);
 
@@ -131,15 +129,13 @@
       log.textContent = '';
       try {
         const plan = buildPlan(scenes, keeper, losers, conflicts, choices);
-        await runPlan(plan, gql, (m) => (log.textContent += m + '\n'), dry.checked);
-        if (!dry.checked) {
-          group.rows.forEach((tr) => (tr.dataset.dmDone = '1'));
-          scenes.forEach((s) => cache.delete(s.id));
-        }
+        await runPlan(plan, gql, (m) => (log.textContent += m + '\n'), false);
+        group.rows.forEach((tr) => (tr.dataset.dmDone = '1'));
+        scenes.forEach((s) => cache.delete(s.id));
       } catch (e) {
         log.textContent += `ERROR: ${e.message}\n`;
+        run.disabled = false; // a failed run stopped before any delete, so it can be retried
       }
-      run.disabled = !dry.checked;
     };
 
     const overlay = el('div', { className: 'dm-overlay' }, el('div', { className: 'dm-modal' },
@@ -149,7 +145,6 @@
       el('h5', { textContent: 'Delete' }), losers.map((c) => el('div', { className: 'dm-del', textContent: describe(c) })),
       conflicts.length ? [el('h5', { textContent: 'Values that differ' }), conflictUi] : '',
       needReview ? el('label', {}, review, ' I checked the choices above') : '',
-      el('label', {}, dry, ' Dry run (nothing is changed)'),
       el('div', { style: 'margin-top:1rem' }, run, ' ', el('button', { className: 'btn btn-secondary', textContent: 'Close', onclick: close })),
       log));
     document.body.append(overlay);
