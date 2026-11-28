@@ -17,8 +17,12 @@ For one group, in this order. A failed step stops the run before any delete.
 
 ## Scenes that already hold several files
 
-The native Merge leaves one scene with several files. The bar above the table lists these scenes.
-Each scene keeps its best file (same rules as below) and `deleteFiles` deletes the others. A scene with a 720p and a 1080p file is skipped: no file is deleted. Delete the extra file in Stash by hand. The dry run is on by default.
+The native Merge leaves one scene with several files. A section below the native table lists these scenes, one block per scene, one row per file.
+The buttons work as in the table above: `Keep (<reason>)` on the suggested file (same rules as below), plain `Keep this` on every file of a 720p and 1080p scene. A click opens a dialog. It makes the chosen file the primary file and runs `deleteFiles` on the others.
+
+## Missing phashes
+
+Next to the native warning "Missing phashes for N scenes" a button starts Stash's phash task. It skips scenes that already have a phash. Reload the page when the task ends.
 
 ## Which file stays
 

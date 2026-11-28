@@ -5,7 +5,7 @@
   'use strict';
 
   const { pickKeeper, findConflicts } = window.DupRank;
-  const { Q, buildPlan, runPlan, buildCleanup, runCleanup } = window.DupPlan;
+  const { Q, buildPlan, runPlan, runCleanup } = window.DupPlan;
   const ROOT = '#scene-duplicate-checker';
   const cache = new Map(); // scene id -> scene
   const el = (tag, props = {}, ...kids) => {
@@ -24,6 +24,8 @@
   document.head.append(el('style', { textContent: `
     [data-dm-done] { display: none; }
     .dm-keep { white-space: normal; }
+    .dm-multi { margin-top: 2rem; }
+    .dm-scene { margin-bottom: 1.5rem; }
     .dm-badge { display: block; font-size: .8em; opacity: .85; }
     .dm-badge.dm-manual { color: #f0ad4e; }
     .dm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 2000; overflow: auto; }
@@ -63,14 +65,27 @@
 
   // ---- annotate -------------------------------------------------------------------------------
   let busy = false;
-  function ensureBar() {
-    const root = document.querySelector(ROOT);
-    if (!root || root.querySelector('.dm-bar')) return;
-    root.prepend(el('div', { className: 'dm-bar' }, el('button', { className: 'btn btn-secondary', textContent: 'Clean up scenes that hold several files', onclick: openCleanup })));
+  // Puts a button next to the native "Missing phashes" warning.
+  function ensurePhashButton() {
+    const warn = [...document.querySelectorAll(`${ROOT} p.lead`)].find((p) => /phash/i.test(p.textContent));
+    if (!warn || warn.querySelector('.dm-phash')) return;
+    const btn = el('button', { className: 'btn btn-primary btn-sm dm-phash ml-3', textContent: 'Generate phashes' });
+    btn.onclick = async () => {
+      btn.disabled = true;
+      try {
+        await gql(Q.phash);
+        btn.textContent = 'Started - see the task queue, then reload this page';
+      } catch (e) {
+        btn.textContent = `Failed: ${e.message}`;
+        btn.disabled = false;
+      }
+    };
+    warn.append(btn);
   }
 
   async function annotate() {
-    ensureBar();
+    ensureMulti();
+    ensurePhashButton();
     if (busy || !document.querySelector(ROOT)) return;
     busy = true;
     try {
@@ -150,40 +165,70 @@
     document.body.append(overlay);
   }
 
-  // ---- clean up scenes that already hold several files ------------------------------------------
-  async function openCleanup() {
-    const scenes = (await gql(Q.multi)).findScenes.scenes;
-    const items = scenes.map((s) => buildCleanup(s, pickKeeper([s])));
+  // ---- scenes that already hold several files: a section below the native table --------------------
+  const fmtDur = (s) => `${Math.floor((s || 0) / 60)}:${String(Math.round((s || 0) % 60)).padStart(2, '0')}`;
+
+  function openCleanupModal(scene, keepFileId) {
+    const keep = scene.files.find((f) => f.id === keepFileId);
     const log = el('pre', { textContent: '' });
-    const dry = el('input', { type: 'checkbox', checked: true });
-    const run = el('button', { className: 'btn btn-danger', textContent: 'Run' });
-    const todo = items.filter((i) => !i.manual);
-    run.disabled = !todo.length;
+    const run = el('button', { className: 'btn btn-danger', textContent: 'Delete the others' });
     run.onclick = async () => {
       run.disabled = true;
-      log.textContent = '';
       try {
-        await runCleanup(items, gql, (m) => (log.textContent += m + '\n'), dry.checked);
-        if (!dry.checked) scenes.forEach((s) => cache.delete(s.id));
+        await runCleanup(scene, keepFileId, gql, (m) => (log.textContent += m + '\n'));
+        cache.delete(scene.id);
+        document.querySelector(`[data-dm-scene="${scene.id}"]`)?.remove();
       } catch (e) {
         log.textContent += `ERROR: ${e.message}\n`;
+        run.disabled = false;
       }
-      run.disabled = !dry.checked; // a dry run can be followed by the real one
     };
-    const rows = items.map((i) => el('div', { className: i.manual ? 'dm-manual' : '' },
-      el('b', { textContent: `scene ${i.scene.id} ${i.scene.title || ''}` }),
-      i.manual ? ` - needs your choice, skipped: ${i.manual}` : '',
-      i.scene.files.map((f) => {
-        const label = i.manual ? 'file' : f.id === i.keepFileId ? 'keep' : 'delete';
-        return el('div', { className: label === 'delete' ? 'dm-del' : '', textContent: `${label}: ${describe({ file: f })}` });
-      })));
     const overlay = el('div', { className: 'dm-overlay' }, el('div', { className: 'dm-modal' },
-      el('h4', { textContent: `${items.length} scene(s) hold several files` }),
-      rows,
-      el('label', {}, dry, ' Dry run (nothing is changed)'),
+      el('h4', { textContent: `Scene ${scene.id}: keep one file` }),
+      el('h5', { textContent: 'Keep' }), el('div', { textContent: describe({ file: keep }) }),
+      el('h5', { textContent: 'Delete' }), scene.files.filter((f) => f.id !== keepFileId).map((f) => el('div', { className: 'dm-del', textContent: describe({ file: f }) })),
       el('div', { style: 'margin-top:1rem' }, run, ' ', el('button', { className: 'btn btn-secondary', textContent: 'Close', onclick: () => overlay.remove() })),
       log));
     document.body.append(overlay);
+  }
+
+  function sceneBlock(scene) {
+    const auto = pickKeeper([scene]);
+    const suggestedId = auto.manual ? null : auto.keeper.file.id;
+    const rows = scene.files.map((f) => {
+      const isSuggested = f.id === suggestedId;
+      return el('tr', {},
+        el('td', {}, el('div', { textContent: f.basename }), el('small', { textContent: f.path })),
+        el('td', { textContent: fmtDur(f.duration) }),
+        el('td', { textContent: `${f.width}x${f.height}` }),
+        el('td', { textContent: `${Math.round(f.frame_rate || 0)} fps` }),
+        el('td', { textContent: `${Math.round((f.bit_rate || 0) / 1000)} kb/s` }),
+        el('td', { textContent: `${(f.size / 1e6).toFixed(0)} MB` }),
+        el('td', {}, el('button', { className: `btn ${isSuggested ? 'btn-success' : 'btn-secondary'} edit-button dm-keep`, textContent: isSuggested ? `Keep (${auto.trail.join(', ') || 'suggested'})` : 'Keep this', onclick: () => openCleanupModal(scene, f.id) })));
+    });
+    const block = el('div', { className: 'dm-scene' },
+      el('h6', { textContent: `Scene ${scene.id}${scene.title ? ' - ' + scene.title : ''}` }),
+      auto.manual ? el('div', { className: 'dm-badge dm-manual', textContent: `no suggestion: ${auto.manual}` }) : '',
+      el('table', { className: 'table table-sm' }, el('tbody', {}, rows)));
+    block.dataset.dmScene = scene.id;
+    return block;
+  }
+
+  let multiBusy = false;
+  async function ensureMulti() {
+    const root = document.querySelector(ROOT);
+    if (!root || multiBusy || root.querySelector('.dm-multi')) return;
+    multiBusy = true;
+    try {
+      const scenes = (await gql(Q.multi)).findScenes.scenes;
+      if (root.querySelector('.dm-multi')) return;
+      const head = scenes.length ? [el('h5', { textContent: `Scenes that hold several files (${scenes.length})` })] : [];
+      root.append(el('div', { className: 'dm-multi' }, head, scenes.map(sceneBlock)));
+    } catch (e) {
+      console.error('duplicate-merger', e);
+    } finally {
+      multiBusy = false;
+    }
   }
 
   new MutationObserver(() => requestAnimationFrame(annotate)).observe(document.body, { childList: true, subtree: true });
