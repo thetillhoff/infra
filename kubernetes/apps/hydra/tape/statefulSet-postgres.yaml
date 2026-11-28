@@ -68,11 +68,11 @@ spec:
               mountPath: /tmp
           resources:
             requests:
-              cpu: 100m
-              memory: 192Mi
+              cpu: 25m
+              memory: 64Mi
             limits:
-              cpu: 1000m
-              memory: 512Mi
+              cpu: 500m
+              memory: 256Mi
       volumes:
         - name: run
           emptyDir: {}
