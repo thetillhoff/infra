@@ -1,7 +1,8 @@
 # Duplicate Merger
 
-Adds a "Keep this" button to each row of the native Scene Duplicate Checker (Settings, Tools).
-The button merges the metadata of a duplicate group into the kept file and deletes the other files from disk.
+Adds a "Keep" button to each row of the native Scene Duplicate Checker (Settings, Tools).
+The button of the suggested file shows the reason, for example "Keep (higher resolution)".
+A click opens a dialog that lists the file to keep and the files to delete. "Merge and delete the others" merges the metadata of the group into the kept file and deletes the other files from disk.
 The page does not reload: a resolved group is hidden.
 
 ## What a run does
@@ -14,12 +15,14 @@ For one group, in this order. A failed step stops the run before any delete.
 4. `sceneUpdate` makes the kept file the primary file.
 5. `deleteFiles` deletes the other files from disk.
 
-The "Dry run" box is on by default. It lists the calls and sends none.
-
 ## Scenes that already hold several files
 
-The native Merge leaves one scene with several files. The bar above the table lists these scenes.
-Each scene keeps its best file (same rules as below) and `deleteFiles` deletes the others. A scene with a 720p and a 1080p file is skipped: no file is deleted. Delete the extra file in Stash by hand. The dry run is on by default.
+The native Merge leaves one scene with several files. A section below the native table lists these scenes, one block per scene, one row per file.
+The buttons work as in the table above: `Keep (<reason>)` on the suggested file (same rules as below), plain `Keep this` on every file of a 720p and 1080p scene. A click opens a dialog. It makes the chosen file the primary file and runs `deleteFiles` on the others.
+
+## Missing phashes
+
+Next to the native warning "Missing phashes for N scenes" a button starts Stash's phash task. It skips scenes that already have a phash. The button shows the progress. When the task ends it becomes "Finished - reload this page", and a click reloads the page.
 
 ## Which file stays
 
@@ -27,7 +30,7 @@ Rules run in order. Each rule keeps the best files and the next rule decides bet
 
 1. The longer file (2 seconds tolerance, same as `video`).
 2. A file with audio.
-3. The higher short side. A group with both a 720p and a 1080p file needs a choice: no file is deleted until the user picks one. The suggested file is 1080p when a scene in the group has a rating of 5 stars, else 720p. A short side above 1080 also needs a choice.
+3. The higher short side. A group with both a 720p and a 1080p file needs a choice: no file is suggested, and each row has a plain "Keep this" button. A short side above 1080 also needs a choice.
 4. The higher frame rate, counted up to 30 fps (same cap as `video shrink`).
 5. The higher bitrate, counted up to the lean limit of `video` (350 kb/s at 720p, scaled by pixel count).
 6. The smaller file.
